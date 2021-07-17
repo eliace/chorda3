@@ -1,0 +1,45 @@
+
+
+.list-box {
+    .list-box-item {
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;    
+      //border-bottom: 1px solid #ddd;
+  
+      &__content {
+        padding: 0.65rem 0;
+        flex: 2;
+        white-space: nowrap;
+      }
+  
+      &__subtitle {
+        color: #888;
+        font-size: 0.8em;
+      }
+  
+      &__avatar {
+        font-size: 1.2em;
+        border-radius: 50%;
+        height: 2.5rem;
+        width: 2.5rem;
+      }
+  
+      > .image {
+        width: 2.5rem;
+      }
+  
+      > .is-before {
+        margin-right: .8rem;
+      }
+  
+      > .is-after {
+        margin-left: .8rem;
+      }
+  
+      &:hover {
+        background-color: #f6f6f6;
+      }
+    }
+  }
+  

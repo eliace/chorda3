@@ -1,0 +1,21 @@
+{
+    "compilerOptions": {
+      "outDir": "./lib/",
+      "noImplicitAny": true,
+      "noImplicitThis": true,
+//      "module": "umd",
+//      "moduleResolution": "node",
+      "module": "commonjs",
+      "target": "es5",
+      "lib": [ "es2015", "dom" ],
+      "allowJs": true,
+      "sourceMap": true,
+      "declaration": true,
+      "esModuleInterop": true
+    },
+    "exclude": [
+      "node_modules",
+      "dist",
+      "webpack.config.js"
+    ]
+  }

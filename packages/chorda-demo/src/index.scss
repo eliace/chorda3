@@ -1,0 +1,277 @@
+@import "~bulma";
+
+$fa-font-path : "~@fortawesome/fontawesome-free/webfonts";
+@import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';
+@import '~@fortawesome/fontawesome-free/scss/solid.scss';
+@import '~@fortawesome/fontawesome-free/scss/brands.scss';
+@import '~@fortawesome/fontawesome-free/scss/regular.scss';
+
+@import '~@fortawesome/fontawesome-svg-core/styles.css';
+
+
+html {
+    height: 100%;
+    overflow-y: hidden;
+}
+
+body {
+    height: 100%;
+}
+
+#root {
+    height: 100%;  
+}
+
+.app {
+    height: 100%;
+    overflow-y: auto;
+}
+
+
+
+
+main {
+    min-height: 100%;
+    background-color: #f8f8f8;
+}
+
+.app-layout {
+    > .app-menu {
+        position: fixed;
+        height: 100%;
+        width: 240px;
+        overflow: auto;
+        padding: 0.75rem;
+        margin-top: -3.25rem;
+        padding-top: 4rem;
+        border-right: 1px solid #eee;
+        background-color: #fff;
+    }
+    > .app-content {
+        width: calc(100% - 240px);
+        overflow: auto;
+        margin-left: 240px;
+    //    padding: 0.75rem;
+        padding: 0.5rem 1.25rem;
+    //    background-color: #f8f8f8;
+    }
+    // > .app-sidepan {
+    //   position: fixed;
+    //   background-color: #fff;
+    //   width: 300px;
+    //   height: calc(100% - 52px);
+    //   right: 0;
+    //   top: 52px;
+
+    //   > div {
+    //     height: 100%;
+    //   }
+    // }
+}
+
+.chorda-logo::after {
+    content: '3.0';
+    font-size: 0.7rem;
+    vertical-align: top;
+    display: inline-block;
+    margin-top: -0.2rem;
+    padding-left: 0.15rem;
+    color: rgba(255, 255, 255, .7);    
+}
+
+
+.example-header {
+    > .level-left {
+        flex-grow: 1;
+        > .level-item {
+            flex-grow: 1;
+        }
+    }
+}
+
+.example-title {
+  border-bottom: 1px solid #dbdbdb;
+  width: 100%;
+  h4 {
+    font-size: 1.33em;
+    margin-bottom: 0.5em;
+    margin-top: 0.3em;
+  }
+}
+
+
+.example-box-title {
+  text-transform: uppercase;
+  color: #ccc;
+}
+.example-box-header.card-header {
+  padding: 1rem;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+
+
+
+.code-panel {
+    font-size: 0.8em;
+    code {
+      width: 100%;
+      white-space: pre-wrap !important;
+  
+      .number {
+        font-size: inherit;
+        margin-right: 0;
+        padding: 0;
+        height: inherit;
+        min-width: inherit;
+        background: none;
+      }
+    }
+    pre.language-typescript {
+      margin-top: 0;
+      background-color: #2d2d2d;
+      outline: none;
+    }
+  }
+  
+  
+  .code-tabs {
+  
+    &.tabs {
+      margin-bottom: 0;
+      background: #333;
+  
+      li a:hover {
+        color: #999;
+        border-bottom-color: #999;      
+      }
+  
+      li.is-active a {
+        color: #ccc;
+        border-bottom-color: #79b8ec;      
+      }
+  
+    }
+  
+    ul {
+      border-bottom-color: #4d4d4d;    
+    }
+  
+    a {
+      border-bottom-color: #4d4d4d;
+      color: #777;
+    }
+  
+  }
+
+
+  .centered-narrow-box {
+    width: 600px;
+    margin: 0 auto;
+  }
+  
+
+
+.dropdown-content {
+  max-height: 150px;
+  overflow-y: auto;  
+}
+
+.dropdown-item {
+  &.is-current {
+    background-color: #eee;
+  }
+}
+
+
+
+
+
+.catapi-breed-dropdown {
+  .dropdown-content {
+      max-height: 300px;
+      overflow-y: auto;
+  }
+
+  button {
+    width: 300px;
+    span {
+      width: 100%;
+      text-align: left;
+    }
+  }
+}
+
+
+.bg-image {
+  position: relative;
+  .bg-image-content {
+      background-size: contain;
+      position: absolute;
+      height: 100%;
+      width: 100%;
+      background-repeat: no-repeat;
+      background-position: center;        
+  }
+}
+
+
+.catapi-search {
+
+  $tile-gap: .2rem;
+
+  .flex-tiles {
+      display: flex;
+      flex-wrap: wrap;
+      margin: -$tile-gap;
+  }
+  
+  .flex-tile {
+      padding: $tile-gap;
+      flex-basis: 33.333333333%;
+      position: relative;
+      .bg-image {
+          padding-bottom: 100%;
+          width: 100%;    
+          .bg-image-content {
+              background-size: cover;
+          }
+      }
+      .icon {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        color: rgba(255,255,255,.5);
+        cursor: pointer;
+        &:hover, &.is-favourited {
+          color: rgba(255,0,0,.5);
+        }  
+      }      
+  }
+  
+}
+
+.catapi-search-form {
+  .field {
+    width: 100%;
+  }
+  .dropdown {
+    display: block;
+
+    button {
+      width: 100%;
+      span {
+        width: 100%;
+        text-align: left;
+      }
+    }
+  }
+}
+
+
+.portal-host {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;  
+}

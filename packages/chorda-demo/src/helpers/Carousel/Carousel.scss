@@ -1,0 +1,131 @@
+
+$white: #fff;
+
+$carousel-control-width:             15% !default;
+
+$carousel-indicator-width:           30px !default;
+$carousel-indicator-height:          3px !default;
+$carousel-indicator-hit-area-height: 10px !default;
+$carousel-indicator-spacer:          3px !default;
+$carousel-indicator-active-bg:       $white !default;
+$carousel-indicator-transition:      opacity .6s ease !default;
+
+$carousel-transition-duration:       .6s !default;
+$carousel-transition:                transform $carousel-transition-duration ease-in-out !default; // Define transform transition first if using multiple transitions (e.g., `transform 2s ease, opacity .5s ease-out`)
+
+$enable-caret:                                true !default;
+$enable-rounded:                              true !default;
+$enable-shadows:                              false !default;
+$enable-gradients:                            false !default;
+$enable-transitions:                          true !default;
+$enable-prefers-reduced-motion-media-query:   true !default;
+$enable-grid-classes:                         true !default;
+$enable-pointer-cursor-for-buttons:           true !default;
+$enable-responsive-font-sizes:                false !default;
+$enable-validation-icons:                     true !default;
+$enable-deprecation-messages:                 true !default;
+
+// stylelint-disable property-blacklist
+@mixin transition($transition...) {
+    @if $enable-transitions {
+      @if length($transition) == 0 {
+        transition: $transition-base;
+      } @else {
+        transition: $transition;
+      }
+    }
+  
+    @if $enable-prefers-reduced-motion-media-query {
+      @media (prefers-reduced-motion: reduce) {
+        transition: none;
+      }
+    }
+}
+
+
+.carousel {
+  position: relative;
+
+  &:hover {
+      .carousel__title {
+          opacity: 1;
+      }
+  }
+}
+
+.carousel__slide {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  > div {
+    background-size: contain;
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background-repeat: no-repeat;
+    background-position: center;   
+    opacity: 1;
+    transition: opacity .7s ease-in-out;
+    
+    &.hidden {
+      opacity: 0;
+//      display: none;
+    }
+  }
+}
+
+
+.carousel__indicators {
+  position: absolute;
+  right: 0;
+  bottom: 1rem;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  padding-left: 0; // override <ol> default
+  // Use the .carousel-control's width as margin so we don't overlay those
+  margin-right: $carousel-control-width;
+  margin-left: $carousel-control-width;
+  list-style: none;
+
+  li {
+    box-sizing: content-box;
+    flex: 0 1 auto;
+    width: $carousel-indicator-width;
+    height: $carousel-indicator-height;
+    margin-right: $carousel-indicator-spacer;
+    margin-left: $carousel-indicator-spacer;
+    text-indent: -999px;
+    cursor: pointer;
+    background-color: $carousel-indicator-active-bg;
+    background-clip: padding-box;
+    // Use transparent borders to increase the hit area by 10px on top and bottom.
+    border-top: $carousel-indicator-hit-area-height solid transparent;
+    border-bottom: $carousel-indicator-hit-area-height solid transparent;
+    opacity: .5;
+    @include transition($carousel-indicator-transition);
+  }
+
+  .active {
+    opacity: 1;
+  }
+}
+
+
+.carousel__title {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    color: #fff;
+    padding: 0.2rem 0.8rem;
+    background-color: rgba(255, 255, 255, 0.12);
+    opacity: 0;
+    transition: opacity .3s ease-in-out;
+}
+
+.carousel-dark {
+    .carousel__slides {
+        background-color: #000;
+    }
+  }

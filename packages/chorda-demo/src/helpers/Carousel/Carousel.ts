@@ -1,0 +1,152 @@
+import { computable, HtmlBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core"
+import { DomEvents } from "@chorda/react"
+import { Coerced } from "../../utils"
+
+import './Carousel.scss'
+
+
+type CarouselScope = {
+    images: string[]
+//    slide: CarouselSlide
+    current: number
+    slides: CarouselSlide[]
+    __it: CarouselSlide[]
+}
+
+type CarouselSlide = {
+    id: number
+    hidden: boolean
+    url: string
+}
+
+type CarouselSlideScope = {
+    slide: CarouselSlide
+}
+
+type CarouselProps<T> = {
+    css?: string
+    height?: number|string
+    images$?: Injector<T>
+    image?: HtmlBlueprint<T>
+    title?: HtmlBlueprint<T>
+    current?: number
+}
+
+
+export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : HtmlBlueprint<T> => {
+    return mix<CarouselScope, DomEvents>({
+        css: 'carousel',
+        templates: {
+            slides: {
+                css: 'carousel__slides',
+                styles: {
+                    height: 400
+                },
+                defaultItem: {
+                    css: 'carousel__slide',
+                    templates: {
+                        content: Coerced<CarouselSlideScope, CarouselScope>({
+                            reactors: {
+                                slide: (v) => {patch({
+                                    styles: {
+                                        backgroundImage: `url(${v.url})`
+                                    },
+                                    classes: {
+                                        'hidden': v.hidden//.valueOf()
+                                    },
+                                    dom: {
+                                        key: v.url//.valueOf()
+                                    }
+                                })}                                
+                            }
+                        }),
+                    }
+                },
+                reactors: {
+                    __it: (v) => patch({items: v})
+                }
+            },
+            indicators: {
+                tag: 'ul',
+                css: 'carousel__indicators',
+                defaultItem: Coerced<CarouselSlideScope, CarouselScope>({
+                    tag: 'li',
+                    reactors: {
+                        slide: (v) => patch({
+                            classes: {
+                                'active': !v.hidden//.valueOf()
+                            }
+                        })
+                    },
+                    events: {
+                        click: (e, {current, slide}) => {
+                            current.$value = slide.id
+                            e.stopPropagation()
+                        }
+                    }
+                }),
+                reactors: {
+                    __it: (v) => patch({items: v})
+                }
+            },
+            title: {
+                css: 'carousel__title'
+            }
+        }
+    }, props && {
+        css: props.css,
+        templates: {
+            slides: {
+                defaultItem: props.image
+            },
+            title: props.title
+        },
+        initials: {
+            images: () => observable([]),
+            current: () => observable(props.current || 0),
+//            slides: () => observable([]),
+        },
+        injectors: {
+            images: props.images$,
+            slides: ({images, current}) => computable(() => {
+                return images.map((img, i) => {
+                    return {id: i, url: img, hidden: i != current}
+                })
+            }),
+            __it: (scope) => iterable(scope.slides, 'slide')
+        },
+        joints: {
+            current: {
+                init: (current, {slides, images}) => {
+
+                    images.$subscribe((next) => {
+                        if (next.length) {
+                            current.$value = Math.min(current, next.length-1)
+                        }
+                    })
+
+//                     current.$subscribe((next) => {
+// //                        console.log('images', images)
+//                         slides.$value = images.map((img, i) => {
+//                             return {id: i, url: img, hidden: i != next}
+//                         })
+// //                        console.log('slides', slides.$value)
+                    // })
+
+                }
+            }
+        },
+        events: {
+            click: (e, {current, slides}) => {
+                console.log('slides', slides)
+                if (current.$value >= slides.length - 1) {
+                    current.$value = 0
+                }
+                else {
+                    current.$value = current + 1
+                    console.log('current', current.$value)
+                }
+            }
+        }
+    })
+}
