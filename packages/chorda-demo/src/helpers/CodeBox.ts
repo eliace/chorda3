@@ -8,15 +8,13 @@ import 'prismjs/components/prism-typescript'
 const withHighlight = () : HtmlBlueprint<HtmlScope> => {
     return {
         joints: {
-            $dom: {
-                highlight: (dom, scope) => {
-                    dom.$subscribe((el) => {
-                        el && Prism.highlightAllUnder(el)
-                        // el && scope.$renderer.addTask(() => {
-                        //     Prism.highlightAllUnder(el)
-                        // })
-                    })
-                }
+            highlight: ({$dom}) => {
+                $dom.$subscribe((el) => {
+                    el && Prism.highlightAllUnder(el)
+                    // el && scope.$renderer.addTask(() => {
+                    //     Prism.highlightAllUnder(el)
+                    // })
+                })
             }
         }
     }

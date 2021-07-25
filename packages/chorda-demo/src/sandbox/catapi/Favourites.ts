@@ -52,17 +52,15 @@ export const Favourites = () : HtmlBlueprint<FavouritesScope> => {
             })
         },
         joints: {
-            images: {
-                autoLoad: (images, {filters}) => {
+            autoLoad: ({images, filters}) => {
 
-                    const search = createValueEffect(images, 'loadFavourites', api.searchFavourites)
+                const search = createValueEffect(images, 'loadFavourites', api.searchFavourites)
 
-                    filters.$subscribe(next => {
+                filters.$subscribe(next => {
 //                        debugger
-                        search(next)
-                    })
+                    search(next)
+                })
 
-                }
             }
         },
         styles: {

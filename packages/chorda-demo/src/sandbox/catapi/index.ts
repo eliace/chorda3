@@ -54,7 +54,7 @@ export const CatApi = () : HtmlBlueprint<CatApiScope> => {
             })
         ],
         injectors: {
-            selected: () => observable('breeds')
+            selected: () => observable('vote')
         }
     })
 }

@@ -29,7 +29,7 @@ type FilterScope<I, V=I> = {
 }
 
 type FilterEvents<I> = {
-    itemsFilter: string
+    itemsFilter?: () => string
 } & DropdownEvents<I>
 
 type InputScope<V> = {
@@ -43,10 +43,6 @@ type Stats = {
 }
 
 const stats: Stats = observable({filter: null, value: null, selected: null})
-
-
-
-
 
 
 
@@ -85,8 +81,14 @@ export default () : HtmlBlueprint => {
                                     value.$value = (e.target as any).value
                                     value.$emit('itemsFilter')
                                 },
-                                focus: (e, {active}) => {
-                                    active.$value = true
+                                focus: (e, {value}) => {
+//                                    active.$value = true
+                                    value.$emit('itemsFilter')
+                                },
+                                keyDown: (e, {filter, selected}) => {
+                                    if (e.code == 'Escape') {
+                                        filter.$value = filterFunc(selected)
+                                    }
                                 }
                             },
                             injectors: {
@@ -96,33 +98,28 @@ export default () : HtmlBlueprint => {
                                 value: (v) => patch({dom: {defaultValue: v || ''}})
                             },
                             joints: {
-                                value: {
-                                    domValue: (value, {$dom}) => {
-                                        value.$subscribe(next => {
-                                            if ($dom.$value) {
-                                                const htmlValue = ($dom.$value as HTMLInputElement).value
-                                                if (htmlValue != next) {
-                                                    ($dom.$value as HTMLInputElement).value = next
-                                                }
+                                domValue: ({value, $dom}) => {
+                                    value.$subscribe(next => {
+                                        if ($dom.$value) {
+                                            const htmlValue = ($dom.$value as HTMLInputElement).value
+                                            if (htmlValue != next) {
+                                                ($dom.$value as HTMLInputElement).value = next
                                             }
-                                        })
-                                    }
+                                        }
+                                    })
                                 },
-                                $dom: {
-                                    initEl: (dom, {value}) => {
-                                        dom.$subscribe((el) => {
+                                initEl: ({$dom, value}) => {
+                                    $dom.$subscribe((el) => {
 //                                            el && ((el as HTMLInputElement).value = value)
-                                        })
-                                    }
+                                    })
                                 }
                             }
                         }
                     }))
                 }),
                 events: {
-                    itemsFilter: (evt, {active}) => {
-                        active.$value = true
-                        
+                    itemsFilter: (evt, {active, filteredItems}) => {
+                        active.$value = filteredItems.length > 1
                     },
                     itemSelect: (itm, {active, value, filter}) => {
                         active.$value = false
@@ -131,60 +128,27 @@ export default () : HtmlBlueprint => {
                     }
                 },
                 joints: {
-                    filter: {
-                        init: (filter) => {
-                            filter.$event('itemsFilter')
-                        },
-                        // openDropdown: (filter, {active}) => {
-                        //     filter.$subscribe(next => {
-                        //         active.$value = true
-                        //     })
-                        // },
-                        updateStats: (filter) => {
-                            filter.$subscribe(next => {
-//                                console.log('Update stats: filter', next)
-                                stats.filter = next
-                            })
-                        }
+                    initFilter: ({filter}) => {
+                        filter.$event('itemsFilter')
                     },
-                    value: {
-                        initFilter: (value, {filter, items}) => {
+                    initValueFilter: ({value, filter, items}) => {
 
-                            items.forEach(itm => {
-                                if (valueFunc(itm as any) == value) {
-                                    filter.$value = filterFunc(itm)
-                                }
-                            })
-                        },
-                                // updateFilter: (value, {filter, items}) => {
-                        //     value.$subscribe((next) => {
-                        //         console.log('update filter from value', next)
-                        //         if (next == null) {
-    
-                        //         }
-                        //         else {
-                        //             items.forEach(itm => {
-                        //                 if (valueFunc(itm) == next) {
-                        //                     filter.$value = filterFunc(itm)
-                        //                 }
-                        //             })
-                        //         }
-                        //     })
-                        // },
-                        updateStats: (value) => {
-                            value.$subscribe(next => {
-//                                console.log('Update stats: value', next)
-                                stats.value = next
-                            })
-                        }
+                        items.forEach(itm => {
+                            if (valueFunc(itm as any) == value) {
+                                filter.$value = filterFunc(itm)
+                            }
+                        })
                     },
-                    selected: {
-                        updateStats: (selected) => {
-                            selected.$subscribe(next => {
-//                                console.log('Update stats: selected', next)
-                                stats.selected = next
-                            })
-                        }
+                    updateStats: ({filter, value, selected}) => {
+                        filter.$subscribe(next => {
+                            stats.filter = next
+                        })
+                        value.$subscribe(next => {
+                            stats.value = next
+                        })
+                        selected.$subscribe(next => {
+                            stats.selected = next
+                        })                            
                     }
                 }
             }),

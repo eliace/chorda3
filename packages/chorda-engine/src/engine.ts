@@ -13,6 +13,7 @@ export class SimpleEngine implements Engine<Stateable> {
     links: Engine<Stateable>[]
     isScheduled: boolean
     tasks: Task[]
+    pipeTasks: Task[]
     subscriptions: Function[]
 
     constructor () {
@@ -20,6 +21,12 @@ export class SimpleEngine implements Engine<Stateable> {
         this.tasks = []
         this.isScheduled = false
         this.subscriptions = []
+        this.pipeTasks = []
+    }
+
+    pipeTask (fn: Function, arg?: any, target?: Stateable) {
+        this.pipeTasks.push({fn, arg, target})
+        !this.isScheduled && this.schedule()
     }
 
     chain (link: Engine<any>) {
@@ -62,7 +69,12 @@ export class SimpleEngine implements Engine<Stateable> {
                 // если новых задач нет, переходим к следующему движку по цепочке
                 if (this.tasks.length == 0) {
                     this.subscriptions.forEach(f => f())
-                    this.links.forEach(link => link.schedule())
+                    this.links.forEach(link => {
+                        const pipeTasks = this.pipeTasks
+                        this.pipeTasks = []
+                        pipeTasks.forEach(task => link.scheduleTask(task.fn, task.arg, task.target))
+                        link.schedule()
+                    })
                 }
                 else if (!this.isScheduled) {
                     console.error('Not scheduled tasks found')

@@ -207,7 +207,7 @@ describe ('Hub', () => {
 
             const result: any[] = []
 
-            const v: EventBus = observable(null);
+            const v: EventBus<any> = observable(null);
 
             v.$event('test')
 
@@ -216,8 +216,10 @@ describe ('Hub', () => {
                     data: () => v
                 },
                 events: {
-                    test: () => {
-                        result.push('ok')
+                    data: {
+                        test: () => {
+                            result.push('ok')
+                        }    
                     }
                 }
             })
@@ -244,12 +246,10 @@ describe ('Hub', () => {
                     name: () => observable('Alice')
                 },
                 joints: {
-                    name: {
-                        init: (name) => {
-                            name.$subscribe(v => {
-                                result.push(v)
-                            })
-                        }
+                    init: ({name}) => {
+                        name.$subscribe(v => {
+                            result.push(v)
+                        })
                     }
                 }
             })
@@ -269,10 +269,8 @@ describe ('Hub', () => {
                     name: () => observable('Alice')
                 },
                 joints: {
-                    name: {
-                        init: (name) => () => {
-                            result.push('ok')
-                        }
+                    init: ({name}) => () => {
+                        result.push('ok')
                     }
                 }
             })
@@ -290,14 +288,12 @@ describe ('Hub', () => {
                     name: () => observable('Alice')
                 },
                 joints: {
-                    name: {
-                        init: (name) => () => {
-                            return new Promise(resolve => {
-                                setTimeout(() => {
-                                    resolve(null)
-                                })
+                    init: (name) => () => {
+                        return new Promise(resolve => {
+                            setTimeout(() => {
+                                resolve(null)
                             })
-                        }
+                        })
                     }
                 }
             })

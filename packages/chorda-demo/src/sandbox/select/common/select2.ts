@@ -1,4 +1,4 @@
-import { HtmlBlueprint, HtmlEvents, Injector, iterable, Listener, mix, patch } from "@chorda/core"
+import { HtmlBlueprint, Injector, iterable, Listener, mix, patch } from "@chorda/core"
 import { DomEvents } from "@chorda/react"
 import { OptionProps, Select, SelectProps, Option } from "./select"
 

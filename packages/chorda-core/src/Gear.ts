@@ -5,7 +5,7 @@ import { isIterable, isValueIterator, IterableValue, Value, ValueIterator } from
 import { ItemOp, KVItem, reconcile } from './reconcile'
 
 
-export const defaultGearFactory = <D, E>(opts: GearOptions<D, E>, context: GearScope&D, scope?: any, rules? : MixRules) : Gear<D, E> => {
+export const defaultGearFactory = <D, E>(opts: GearOptions<D, E>, context: GearScope&D, scope?: any, rules? : MixRules) : Gear<D> => {
     return new Gear(opts, context, scope)
 }
 
@@ -51,7 +51,7 @@ type KeyedAndIndexed = {
 
 
 
-export interface GearOptions<D=unknown, E=unknown, B extends Blueprint<D, E>=Blueprint<D, E>> extends HubOptions<D, E> {
+export interface GearOptions<D, E, B extends Blueprint<D, E>=Blueprint<D, E>> extends HubOptions<D, E> {
     
     weight?: number
     name?: string
@@ -74,14 +74,18 @@ export interface GearOptions<D=unknown, E=unknown, B extends Blueprint<D, E>=Blu
 
 export type GearScope = HubScope & {
     $defaultFactory: Function
+    // afterSyncIndexed?: () => Indexed<Gear>
+    // afterSyncKeyed?: () => Keyed<Gear>
+    // afterAddKeyed?: () => Gear
+    // beforeRemoveKeyed?: () => string
 }
 
-export type GearEvents = {
-    afterSyncIndexed?: Indexed<Gear>
-    afterSyncKeyed?: Keyed<Gear>
-    afterAddKeyed?: Gear
-    beforeRemoveKeyed?: string
-} & HubEvents
+export type GearEvents = HubEvents & {
+    afterSyncIndexed?: () => Indexed<Gear>
+    afterSyncKeyed?: () => Keyed<Gear>
+    afterAddKeyed?: () => Gear
+    beforeRemoveKeyed?: () => string
+}
 
 
 export const isGear = (obj: any) : obj is Gear => {
@@ -90,14 +94,14 @@ export const isGear = (obj: any) : obj is Gear => {
 
 
 
-export class Gear<D=unknown, E=unknown, M extends GearEvents=GearEvents, S extends GearScope=GearScope, O extends GearOptions<D, E>=GearOptions<D, E>, B extends Blueprint<D, E>=Blueprint<D, E>> extends Hub<D, E, M, S, O> {
+export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends GearOptions<D, E>=GearOptions<D, E>, B extends Blueprint<D, E>=Blueprint<D, E>> extends Hub<D, E, S, O> {
 
 //    containers: {[k: string]: ComponentCollection<B>|ItemCollection<B>}
     index: number
     key: string
     parent: this
-    components: {[k: string]: Gear<D, E>}
-    items: Gear<D, E>[]
+    components: {[k: string]: Gear<D>}
+    items: Gear<D>[]
     uid: string | number | symbol
 
     constructor (options: O, context?: S, scope?: any) {
@@ -179,7 +183,7 @@ export class Gear<D=unknown, E=unknown, M extends GearEvents=GearEvents, S exten
     // Keyed
     //-----------------------
 
-    addKeyed (key: string, blueprint: B|Mixed<B>|Gear<D, E>, scope?: D&GearScope) : Gear<D, E> {
+    addKeyed (key: string, blueprint: B|Mixed<B>|Gear<D>, scope?: D&GearScope) : Gear<D> {
 
         if (this.components[key]) {
             console.error('Component already exists', key)
@@ -356,7 +360,7 @@ export class Gear<D=unknown, E=unknown, M extends GearEvents=GearEvents, S exten
     //-----------------------
 
 
-    addIndexed (blueprint: B|Mixed<B>|Gear<D, E>, idx?: number, scope?: unknown) : Gear<D, E> {
+    addIndexed (blueprint: B|Mixed<B>|Gear<D>, idx?: number, scope?: unknown) : Gear<D> {
         
         if (blueprint == null) {
             return
@@ -451,11 +455,11 @@ export class Gear<D=unknown, E=unknown, M extends GearEvents=GearEvents, S exten
 
 //            console.log('merged items', this.key, mergedItems)
 
-            const children: Gear<D, E>[] = []
+            const children: Gear<D>[] = []
 
             let i = 0
             mergedItems.forEach((itm) => {
-                let item: Gear<D, E> = null
+                let item: Gear<D> = null
                 if (itm.op == ItemOp.ADD) {
                     const v = itm.value
                     item = this.addIndexed({} as B, i, {[key]: v})
@@ -463,7 +467,7 @@ export class Gear<D=unknown, E=unknown, M extends GearEvents=GearEvents, S exten
 //                        console.log('add', i, itm.key)//v.$uid)
                 }
                 else if (itm.op == ItemOp.DELETE) {
-                    item = itm.value as Gear<D, E>
+                    item = itm.value as Gear<D>
                     item.parent = null
                     item.destroy()
                     item.parent = this
@@ -474,7 +478,7 @@ export class Gear<D=unknown, E=unknown, M extends GearEvents=GearEvents, S exten
 //                        console.log('del', i, itm.key)
                 }
                 else {
-                    item = itm.value as Gear<D, E>
+                    item = itm.value as Gear<D>
                     item.index = i
 //                        console.log('upd', i, itm.key, itm.value)
                 }

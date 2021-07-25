@@ -21,17 +21,17 @@ export class Mixin<T=unknown> implements Mixed<T> {
     }
 
 
-    mix(nextOpts: any) : Mixed<T> {
+    mix <X extends any|Mixin>(nextOpts: X) : Mixed<T&X> {
         if (nextOpts != null) {
             if (typeof (nextOpts as Mixin).mixins === 'function') {
 //                console.log(nextOpts.mixins())
-                this._raw = this._raw.concat(nextOpts.mixins())//(nextOpts as any)._raw)
+                this._raw = this._raw.concat((nextOpts as any).mixins())//(nextOpts as any)._raw)
             }
             else {
-                this._raw.push(nextOpts)
+                this._raw.push(nextOpts as any)
             }
         }
-        return this
+        return this as any
     }
 
     mergeBefore(prevOpts: any) : Mixed<T> {

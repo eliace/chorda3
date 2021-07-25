@@ -1,6 +1,6 @@
 import { computable, DomNode, HtmlBlueprint, HtmlScope, Injector, iterable, Joint, Listener, mix, observable, patch, Value } from "@chorda/core";
 import { DomEvents } from "@chorda/react";
-import { faAngleDown, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDown, faAngleUp, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "chorda-bulma";
 import { SvgIcon } from "./SvgIcon";
 import { onOuterClick, OuterClickEvent, stopMouseDown, autoFocus } from './events'
@@ -20,48 +20,52 @@ export type DropdownScope<T, V=T> = {
     loading: boolean
     __it: T[]
     bounds: DOMRect
-    parentScrollTop: number
+    menuBounds: DOMRect
+    up: boolean
+//    parentScrollTop: number
 //    icon: string
-} & HtmlScope
+} //& HtmlScope
 
-export type DropdownProps<T, I, V=I> = {
+export type DropdownProps<T, I, V=I, E=unknown> = {
     items$?: Injector<T>
     active$?: Injector<T>
     active?: boolean
-    defaultItem?: HtmlBlueprint<T>
+    defaultItem?: HtmlBlueprint<T, E>
     text$?: Injector<T>
     value$?: Injector<T>
     itemToValue?: (item: I&Value<I>) => V
     itemToKey?: (item: I&Value<I>) => string|symbol|number
     valueToKey?: (item: V&Value<V>) => string|symbol|number
-    trigger?: HtmlBlueprint<T>
+    trigger?: HtmlBlueprint<T, E>
     autoFocus?: boolean
-    as?: HtmlBlueprint<T>
+    as?: HtmlBlueprint<T, E>
     loading$?: Injector<T>
+    maxHeight?: number
 //    watchers?: {[K in keyof T]: Joint<T[K]>}
 }
 
 export type DropdownEvents<I> = {
-    itemSelect: I
+    itemSelect?: () => I
+    cancelSelect?: () => void
 } & OuterClickEvent & DomEvents
 
 
 
-export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope<I, V>, I, V>) : HtmlBlueprint<T> => {
+export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope<I, V>&HtmlScope, I, V, DropdownEvents<I>>) : HtmlBlueprint<T> => {
     
     const itemToValue = props.itemToValue || ((v: I&Value<I>): V => (v as any).id)
     const itemToKey = props.itemToKey || ((v: I&Value<I>): string|symbol|number => (v as any).id)
     const valueToKey = props.valueToKey || ((v: V&Value<V>): string|symbol|number => (v as any))
     
-    return mix<DropdownScope<I, V>, DropdownEvents<I>>({
+    return mix<DropdownScope<I, V>&HtmlScope, DropdownEvents<I>>({
         css: 'dropdown',
         templates: {
             trigger: DropdownTrigger({
                 content: Button({
                     rightIcon: FaIcon({
-                        icon$: ({loading}) => computable(() => {
+                        icon$: ({loading, up}) => computable(() => {
 //                            console.log('icon', loading.$value, faCircleNotch.iconName, faAngleDown.iconName)
-                            return loading.$value ? [faCircleNotch, 'spin'] : faAngleDown
+                            return loading.$value ? [faCircleNotch, 'spin'] : (up.$value ? faAngleUp : faAngleDown)
                         })
                     }),
                     text$: (scope) => scope.text,
@@ -76,23 +80,20 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
                         //     }
                         // },
                         joints: {
-                            active: {
-                                autoFocus: (active, {$dom}) => {
-                                    active.$subscribe(next => {
-                                        if (next && $dom.$value) {
-                                            $dom.$value.focus()
-                                        }
-                                    })
-                                }
+                            autoFocus: ({$dom, active}) => {
+                                active.$subscribe(next => {
+                                    if (next && $dom.$value) {
+                                        $dom.$value.focus()
+                                    }
+                                })
                             },
-                            $dom: {
-                                initEl: (dom, {active}) => {
-                                    dom.$subscribe(el => {
-                                        if (el && active.$value) {
-                                            el.focus()
-                                        }
-                                    })
-                                }
+                            initEl: ({$dom, active}) => {
+                                $dom.$subscribe(el => {
+                                    if (el && active.$value) {
+                                        el.focus()
+                                    }
+                                })
+                            }
                                 // autoFocus: (dom, {$renderer}) => {
                                 //     if (props.autoFocus) {
                                 //         dom.$subscribe(el => {
@@ -106,7 +107,6 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
                                 //         })    
                                 //     }
                                 // }
-                            }
                         }
                     }
                 })
@@ -165,61 +165,63 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
 //                                     })
 //                                 }
                             // },
-                            $dom: {
-                                initEl: (dom, {activeOffset}) => {
+                            initEl: ({$dom, activeOffset}) => {
 //                                    console.log('init el')
-                                    dom.$subscribe(el => {
+                                $dom.$subscribe(el => {
 //                                        console.log('content el')
-                                        if (el) {
-                                            console.log('scroll to', activeOffset.$value)
-                                            el.scrollTo(0, activeOffset.$value - 18)
-                                        }
-                                    })
-                                }
+                                    if (el) {
+                                        console.log('scroll to', activeOffset.$value)
+                                        el.scrollTo(0, activeOffset.$value - 18)
+                                    }
+                                })
                             },
-                            active: {
-                                scrollTo: (active, {activeOffset, $dom}) => {
-                                    active.$subscribe(next => {
-                                        if (next && $dom.$value /*activeOffset.$value*/) {
-                                            console.log('opened')
+                            scrollTo: ({active, activeOffset, $dom}) => {
+                                active.$subscribe(next => {
+                                    if (next && $dom.$value /*activeOffset.$value*/) {
+                                        console.log('opened')
 //                                            $dom.$value.scrollTo(0, activeOffset.$value - 18)
-                                        }
-                                        else if (!next) {
-                                            activeOffset.$value = null
-                                        }
-                                    })
-                                }
+                                    }
+                                    else if (!next) {
+                                        activeOffset.$value = null
+                                    }
+                                })
                             },
-                            currentOffset: {
-                                autoScroll: (offset, {$dom, currentHeight}) => {
-                                    offset.$subscribe(next => {
-                                        const el = $dom.$value
+                            autoScroll: ({currentOffset, $dom, currentHeight}) => {
+                                currentOffset.$subscribe(next => {
+                                    const el = $dom.$value
 //                                        console.log('current changed', next)
-                                        if (el) {
-                                            const bcr = el.getBoundingClientRect()
-                                            const containerMaxOffset = el.scrollTop + bcr.height
-                                            const itemMaxOffset = next + currentHeight
-                                            const containerMinOffset = el.scrollTop
-                                            const itemMinOffset = next
-                                            if (itemMaxOffset > containerMaxOffset) {
-                                                el.scrollTop = next - bcr.height + currentHeight
-                                            }
-                                            else if (itemMinOffset < containerMinOffset) {
-                                                el.scrollTop = next
-                                            }
+                                    if (el) {
+                                        const bcr = el.getBoundingClientRect()
+                                        const containerMaxOffset = el.scrollTop + bcr.height
+                                        const itemMaxOffset = next + currentHeight
+                                        const containerMinOffset = el.scrollTop
+                                        const itemMinOffset = next
+                                        if (itemMaxOffset > containerMaxOffset) {
+                                            el.scrollTop = next - bcr.height + currentHeight
+                                        }
+                                        else if (itemMinOffset < containerMinOffset) {
+                                            el.scrollTop = next
+                                        }
 //                                            if ()
 //                                            console.log('check bounaries', containerMaxOffset, itemMaxOffset, containerMinOffset, itemMinOffset)
-                                        }
-                                    })
-                                }
+                                    }
+                                })
                             }
                         }
                     }
                 },
                 joints: {
-                    $dom: { onOuterClick, stopMouseDown }
+                    onOuterClick, 
+                    stopMouseDown,
+                    detectBounds: ({$dom, menuBounds}) => {
+                        $dom.$subscribe(el => {
+                            if (el) {
+                                menuBounds.$value = el.getBoundingClientRect()
+                            }
+                        })
+                    },
                 },
-                events: {
+                events: {                  
                     outerClick: (e, {active}) => {
                         active.$value = false
                     }
@@ -229,6 +231,9 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
         reactors: {
             active: (v) => {
                 patch({classes: {'is-active': v}})
+            },
+            up: (v) => {
+                patch({classes: {'is-up': v}})
             }
         },
     },
@@ -245,8 +250,8 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
             currentHeight: () => observable(null),
             loading: () => observable(false),
             bounds: () => observable(null),
-            parentScrollTop: () => observable(0),
-
+            menuBounds: () => observable(null),
+            up: () => observable(false),
 //            icon: () => observable(faAngleDown.iconName),
 //            text: () => observable(''),
         },
@@ -259,107 +264,72 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
 //            selected: (scope) => scope.value,
         },
         joints: {
-            $dom: { 
-                stopMouseDown,
-                updateBounds: (dom, {bounds, parentScrollTop}) => {
+            stopMouseDown,
+            updateBounds: ({$dom, bounds}) => {
 
-                    let scrollListeners: {listener: (e: Event) => void, target: Element, scroll: number}[] = []
+//                let scrollListeners: {listener: (e: Event) => void, target: Element, scroll: number}[] = []
 
-                    dom.$subscribe(el => {
-                        if (el) {
-                            bounds.$value = el.getBoundingClientRect()
+                $dom.$subscribe(el => {
+                    if (el) {
+                        bounds.$value = el.getBoundingClientRect()
 
-                            let parentEl = el.parentElement
-                            while (parentEl != null) {
-                                const listener = (e: Event) => {
-                                    let scroll = 0
-                                    scrollListeners.forEach(l => {
-                                        if (l.target == e.target) {
-                                            l.scroll = (e.target as Element).scrollTop
-                                        }
-                                        scroll += l.scroll
-                                    })
-                                    parentScrollTop.$value = scroll
-//                                    console.log('scroll', (e.target as Element).scrollTop)
-                                }
-                                parentEl.addEventListener('scroll', listener)
-                                scrollListeners.push({listener, target: parentEl, scroll: 0})
-                                parentEl = parentEl.parentElement
-                            }
+//                         let parentEl = el.parentElement
+//                         while (parentEl != null) {
+//                             const listener = (e: Event) => {
+//                                 let scroll = 0
+//                                 scrollListeners.forEach(l => {
+//                                     if (l.target == e.target) {
+//                                         l.scroll = (e.target as Element).scrollTop
+//                                     }
+//                                     scroll += l.scroll
+//                                 })
+//                                 parentScrollTop.$value = scroll
+// //                                    console.log('scroll', (e.target as Element).scrollTop)
+//                             }
+//                             parentEl.addEventListener('scroll', listener)
+//                             scrollListeners.push({listener, target: parentEl, scroll: 0})
+//                             parentEl = parentEl.parentElement
+//                         }
 //                            console.log('dropdown bounds', bounds.$value)
-                        }
-                        else {
-                            scrollListeners.forEach(l => {
-                                l.target.removeEventListener('scroll', l.listener)
-                            })
-                            scrollListeners = []
-                        }
-                    })
-                }
+                    }
+                    // else {
+                    //     scrollListeners.forEach(l => {
+                    //         l.target.removeEventListener('scroll', l.listener)
+                    //     })
+                    //     scrollListeners = []
+                    // }
+                })
             },
-            selected: {
-                init: (selected) => {
-                    selected.$event('itemSelect')
-                }
-                // init: (selected, {value, items}) => {
-                //     selected.$subscribe(next => {
-                //         console.log('update value from selected', next)
-                //         if (next == null) {
-                //             //value.$value = null
-                //         }
-                //         else {
-                //             value.$value = keyFunc(next as any)
-                //         }
-                //     })
-                // }
-            },
-            value: {
-                init: (value, {selected, items}) => {
+            init: ({selected, value, items}) => {
+                selected.$event('itemSelect')
+                selected.$event('cancelSelect')
 
-                    value.$subscribe((next) => {
-                        console.log('dropdown value', next)
-                        items.forEach(itm => {
-                            if (itemToKey(itm as any) == valueToKey(next as any)) {
-                                 selected.$value = itm
-                            }
-                        })        
-                    })
-
-                    // value.$subscribe(next => {
-                    //     console.log('update selected from value', next, value)
-                    //     if (next == null) {
-                    //         selected.$value = null// items.length > 0 ? items[0] : null
-                    //     }
-                    //     else {
-                    //         items.forEach(itm => {
-                    //             if (keyFunc(itm as any) == next) {
-                    //                 selected.$value = itm
-                    //             }
-                    //         })    
-                    //     }
-                    // })
-                }
-            },
-            active: {
-                initCurrent: (active, {current, selected}) => {
-                    active.$subscribe(next => {
-                        if (next) {
-                            current.$value = selected
+                value.$subscribe((next) => {
+                    console.log('dropdown value', next)
+                    items.forEach(itm => {
+                        if (itemToKey(itm as any) == valueToKey(next as any)) {
+                             selected.$value = itm
                         }
-                    })
-                },
-                // navigation: (active, {$dom}) => {
-                //     active.$subscribe(next => {
+                    })        
+                })
 
-                //     })
-                // }
+            },
+            initCurrent: ({active, current, selected}) => {
+                active.$subscribe(next => {
+                    if (next) {
+                        current.$value = selected
+                    }
+                })
             }
         },
-        events: {
+        events: {      
             itemSelect: (item, {active, value, current}) => {
                 active.$value = false
                 value.$value = itemToValue(item as any)
 //                current.$value = item
+            },
+            cancelSelect: (e, {active}) => {
+                active.$value = false
             },
             keyDown: (e, {current, items, active, selected}) => {
 //                console.log(e.code)
@@ -384,6 +354,9 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
                         selected.$value = current
                         selected.$emit('itemSelect', current)
                     }
+                    else if (e.code == 'Escape') {
+                        selected.$emit('cancelSelect')
+                    }
                     else {
                         return
                     }
@@ -391,12 +364,16 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
                     return false    
                 }
             }
+            
         },
         templates: {
             trigger: props.trigger,
             menu: {
                 templates: {
                     content: {
+                        styles: {
+                            maxHeight: props.maxHeight
+                        },
                         defaultItem: props.defaultItem
                     }
                 }
@@ -438,7 +415,7 @@ type DropdownItemProps<T> = {
     as?: HtmlBlueprint<T>
     item$?: Injector<T>
     text$?: Injector<T>
-    onClick?: Listener<T, MouseEvent>
+    onClick?: Listener<T, ReturnType<DomEvents['click']>>
     active$?: Injector<T>
     offset$?: Injector<T>
     current$?: Injector<T>
@@ -447,7 +424,7 @@ type DropdownItemProps<T> = {
 }
 
 export const DropdownItem = <I, V=I, T=DropdownScope<I, V>>(props: DropdownItemProps<T&DropdownItemScope<I>&{__it: I}&HtmlScope>) : HtmlBlueprint<T> => {
-    return mix<DropdownItemScope<I>&{__it: I}&HtmlScope>(props?.as, {
+    return mix<DropdownItemScope<I>&{__it: I}&HtmlScope, DomEvents>(props?.as, {
         css: 'dropdown-item',
         tag: 'a',
         reactors: {
@@ -483,28 +460,24 @@ export const DropdownItem = <I, V=I, T=DropdownScope<I, V>>(props: DropdownItemP
             click: props.onClick
         },
         joints: {
-            $dom: {
-                itemPosition: (dom, {offset, active}) => {
-                    dom.$subscribe(el => {
-                        if (el && active.$value) {
-                            offset.$value = el.offsetTop
+            itemPosition: ({$dom, offset, active}) => {
+                $dom.$subscribe(el => {
+                    if (el && active.$value) {
+                        offset.$value = el.offsetTop
 //                            console.log('offset', el.offsetTop)
-                        }
-                    })
-                }
+                    }
+                })
             },
-            current: {
-                itemPosition: (current, {$dom, currentOffset, currentHeight}) => {
-                    current.$subscribe(next => {
-                        const el = $dom.$value
-                        if (el && next) {
+            currentItemPosition: ({current, $dom, currentOffset, currentHeight}) => {
+                current.$subscribe(next => {
+                    const el = $dom.$value
+                    if (el && next) {
 //                            console.log('---- current offset', $dom.$value.offsetTop, currentOffset.$value)
-                            currentOffset.$value = el.offsetTop
-                            currentHeight.$value = el.getBoundingClientRect().height
+                        currentOffset.$value = el.offsetTop
+                        currentHeight.$value = el.getBoundingClientRect().height
 //                            console.log(currentOffset)
-                        }
-                    })
-                }
+                    }
+                })
             }
         }
     })

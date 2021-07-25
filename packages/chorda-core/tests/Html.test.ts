@@ -1,11 +1,11 @@
 import { expect } from "chai"
-import { defaultHtmlFactory, defaultLayout, EventBus, Gear, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, iterator, observable, patch, Value } from "../src"
+import { defaultHtmlFactory, defaultLayout, EventBus, Gear, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, observable, patch, Value } from "../src"
 import { attachRoot, createEngine, createRenderer, defaultVNodeFactory, nextFrame, nextTick } from "./utils"
 
 
 
 
-const createHtml = <D extends {}, E=unknown>(o: HtmlOptions<D, E&HtmlEvents>) : Html<D, E> => {
+const createHtml = <D, E=unknown, H=any>(o: HtmlOptions<D&HtmlScope, E, H>) : Html<D, E> => {
     const s = new Html<D, E>(o, {
         $engine: createEngine(), 
         $renderer: createRenderer(), 
@@ -115,7 +115,7 @@ describe ('Html', () => {
 
         const onUpdate = (portal as any).$event('update')
 
-        const html = createHtml<{portal: HtmlBlueprint[]}, {update: boolean}>({
+        const html = createHtml<{portal: HtmlBlueprint[]}, {update: () => boolean}>({
             components: {
                 a: {
                     components: {
@@ -185,7 +185,7 @@ describe ('Html', () => {
 
         const portal = observable([])
 
-        const html = createHtml<{portal: Gear[]}>({
+        const html = createHtml<{portal: Gear[]}, HtmlEvents>({
             injectors: {
                 portal: () => portal
             },

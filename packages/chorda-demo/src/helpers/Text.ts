@@ -1,4 +1,5 @@
 import { HtmlBlueprint, Injector, Listener, mix, patch } from "@chorda/core"
+import { DomEvents } from "@chorda/react"
 
 
 
@@ -13,12 +14,12 @@ type TextProps<T> = {
     text?: string
     css?: string
     text$?: Injector<T>
-    onClick?: Listener<T, any>
+    onClick?: Listener<T, React.MouseEvent>
 }
 
 
 export const Text = <S, T=unknown>(props: TextProps<T&TextScope&S>) : HtmlBlueprint<T> => {
-    return mix<TextScope>(props.as || {tag: 'span'}, {
+    return mix<TextScope, DomEvents>(props.as || {tag: 'span'}, {
 //        tag: 'span',
         reactors: {
             text: (v) => {

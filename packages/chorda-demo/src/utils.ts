@@ -1,4 +1,4 @@
-import { defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlOptions, HtmlScope, Keyed, mix, observable, Value } from "@chorda/core"
+import { defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, Keyed, mix, Observable, observable, PublishFunc, Value } from "@chorda/core"
 import { createPatchEngine } from "@chorda/engine"
 import { createRenderEngine, defaultVNodeFactory, DomEvents } from "@chorda/react"
 import { Route } from "router5"
@@ -44,8 +44,8 @@ export const createAppScope = () : HtmlScope => {
     return scope
 }
 
-export const createAppOptions = () : HtmlOptions => {
-    return App() as HtmlOptions
+export const createAppOptions = () : HtmlOptions<unknown, unknown, any> => {
+    return App() as HtmlOptions<unknown, unknown, any>
 }
 
 
@@ -60,12 +60,12 @@ export const render = (html: Html, el: () => Element) => {
 
 
 
-type CustomProps<T, E> = {
+type CustomProps<T, E=unknown> = {
     as?: HtmlBlueprint<T, E>
     content?: HtmlBlueprint<T, E>
 } & HtmlBlueprint<T, E>
 
-export const Coerced = <S, T=unknown, E=DomEvents>(props: CustomProps<Omit<T, keyof S>&S, E>) : HtmlBlueprint<T, E> => {
+export const Coerced = <S, T=unknown, E=unknown>(props: CustomProps<Omit<T, keyof S>&S, E&DomEvents&HtmlEvents>) : HtmlBlueprint<T> => {
     return mix(props.as, props, {
         templates: {
             content: props.content
@@ -73,7 +73,7 @@ export const Coerced = <S, T=unknown, E=DomEvents>(props: CustomProps<Omit<T, ke
     })
 }
 
-export const Custom = <T, E>(props: CustomProps<T, E>) : HtmlBlueprint<T, E> => {
+export const Custom = <T, E=unknown>(props: CustomProps<T, E>) : HtmlBlueprint<T, E> => {
     return mix(props.as, props, {
         templates: {
             content: props.content
@@ -87,6 +87,10 @@ export type DataScope<T> = {
 
 export type IteratorScope<D> = {
     __it: D
+}
+
+export type ItemScope<D> = {
+    __item: D
 }
 
 
@@ -150,4 +154,13 @@ export const createValueEffect = <T, F extends Function>(bus: EventBus<any>&Valu
             })
     }
     return f
+}
+
+
+
+
+export const watch = <T>(f: PublishFunc<T>, objects: any[]) => {
+    for (let obj of objects) {
+        (obj as Observable<unknown>).$subscribe(() => f.apply(this, objects))
+    }
 }

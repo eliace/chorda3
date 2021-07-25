@@ -6,7 +6,7 @@ import { isMixed } from "./Mixin"
 
 export interface Mixed<T> {
     build: (rules: MixRules) => T|boolean
-    mix: (nextMix: any) => Mixed<T>
+    mix: <X>(nextMix: X) => Mixed<T&X>
     readonly entries: any[]
 }
 

@@ -1,4 +1,4 @@
-import { Value, EventBus, Subscription, ObservableValue, Handler, spySubscriptions, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable } from './value'
+import { Value, EventBus, Subscription, ObservableValue, Handler, spySubscriptions, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable, Thenable, isCallable } from './value'
 import { Engine } from './engine'
 import { MixRules, mixin } from './mix'
 
@@ -14,7 +14,7 @@ type EventScoped<D> = {
 }
 
 type ObservableScoped<D> = {
-    [P in keyof D]?: D[P]&ObservableValue<D[P]>&EventBus<any>
+    [P in keyof D]?: D[P]&ObservableValue<D[P]>&EventBus<any>&ObservableScoped<D[P]>
 }
 
 // Scope injectors
@@ -28,11 +28,73 @@ export type Injector<D, R=any> = (scope: Scoped<D>&{$context?: Scoped<D>}) => R
 
 // Scope listeners
 
-type Listeners<D, E> = {
-    [P in keyof E]?: Listener<D, E[P]>
+type L<T, S> = T extends (...args: any[]) => infer R ? Listener<S, R> : Listeners<T, S>// (T extends number|string|any[] ? any : Listeners<T, S>)// NestedListeners<T, D>// Listeners<T>
+
+// type L2<T, D> = T extends (...args: any[]) => infer R ? Listener<D, R> : any
+
+// type NestedListeners<T, S=T> = {
+//     [P in keyof T]?: L2<T[P], S>
+// }
+
+//type X = ((...args: any[]) => any) | {[k: string]: Function}
+
+type Listeners<E, S> = {
+//    [P in keyof D]?: Listener<D, D[P]>
+    [P in keyof E]?: L<E[P], S>// D[P] extends (...args: any[]) => infer R ? Listener<D, R> : Listeners<D[P]> //(D[P] extends object ? Listeners<D[P]> : never)//Listeners<D[P]>
+} //& Keyed<any>
+
+type MethodsAndObjectsOf<D> = {
+    [P in keyof D as D[P] extends ((...args: any[]) => any) | {[k: string]: any} ? P : never]?: D[P]// extends (...args: any[]) => any ? D[P] : never
 }
 
-export type Listener<D, E> = (event: E, scope: EventScoped<D>) => boolean | void
+export type MethodsOf<D> = {
+    [P in keyof D as D[P] extends ((...args: any[]) => any) ? P : never]?: D[P]// extends (...args: any[]) => any ? D[P] : never
+}
+
+
+type ObjectsOf<D> = {
+    [P in keyof D as D[P] extends {[k: string]: any} ? P : never]?: D[P]// extends (...args: any[]) => any ? D[P] : never
+}
+
+
+/*
+type d = {
+    onLoad: () => void
+    a: number
+    b: {}
+    c: DOMRect
+    d: string
+}
+
+type e = {
+    a: {
+        aaa: () => void
+    }
+    x: {
+        xxx: () => void
+    }
+    onTest: () => void
+}
+
+
+type Test = {}
+
+type x = MethodsOf<d>
+
+
+type l<T> = {
+    [P in keyof T]?: T[P]
+}
+
+const l2: Listeners<d, e> = {
+}
+
+for (let k in l2) {
+    const a = l2[k]
+}
+*/
+
+export type Listener<D, R> = (event: R, scope: EventScoped<D>) => boolean | void
 
 // Scope bindings
 
@@ -48,12 +110,13 @@ type EventActions<E> = {
     [P in keyof E]?: (event: E[P]) => void
 }
 
-export type Joint<T, P extends keyof T=keyof T> = (o: ObservableValue<T[P]>&EventBus<any>&T[P], scope?: ObservableScoped<T>) => Function|void
+export type Joint<T/*, P extends keyof T=keyof T*/> = (/*o: ObservableValue<T[P]>&EventBus<any>&T[P],*/ scope: ObservableScoped<T>) => Function|Promise<void>|void
 
 type Joints<T> = {
-    [P in keyof T]?: {
-        [key: string]: Joint<T, P>
-    }
+    [key: string]: Joint<T>
+    // [P in keyof T]?: {
+    //     [key: string]: Joint<T, P>
+    // }
 }
 
 
@@ -68,16 +131,17 @@ export interface HubOptions<D, E> {
     // изменения скоупа
     reactors?: Reactors<D>
     // слушатели скоупа
-    events?: Listeners<D, E>
+    events?: Listeners<MethodsAndObjectsOf<E>, D>
 }
 
 
 export type HubScope = {
     $engine: Engine<Stateable>
+//    afterDestroy?: () => void
 }
 
 export type HubEvents = {
-    afterDestroy: void
+    afterDestroy: () => void
 }
 
 
@@ -98,11 +162,6 @@ export type Indexed<T=unknown> = T[]
 
 export type Keyed<T=unknown> = {
     [key: string]: T
-}
-
-
-interface Thenable {
-    then: Function
 }
 
 
@@ -138,7 +197,7 @@ const scopeKeyAware = (key: string|symbol, fn: Function) => {
 // }
 
 
-export class Hub<D, E, M extends HubEvents = HubEvents, S extends HubScope = HubScope, O extends HubOptions<D, E> = HubOptions<D, E>> implements Stateable {
+export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E> = HubOptions<D, E>> implements Stateable {
 
     options: O
 
@@ -151,7 +210,7 @@ export class Hub<D, E, M extends HubEvents = HubEvents, S extends HubScope = Hub
 
     // TODO по сути здесь флаги
     bindings: {[key: string]: Function}
-    events: {[P in keyof (E&M&Keyed)]?: Function}// {[key: string]: Function}
+    events: /*{[P in keyof (E&M&Keyed)]?: Function}//*/ {[key: string]: Function}
 
     state: State
     _local: any
@@ -168,11 +227,22 @@ export class Hub<D, E, M extends HubEvents = HubEvents, S extends HubScope = Hub
 //        this.context = context
 //        this.scope = Object.assign({}, context as any)
 
-        this._local = {...initScope}
+        this._local = {}
 //        this._context = {...context}
 
 
-        let _InjectProp: string|symbol = null
+        //let _InjectProp: string|symbol = null
+        const _InjectProps: {[k:string]: PropState} = {}
+
+        enum PropState {
+            None,
+            Injector,
+            Initial,
+            Default,
+            Context
+        }
+
+        // injector -> initial -> default -> context
 
         
         this.scope = new Proxy(this._local, {
@@ -186,19 +256,20 @@ export class Hub<D, E, M extends HubEvents = HubEvents, S extends HubScope = Hub
 
                 let isInjected = false
 
-                if (_InjectProp != p) {
+                const prop = _InjectProps[String(p)] || PropState.None
+
+//                if () {
 
                     if (p in target) {
                         isInjected = true
 //                        return (target[p] && isAutoTerminal() && target[p].$isTerminal) ? target[p].$value : target[p]
                     }
 
-                    if (!isInjected && this.options.injectors) {
+                    if (!isInjected && prop < PropState.Injector && this.options.injectors) {
                         const injector: Injector<any> = (this.options.injectors as any)[p]
                         if (injector !== undefined) {
                             if (typeof injector === 'function') {
-                                const prevProp = _InjectProp
-                                _InjectProp = p
+                                _InjectProps[String(p)] = PropState.Injector
                                 scopeKeyAware(p, () => {
                                     noAutoTerminal(() => {
                                         // const entry = injector(this.scope)
@@ -208,7 +279,6 @@ export class Hub<D, E, M extends HubEvents = HubEvents, S extends HubScope = Hub
                                         target[p] = injector(this.scope)
                                     })    
                                 })
-                                _InjectProp = prevProp
                             }
                             else if (injector != null) {
                                 console.warn('Injector must be a function', p, injector)
@@ -219,12 +289,21 @@ export class Hub<D, E, M extends HubEvents = HubEvents, S extends HubScope = Hub
 //                            return target[p]
                         }
                     }    
+//                }
+
+
+                if (!isInjected && prop < PropState.Initial && initScope && initScope[p] != null) {
+                    _InjectProps[String(p)] = PropState.Initial
+                    target[p] = initScope[p]
+                    isInjected = true
                 }
 
-                if (!isInjected && this.options.initials) {
+
+                if (!isInjected && prop < PropState.Default && this.options.initials) {
                     const injector: Injector<any> = (this.options.initials as any)[p]
                     if (injector !== undefined) {
                         if (typeof injector === 'function') {
+                            _InjectProps[String(p)] = PropState.Default
                             scopeKeyAware(p, () => {
                                 noAutoTerminal(() => {
                                     target[p] = injector(this.scope)
@@ -241,10 +320,12 @@ export class Hub<D, E, M extends HubEvents = HubEvents, S extends HubScope = Hub
                     }
                 }
 
-                if (!isInjected) {
+                if (!isInjected && prop < PropState.Context) {
+                    _InjectProps[String(p)] = PropState.Context
                     noAutoTerminal(() => {
                         target[p] = (context as any)[p]
-                    })    
+                    })
+                    isInjected = true
                 }
 
 //                return target[p]
@@ -284,7 +365,7 @@ export class Hub<D, E, M extends HubEvents = HubEvents, S extends HubScope = Hub
                 return Reflect.getOwnPropertyDescriptor(target, p) 
                     || Reflect.getOwnPropertyDescriptor(context, p)
                     || (this.options.injectors && Reflect.getOwnPropertyDescriptor(this.options.injectors, p))
-            }
+            },
         })
 
         this.subscriptions = []
@@ -355,12 +436,14 @@ export class Hub<D, E, M extends HubEvents = HubEvents, S extends HubScope = Hub
             const subscriptions = spySubscriptions(() => {
                 noAutoTerminal(() => {
                     for (let k in o.joints) {
-                        for (let i in o.joints[k]) {
-                            if (o.joints[k][i]) {
-                                const joint = o.joints[k][i].call(this, this.scope[k], this.scope)
-                                this.joints.push(joint)    
-                            }
-                        }
+                        const joint = o.joints[k].call(this, this.scope)
+                        this.joints.push(joint)
+                        // for (let i in o.joints[k]) {
+                        //     if (o.joints[k][i]) {
+                        //         const joint = o.joints[k][i].call(this, this.scope[k], this.scope)
+                        //         this.joints.push(joint)    
+                        //     }
+                        // }
                     }        
                 })
             })
@@ -403,7 +486,7 @@ export class Hub<D, E, M extends HubEvents = HubEvents, S extends HubScope = Hub
 
                 if (o.events[i] && !this.events[i]) {
 
-                    this.events[i] = o.events[i]
+                    this.events[i] = o.events[i] as any // FIXME
 
                     for (let k in this.scope) {
 
@@ -419,6 +502,43 @@ export class Hub<D, E, M extends HubEvents = HubEvents, S extends HubScope = Hub
                             }, this)
 
                             newHandlers.push(handler) // FIXME
+                        }
+                    }
+
+                    const events = o.events[i] as any
+                    if (typeof events === 'function') {
+                        if (isCallable(this.scope[i])) {
+
+                            const bus = this.scope[i]
+                            const callback = events
+
+                            const handler = bus.$on('done', (...args: any[]) => {
+                                noAutoTerminal(() => {
+                                    callback.apply(null, [...args, this.scope])
+                                })
+                            }, this)
+
+                            newHandlers.push(handler) // FIXME
+                        }
+                    }
+                    else if (typeof events === 'object') {
+                        const bus = this.scope[i]
+                        for (let k in events) {
+
+                            // FIXME добавить регистрацию событий
+
+                            const callback = events[k]
+                            
+                            if (isEventBus(bus) /*&& bus.$hasEvent(i)*/) {
+    
+                                const handler = bus.$on(k, (...args: any[]) => {
+                                    noAutoTerminal(() => {
+                                        callback.apply(null, [...args, this.scope])
+                                    })
+                                }, this)
+    
+                                newHandlers.push(handler) // FIXME
+                            }    
                         }
                     }
                 }
@@ -461,9 +581,15 @@ export class Hub<D, E, M extends HubEvents = HubEvents, S extends HubScope = Hub
             const promises = []
             for (let disjoint of this.joints) {
                 if (disjoint) {
-                    const eff = disjoint()
-                    if (eff && (eff as Thenable).then) {
-                        promises.push(eff)
+                    if ((disjoint as Thenable).then) {
+                        debugger
+                        promises.push(disjoint)
+                    }
+                    else {
+                        const eff = disjoint()
+                        if (eff && (eff as Thenable).then) {
+                            promises.push(eff)
+                        }    
                     }
                 }
             }

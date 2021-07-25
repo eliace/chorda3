@@ -1,4 +1,4 @@
-import { computable, HtmlBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core"
+import { computable, HtmlBlueprint, HtmlScope, Injector, iterable, mix, observable, patch } from "@chorda/core"
 import { DomEvents } from "@chorda/react"
 import { Coerced } from "../../utils"
 
@@ -69,7 +69,7 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : HtmlBluepri
             indicators: {
                 tag: 'ul',
                 css: 'carousel__indicators',
-                defaultItem: Coerced<CarouselSlideScope, CarouselScope>({
+                defaultItem: Coerced<CarouselSlideScope, CarouselScope&DomEvents>({
                     tag: 'li',
                     reactors: {
                         slide: (v) => patch({
@@ -116,25 +116,24 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : HtmlBluepri
             __it: (scope) => iterable(scope.slides, 'slide')
         },
         joints: {
-            current: {
-                init: (current, {slides, images}) => {
-
-                    images.$subscribe((next) => {
-                        if (next.length) {
-                            current.$value = Math.min(current, next.length-1)
-                        }
-                    })
-
-//                     current.$subscribe((next) => {
-// //                        console.log('images', images)
-//                         slides.$value = images.map((img, i) => {
-//                             return {id: i, url: img, hidden: i != next}
-//                         })
-// //                        console.log('slides', slides.$value)
-                    // })
-
-                }
+            init: ({current, images}) => {
+                images.$subscribe((next) => {
+                    if (next.length) {
+                        current.$value = Math.min(current, next.length-1)
+                    }
+                })
             }
+            // current: {
+            //     init: (current, {slides, images}) => {
+
+            //         images.$subscribe((next) => {
+            //             if (next.length) {
+            //                 current.$value = Math.min(current, next.length-1)
+            //             }
+            //         })
+
+            //     }
+            // }
         },
         events: {
             click: (e, {current, slides}) => {

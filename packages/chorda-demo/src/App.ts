@@ -93,26 +93,25 @@ export const App = () : HtmlBlueprint<AppScope> => {
                         column: 'is-one-fifth',
                         as: Coerced<HtmlScope>({
                             joints: {
-                                $dom: {
-                                    autoLoad: (dom) => {
-                                        dom.$subscribe(el => {
-                                            if (el) {
-                                                _network = new vis.Network(el, {}, {
-                                                    autoResize: true,
-                                                    layout: {
-                                                        improvedLayout: false,
-                                                        hierarchical: {
-                                                            enabled: true,
-                                                            //parentCentralization: false
-                                                        }
-                                                    },
-                                                    physics: {
-                                                        enabled: false
-                                                    },
-                                                    interaction: {
-                                                        dragNodes: false
+                                autoLoad: ({$dom}) => {
+                                    $dom.$subscribe(el => {
+                                        if (el) {
+                                            _network = new vis.Network(el, {}, {
+                                                autoResize: true,
+                                                layout: {
+                                                    improvedLayout: false,
+                                                    hierarchical: {
+                                                        enabled: true,
+                                                        //parentCentralization: false
                                                     }
-                                                })
+                                                },
+                                                physics: {
+                                                    enabled: false
+                                                },
+                                                interaction: {
+                                                    dragNodes: false
+                                                }
+                                            })
 //                                                 _network.cluster({
 //                                                     joinCondition: (nodeOptions) => {
 // //                                                        console.log(nodeOptions.cid)
@@ -128,29 +127,27 @@ export const App = () : HtmlBlueprint<AppScope> => {
 //                                                         return clusterOptions
 //                                                     }
 //                                                 })
-                                                _network.setData({nodes: _nodes, edges: _edges})
+                                            _network.setData({nodes: _nodes, edges: _edges})
 //                                               _network.clusterByHubsize(20)
-                                            }
-                                        })
-                                    }
+                                        }
+                                    })
                                 },
-                                $engine: {
-                                    updateNetwork: (engine) => {
-                                        engine.addPostEffect(() => {
-                                            const data: vis.Data = buildHtmlTree()
-                                            if (_network) {
-                                                const nextPatch = () => {
-                                                    setTimeout(() => {
-                                                        
-                                                    })
-                                                }
+                                updateNetwork: ({$engine}) => {
+                                    $engine.addPostEffect(() => {
+                                        const data: vis.Data = buildHtmlTree()
+                                        if (_network) {
+                                            const nextPatch = () => {
                                                 setTimeout(() => {
-                                                    // _nodes.clear()
-                                                    // _edges.clear()
-                                                    // _nodes.add(data.nodes as vis.Node[])
-                                                    // _edges.add(data.edges as vis.Edge[])
+                                                    
+                                                })
+                                            }
+                                            setTimeout(() => {
+                                                // _nodes.clear()
+                                                // _edges.clear()
+                                                // _nodes.add(data.nodes as vis.Node[])
+                                                // _edges.add(data.edges as vis.Edge[])
 //                                                    const scale = _network.getScale()
-                                                   _network.setData(data)
+                                                _network.setData(data)
 //                                                    _network.clusterOutliers({
 //                                                         joinCondition: (nodeOptions) => {
 // //                                                            console.log(nodeOptions.cid)
@@ -166,25 +163,24 @@ export const App = () : HtmlBlueprint<AppScope> => {
 //                                                         }
 //                                                     })
 
-                                                    // _network.moveTo({
-                                                    //     scale
-                                                    // })
-                                                })
+                                                // _network.moveTo({
+                                                //     scale
+                                                // })
+                                            })
 //                                                _network.clusterByHubsize(20)
 //                                                _network.stabilize()
-                                            }
-                                            else {
-                                                _nodes.add(data.nodes as vis.Node[])
-                                                _edges.add(data.edges as vis.Edge[])
-                                            }
+                                        }
+                                        else {
+                                            _nodes.add(data.nodes as vis.Node[])
+                                            _edges.add(data.edges as vis.Edge[])
+                                        }
 //                                             if (_network != null) {
 //                                                 _network.setData({
 //                                                     }]
 //                                                 })
 // //                                                _network.redraw()
 //                                             }
-                                        })
-                                    }
+                                    })
                                 }
                             }
                         })

@@ -1,6 +1,6 @@
 import { ObservableValueIterator } from './iterator'
 import { Node, UidFunc, ValueSet, ValueKey, ObservableValueSet, HasCheck, IsCheck, ObservableValue} from './node'
-import { Observable, ValueIterator } from './utils'
+import { EventBus, Observable, ValueIterator } from './utils'
 
 
 let _AutoTerminal = false
@@ -242,7 +242,15 @@ export const proxify = <T>(obj: T, node: ValueSet<T>) : ValueSet<T>&T => {
             pd.configurable = true
             return pd
         },
+        apply: (target, thisArg, args) => {
+            return (target as any).$call(thisArg, args)
+            // const f = (target.$value as any)
+            // f.$emit('before', args)
+
+            // return (target.$value as any).apply(thisArg, args)
+        }
         // getPrototypeOf: (target) : object => {
+        //     console.log('get prototype of')
         //     return Reflect.getPrototypeOf(target.$value as any)
         //     // console.log('prototype of')
         //     // if (typeof target.$value === 'number') {

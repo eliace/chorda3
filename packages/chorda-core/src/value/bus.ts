@@ -40,9 +40,11 @@ export class EventNode<E> implements EventBus<E> {
         this._handlers = this._handlers.filter(l => l != ctl && l.callback != ctl && l.target != ctl)
     }
     $emit(name: string, ...args: any[]): void {
+//        console.log('emit', name, args, this._handlers)
         // TODO возможно, сообщения стоит здесь только помещать в очередь
         this._handlers.forEach(h => {
             if (h.name == name) {
+//                console.log('call handler')
                 h.callback.apply(h.target, args)
             }
         })

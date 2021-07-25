@@ -1,4 +1,4 @@
-import { HtmlBlueprint, HtmlEvents, Injector, Listener, mix, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, Injector, Listener, mix, observable, patch } from "@chorda/core"
 
 
 //
@@ -16,8 +16,8 @@ type ButtonScope = {
     disabled: boolean
 }
 
-type ButtonProps<T, E extends RendererEvents> = {
-    as?: HtmlBlueprint<T, E>
+type ButtonProps<T> = {
+    as?: HtmlBlueprint<T>
     text?: string
     text$?: Injector<T>
     color?: string
@@ -26,14 +26,14 @@ type ButtonProps<T, E extends RendererEvents> = {
     leftIcon?: HtmlBlueprint<T>
     rightIcon?: HtmlBlueprint<T>
     icon?: HtmlBlueprint<T>
-    onClick?: Listener<T, E['click']>
+    onClick?: Listener<T, unknown>
     css?: string|string[]
     disabled$?: Injector<T>
 }
 
 
-export const Button = <T, E extends RendererEvents>(props: ButtonProps<T&ButtonScope, E>) : HtmlBlueprint<T, E> => {
-    return mix<ButtonScope>({
+export const Button = <T>(props: ButtonProps<T&ButtonScope>) : HtmlBlueprint<T> => {
+    return mix<ButtonScope&{click?: () => any}>({
         tag: 'button',
         css: 'button',
         templates: {

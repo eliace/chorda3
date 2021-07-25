@@ -50,6 +50,14 @@ export type Handler<E> = {
 
 
 
+
+export interface Thenable {
+    then: Function
+}
+
+
+
+
 // Stream
 
 // type KeyValuePair<T> = {

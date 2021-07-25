@@ -1,12 +1,13 @@
 import { HtmlScope, Joint } from "@chorda/core"
+import { DomEvents } from "@chorda/react"
 
 
 export type OuterClickEvent = {
-    outerClick: void
+    outerClick?: () => void
 }
 
 
-export const onOuterClick: Joint<HtmlScope> = (v, {$dom}) => {
+export const onOuterClick: Joint<HtmlScope> = ({$dom}) => {
 
     $dom.$event('outerClick')
 
@@ -20,7 +21,7 @@ export const onOuterClick: Joint<HtmlScope> = (v, {$dom}) => {
 }
 
 
-export const stopMouseDown: Joint<HtmlScope> = (v, {$dom}) => {
+export const stopMouseDown: Joint<HtmlScope> = ({$dom}) => {
     $dom.$subscribe((el) => {
         el?.addEventListener('mousedown', (e: MouseEvent) => {
             e.stopPropagation()
@@ -30,7 +31,7 @@ export const stopMouseDown: Joint<HtmlScope> = (v, {$dom}) => {
     })
 }
 
-export const autoFocus: Joint<HtmlScope&{autoFocus: boolean}> = (v, {$dom, $renderer}) => {
+export const autoFocus: Joint<HtmlScope&{autoFocus: boolean}> = ({$dom, $renderer}) => {
     $dom.$subscribe(el => {
         if (el) {
             $renderer.scheduleTask(() => {

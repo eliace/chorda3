@@ -5,8 +5,12 @@ import { Carousel, Dropdown, DropdownItem, Paragraph, Text } from "../../helpers
 import { CatApi , api} from "./api"
 
 
-console.log('toJSON', observable(5))
-console.log('stringify', JSON.stringify(observable(5)))
+// console.log('toJSON', observable(5))
+// console.log('stringify', JSON.stringify(observable(5)))
+// console.log('stringify', JSON.stringify(5))
+// console.log('stringify', JSON.stringify(observable("hello")))
+// console.log('stringify', JSON.stringify("hello"))
+// console.log('typeof', typeof observable("hello"))
 
 
 type BreedsScope = {
@@ -19,10 +23,10 @@ type BreedsScope = {
 }
 
 type BreedsEvents = {
-    loadBreedsStart: any
-    loadBreedsDone: CatApi.Breed[]
-    loadImagesDone: CatApi.Image[]
-    selectBreed: CatApi.Breed
+    loadBreedsStart?: () => any
+    loadBreedsDone?: () => CatApi.Breed[]
+    loadImagesDone?: () => CatApi.Image[]
+    selectBreed?: () => CatApi.Breed
 }
 
 
@@ -41,25 +45,23 @@ export const Breeds = () : HtmlBlueprint<BreedsScope, BreedsEvents> => {
             loadingBreeds: () => observable(null)
         },
         joints: {
-            breeds: {
-                autoLoad: (breeds, {images, selected}) => {
+            autoLoad: ({breeds, images, selected}) => {
 
-                    const loadImages = createValueEffect(images, 'loadImages', api.searchImages)
-                    const loadBreeds = createValueEffect(breeds, 'loadBreeds', api.getBreeds)
+                const loadImages = createValueEffect(images, 'loadImages', api.searchImages)
+                const loadBreeds = createValueEffect(breeds, 'loadBreeds', api.getBreeds)
 
-                    // при изменении выбранной породы загружаем список изображений
-                    selected.$subscribe((next) => {
-                        if (next) {
-                            images.$value = []
-                            loadImages({breed_id: next.id, limit: 8})    
-                        }
-                    })
+                // при изменении выбранной породы загружаем список изображений
+                selected.$subscribe((next) => {
+                    if (next) {
+                        images.$value = []
+                        loadImages({breed_id: next.id, limit: 8})    
+                    }
+                })
 
-                    // FIXME хак из-за того, что события выбрасываются в том же потоке
-                    setTimeout(() => {
-                        loadBreeds()
-                    })
-                }
+                // FIXME хак из-за того, что события выбрасываются в том же потоке
+                setTimeout(() => {
+                    loadBreeds()
+                })
             },
         },
         events: {

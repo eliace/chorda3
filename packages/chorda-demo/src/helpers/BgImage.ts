@@ -1,25 +1,22 @@
-import { HtmlBlueprint, Injector, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, Injector, mix, observable, patch } from "@chorda/core"
 
 
 
-type BackgroundImageScope = {
+export type BgImageScope = {
     url: string
 }
 
-type BackgroundImageProps<T> = {
+type BgImageProps<T> = {
     url?: string
     url$?: Injector<T>
     width?: number
     height?: number
+    as?: HtmlBlueprint<T>
 }
 
-export const BgImage = <T>(props: BackgroundImageProps<T&BackgroundImageScope>) : HtmlBlueprint<T&BackgroundImageScope> => {
-    return {
+export const BgImage = <T>(props: BgImageProps<T&BgImageScope>) : HtmlBlueprint<T> => {
+    return mix<BgImageScope>({
         css: 'bg-image',
-        styles: {
-            width: props.width,
-            height: props.height,
-        },
         templates: {
             content: {
                 css: 'bg-image-content',
@@ -32,11 +29,18 @@ export const BgImage = <T>(props: BackgroundImageProps<T&BackgroundImageScope>) 
                 }        
             }
         },
+    },
+    props?.as,
+    props && {
         injectors: {
             url: props.url$
         },
         initials: {
             url: () => observable(props.url)
-        }
-    }
+        },
+        styles: {
+            width: props.width,
+            height: props.height,
+        },
+    })
 }

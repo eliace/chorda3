@@ -1,4 +1,5 @@
-import { HtmlBlueprint, Injector, isObservable, mix, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, HtmlEvents, Injector, isObservable, mix, observable, patch } from "@chorda/core"
+import { DomEvents } from "@chorda/react"
 import { faCircleNotch, IconDefinition } from "@fortawesome/free-solid-svg-icons"
 import { Icon } from "chorda-bulma"
 import { DataScope } from "../utils"
@@ -12,7 +13,7 @@ type FaIconProps<T, E> = {
     as?: HtmlBlueprint<T, E>
 }
 
-export const FaIcon = <T, E>(props: FaIconProps<T&DataScope<string>, E>): HtmlBlueprint<T, E> => {
+export const FaIcon = <T>(props: FaIconProps<T&DataScope<string>, DomEvents>): HtmlBlueprint<T> => {
 
     const prefix = props?.prefix || 'fas'
 

@@ -15,11 +15,12 @@ export type HtmlScope = {
     $defaultLayout: Function
     $dom?: HTMLElement
     $vnodeFactory: VNodeFactory
+//    afterRender?: any
 } & GearScope
 
-export type HtmlBlueprint<D=unknown, E=unknown, H=unknown> = HtmlOptions<D, E, H>|string|boolean|Function|Mixed<HtmlBlueprint<D, E, H>>
+export type HtmlBlueprint<D=unknown, E=unknown, H=any> = HtmlOptions<D, E, H>|string|boolean|Function|Mixed<HtmlBlueprint<D, E, H>>
 
-export interface HtmlOptions<D=any, E=any, H=unknown, B=HtmlBlueprint<D, E, H>> extends GearOptions<D, E, B> {
+export interface HtmlOptions<D, E, H, B=HtmlBlueprint<D, E, H>> extends GearOptions<D, E, B> {
     layout?: Function
     renderer?: Renderer
     dom?: H
@@ -33,9 +34,9 @@ export interface HtmlOptions<D=any, E=any, H=unknown, B=HtmlBlueprint<D, E, H>> 
     html?: string
 }
 
-export type HtmlEvents = {
-    afterRender?: any
-} & GearEvents
+export type HtmlEvents = GearEvents & {
+    afterRender?: () => any
+}
 
 export type HtmlProps = {
     className?: string
@@ -58,7 +59,7 @@ export const defaultHtmlPatchRules = {
 }
 
 
-export const defaultHtmlFactory = <D extends Keyed, E>(opts: HtmlOptions<D, E>, context: HtmlScope&D, scope: any, rules? : MixRules) : Html<D, E> => {
+export const defaultHtmlFactory = <D extends Keyed, E=unknown, H=unknown>(opts: HtmlOptions<D, E, H>, context: HtmlScope&D, scope: any, rules? : MixRules) : Html<D> => {
     return new Html(opts, context, scope)
 }
 
@@ -78,9 +79,12 @@ export const mix = <T, E=unknown>(...args: HtmlBlueprint<T, E>[]) : HtmlBlueprin
     return mixin.apply(this, args)
 }
 
+export const mix2 = <T, X>(a: HtmlBlueprint<T>, b?: HtmlBlueprint<X>) : Mixed<HtmlBlueprint<T&X>> => {
+    return mixin(b as any, a as any) as Mixed<HtmlBlueprint<T&X>>
+}
 
 
-export class Html<D=unknown, E=unknown, M extends HtmlEvents=HtmlEvents, S extends HtmlScope=HtmlScope, O extends HtmlOptions<D, E>=HtmlOptions<D, E>, B extends HtmlBlueprint<D, E>=HtmlBlueprint<D, E>> extends Gear<D, E, M, S, O, B> implements Renderable {
+export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O extends HtmlOptions<D, E, H>=HtmlOptions<D, E, H>, B extends HtmlBlueprint<D, E, H>=HtmlBlueprint<D, E, H>> extends Gear<D, E, S, O, B> implements Renderable {
 
     vnode: any
     attached: boolean

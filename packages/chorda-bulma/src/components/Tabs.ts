@@ -15,7 +15,7 @@ export type TabScope = {
 }
 
 type TabProps<T> = {
-//    as?: HtmlBlueprint<T>
+    as?: HtmlBlueprint<T>
     active?: boolean
     text?: string
     link?: string
@@ -27,8 +27,8 @@ type TabProps<T> = {
     onClick?: Listener<T, any>
 }
 
-export const Tab = <T>(props: TabProps<T&TabScope>) : HtmlBlueprint<T&TabScope> => {
-    return mix<TabScope>({
+export const Tab = <T>(props: TabProps<T&TabScope>) : HtmlBlueprint<T> => {
+    return mix<TabScope&{click?: () => any}>({
         templates: {
             content: Link
         },
@@ -80,7 +80,8 @@ export const Tabs = <T>(props: TabsProps<T&TabsScope>) : HtmlBlueprint<T> => {
         templates: {
             content: List
         }
-    }, {
+    }, 
+    props && {
         classes: {
             'is-centered': props.centered
         },
@@ -89,7 +90,7 @@ export const Tabs = <T>(props: TabsProps<T&TabsScope>) : HtmlBlueprint<T> => {
         },
         templates: {
             content: List<TabsScope>({
-                items$: scope => scope.tabs,
+                items$: (scope) => scope.tabs,
                 items: props.tabs,
                 defaultItem: props.defaultTab
             })

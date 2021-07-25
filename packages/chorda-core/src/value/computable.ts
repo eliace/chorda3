@@ -1,5 +1,5 @@
 import { EMPTY, UpdateDirection, ObservableValueSet, spyGetters, ValueSet, UidFunc, openTransaction, closeTransaction, transactionUpdates } from './node'
-import { autoTerminalAware, proxify, ObservableNode } from './observable'
+import { autoTerminalAware, proxify, ObservableNode, isValueSet } from './observable'
 import { Observable, PublishFunc, Subscriber, Subscription } from './utils'
 
 
@@ -81,6 +81,10 @@ class ComputableNode<T> extends ObservableNode<T> implements Computable {
         // }
 
 
+        if (isValueSet(next)) {
+            next = next.$value
+        }
+
         return next
     }
 
@@ -107,7 +111,7 @@ class ComputableNode<T> extends ObservableNode<T> implements Computable {
         }
 
         if (this.$isPrimitive && computed === this._memoValue) {
-            console.log('No change detected', computed, this._memoValue)
+//            console.log('No change detected', computed, this._memoValue)
             return
         }
 

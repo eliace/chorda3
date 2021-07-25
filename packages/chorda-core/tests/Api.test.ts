@@ -1,4 +1,4 @@
-import { Blueprint, defaultGearFactory, Gear, GearOptions, Injector, iterator, observable, patch, Scoped } from "../src"
+import { Blueprint, defaultGearFactory, Gear, GearOptions, Injector, iterable, observable, patch, Scoped } from "../src"
 import { createEngine, immediateTick, nextTick } from "./utils"
 
 
@@ -7,8 +7,8 @@ type TestScope = {
     name: string
 }
 
-const createAndRun = <D>(o: Blueprint<D, unknown>) : Gear<D> => {
-    const s = new Gear<D>(o as GearOptions, {$engine: createEngine(), $defaultFactory: defaultGearFactory} as any)
+const createAndRun = <D, E=unknown>(o: Blueprint<D, E>) : Gear<D, E> => {
+    const s = new Gear<D, E>(o as GearOptions<D, E>, {$engine: createEngine(), $defaultFactory: defaultGearFactory} as any)
     immediateTick()
     return s
 }
@@ -25,15 +25,17 @@ describe ('Data', () => {
 
         type ListScope<T> = {
             data: T
+            __it: T[]
         }
 
         const List = <K, T=unknown>(props: ListProps<T&ListScope<K>>) : Blueprint<T> => {
             return {
                 injectors: {
-                    data: props.data$
+                    data: props.data$,
+                    __it: (scope) => iterable(scope.data, '_it')
                 },
                 reactors: {
-                    data: (v) => patch({items: iterator(v, '_it')})
+                    data: (v) => patch({items: v})
                 },
                 defaultItem: Item<number>({
                     injectors: {
@@ -76,6 +78,33 @@ describe ('Data', () => {
         const x: S = {}
 
 //        x.router.name
+
+    })
+
+
+    it ('Nested events', () => {
+
+        type EventScope = {
+            data: {
+                load: (n: number) => string
+            }
+            onLoad: () => void
+        }
+
+        createAndRun<{}, EventScope>({
+            events: {
+                onLoad: (e, scope) => {
+                    
+                },
+                data: {
+                    load: (e, scope) => {
+
+                    }
+                }
+            }
+        })
+
+
 
     })
 

@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { Blueprint, defaultGearFactory, Gear, GearOptions, observable, patch, iterator, mixin, mix } from '../src'
+import { Blueprint, defaultGearFactory, Gear, GearOptions, observable, patch, mixin, mix, iterable } from '../src'
 import { createEngine, immediateTick, nextTick } from './utils'
 import * as _ from 'lodash'
 
@@ -16,7 +16,7 @@ type TestEvents = {
 }
 
 
-const createGear = <D>(o: Blueprint<D, unknown>) : Gear<D> => {
+const createGear = <D>(o: Blueprint<D>) : Gear<D> => {
     const s = new Gear<D>(o as GearOptions, {$engine: createEngine(), $defaultFactory: defaultGearFactory} as any)
     immediateTick()
     return s
@@ -26,17 +26,17 @@ const createGearList = <T>(list: any[]) : Gear<T> => {
     return createGear<any>({
         defaultItem: {
             injectors: {               
-                name: (ctx) => (ctx as any)._it.$value
+                name: (ctx) => (ctx as any).__it.$value
             }
         },
         reactors: {
             items: (v) => {
 //                console.log('new value', iterator(v, ''))
-                return patch({items: iterator(v, '_it')})
+                return patch({items: v})
             }
         },
         injectors: {
-            items: () => observable(list)
+            items: () => iterable(list)
         }
     })
 }
@@ -330,10 +330,10 @@ describe ('Gear', () => {
 
             const g = createGear({
                 injectors: {
-                    data: () => observable({a: 'a', b: 'b', c: 'c'})
+                    data: () => iterable({a: 'a', b: 'b', c: 'c'})
                 },
                 reactors: {
-                    data: (v) => patch({components: iterator(v)})
+                    data: (v) => patch({components: v})
                 }
             })
 
@@ -348,10 +348,10 @@ describe ('Gear', () => {
 
             const g = createGear({
                 injectors: {
-                    data: () => v
+                    data: () => iterable(v)
                 },
                 reactors: {
-                    data: (v) => patch({components: iterator(v)})
+                    data: (v) => patch({components: v})
                 }
             })
 
@@ -371,10 +371,10 @@ describe ('Gear', () => {
 
             const g = createGear({
                 injectors: {
-                    data: () => v
+                    data: () => iterable(v)
                 },
                 reactors: {
-                    data: (v) => patch({components: iterator(v)})
+                    data: (v) => patch({components: v})
                 }
             })
 
@@ -394,10 +394,10 @@ describe ('Gear', () => {
 
             const g = createGear({
                 injectors: {
-                    data: () => v
+                    data: () => iterable(v)
                 },
                 reactors: {
-                    data: (v) => patch({components: iterator(v)})
+                    data: (v) => patch({components: v})
                 }
             })
 

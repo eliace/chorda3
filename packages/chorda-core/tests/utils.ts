@@ -1,15 +1,16 @@
-import { Engine, HtmlProps, Stateable } from "../src"
+import { Engine, HtmlProps, Keyed, Stateable } from "../src"
 import { Dom, Renderable, Renderer, VNodeFactory } from "../src/render"
 
 
 
 class TestEngine implements Engine<Stateable> {
+    pipeTask: (fn: Function, arg?: any, target?: Stateable) => void
 
     tasks: any[] = []
     scheduled: boolean
     post: any[] = []
 
-    addTask (fn: Function, arg: any, target: any) {
+    scheduleTask (fn: Function, arg: any, target: any) {
         this.tasks.push({fn, arg, target})
     }
 
@@ -97,6 +98,8 @@ export class TestRenderer implements Renderer, Engine<any> {
         this.scheduled = false
         this.tasks = []
     }
+    pipeTask: (fn: Function, arg?: any, target?: any) => void
+    events: Keyed<any>
 
     immediate () {
 
@@ -110,7 +113,7 @@ export class TestRenderer implements Renderer, Engine<any> {
 
     }
 
-    addTask (fn: Function) {
+    scheduleTask (fn: Function) {
         this.tasks.push(fn)
     }
 

@@ -22,7 +22,7 @@ type SearchScope = {
     bus: {
         loadCategories: () => void
         loadBreeds: () => void
-        search: (filter: CatApi.SearchImageFilter) => void
+        search: (filter: CatApi.SearchImageFilter) => Promise<any>
         loadNextPage: () => void
         markAsFavourite: (image: CatApi.SearchResult) => void
     }
@@ -38,10 +38,10 @@ type Record = {
 }
 
 type SearchEvents = {
-    loadBreedsDone: CatApi.Breed[]
-    loadCategoriesDone: CatApi.Category[]
-    loadNextPage: void
-    markAsFavourite: CatApi.SearchResult & {favourite?: boolean}
+    loadBreedsDone: () => CatApi.Breed[]
+    loadCategoriesDone: () => CatApi.Category[]
+    loadNextPage: () => void
+    markAsFavourite: () => CatApi.SearchResult & {favourite?: boolean}
 }
 
 const ORDERS = observable([
@@ -90,39 +90,37 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents&DomEvents> =>
             bus: () => observable({})
         },
         joints: {
-            bus: {
-                autoLoad: (bus, {breeds, categories, searchResults, filters}) => {
+            autoLoad: ({bus, breeds, categories, searchResults, filters}) => {
 
-                    bus.search = createValueEffect(searchResults, 'search', api.searchImages)
-                    
-                    bus.$event('loadNextPage')
+                bus.search.$value = createValueEffect(searchResults, 'search', api.searchImages)
+                
+                bus.$event('loadNextPage')
 
-                    bus.loadBreeds = createValueEffect(breeds, 'loadBreeds', () => {
-                        return api.getBreeds().then(data => {
-                            return [RECORD_NONE].concat(data)
-                        })
+                bus.loadBreeds.$value = createValueEffect(breeds, 'loadBreeds', () => {
+                    return api.getBreeds().then(data => {
+                        return [RECORD_NONE].concat(data)
                     })
-                    bus.loadCategories = createValueEffect(categories, 'loadCategories', () => {
-                        return api.getCategories().then(data => {
-                            return [RECORD_NONE].concat(data)
-                        })
+                })
+                bus.loadCategories.$value = createValueEffect(categories, 'loadCategories', () => {
+                    return api.getCategories().then(data => {
+                        return [RECORD_NONE].concat(data)
                     })
-                    bus.markAsFavourite = bus.$event('markAsFavourite') as any
-                    bus.$on('markAsFavourite', (image: CatApi.SearchResult) => {
-                        api.saveAsFavourite(String(image.id))
-                    })
+                })
+                bus.markAsFavourite = bus.$event('markAsFavourite') as any
+                bus.$on('markAsFavourite', (image: CatApi.SearchResult) => {
+                    api.saveAsFavourite(String(image.id))
+                })
 
 
-                    filters.$subscribe((next) => {
-                        bus.search(next)
-                    })
+                filters.$subscribe((next) => {
+                    bus.search(next)
+                })
 
-                    setTimeout(() => {
-                        bus.loadBreeds()
-                        bus.loadCategories()
-                    })
-                }
-            },
+                setTimeout(() => {
+                    bus.loadBreeds()
+                    bus.loadCategories()
+                })
+            }
         },
         events: {
             loadBreedsDone: (breeds, {breedId}) => {
@@ -223,7 +221,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents&DomEvents> =>
                                         reactors: {
                                             favourite: (v) => patch({classes: {'is-favourited': v}})
                                         },
-                                        events: {
+                                        events: {                                                                                                                
                                             click: (e, {bus, __it}) => {
                                                 bus.markAsFavourite(__it)
                                             }

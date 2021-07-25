@@ -26,6 +26,7 @@ export class ReactRenderer implements Renderer, Engine<any> {
         this.isScheduled = false
         this.tasks = []
     }
+    pipeTask: (fn: Function, arg?: any, target?: any) => void
 
     addPostEffect: (fn: Function) => void;
     chain: (link: Engine<any>) => void;
@@ -99,13 +100,13 @@ const EVENT_MAP : Keyed<string> = {
 }
 
 export type DomEvents = {
-    click: React.MouseEvent
-    change: React.ChangeEvent
-    input: React.FormEvent
-    focus: React.FocusEvent
-    blur: React.FocusEvent
-    keyUp: React.KeyboardEvent
-    keyDown: React.KeyboardEvent
+    click?: () => React.MouseEvent
+    change?: () => React.ChangeEvent
+    input?: () => React.FormEvent
+    focus?: () => React.FocusEvent
+    blur?: () => React.FocusEvent
+    keyUp?: () => React.KeyboardEvent
+    keyDown?: () => React.KeyboardEvent
 }
 
 
@@ -156,6 +157,6 @@ type ReactAttributes = Partial<{
     id: string
 }>
 
-export type ReactBlueprint<D, E={}> = HtmlBlueprint<D, E&ReactEvents, ReactAttributes>
+export type ReactBlueprint<D> = HtmlBlueprint<D&ReactEvents, ReactAttributes>
 
 //export type ReactHtml<D, E> = Html<D, E&ReactEvents>

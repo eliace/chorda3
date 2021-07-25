@@ -269,6 +269,7 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
     }
 
     toJSON () {
+        console.log('to json')
         return this.$value
     }
 
@@ -342,7 +343,7 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
         }
 
         if (this.$isPrimitive && newValue === this._memoValue) {
-            console.log('No change detected', newValue, this._memoValue)
+//            console.log('No change detected', newValue, this._memoValue)
             return
         }
 
@@ -433,7 +434,7 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
                 next = (next as Value<any>).$value
             }
 
-            this._updateEntries(next)
+//            this._updateEntries(next)
         }
 
         this.$update(UpdateDirection.BOTH, next, null, EMPTY)
@@ -540,6 +541,9 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
 
         // уведомление дочерних элементов
         if (direction == UpdateDirection.DESC || direction == UpdateDirection.BOTH) {
+
+            this._updateEntries(value)
+
             for (let i in this._entries) {
                 this._entries[i].$update(UpdateDirection.DESC, this._memoValue == null ? undefined : this._memoValue[i])
             }

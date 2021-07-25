@@ -4,5 +4,5 @@ export * from './observable'
 export * from './computable'
 export * from './iterator'
 export * from './iterable'
-
+export * from './callable'
 
