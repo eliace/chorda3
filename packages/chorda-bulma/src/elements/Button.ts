@@ -7,7 +7,9 @@ import { HtmlBlueprint, Injector, Listener, mix, observable, patch } from "@chor
 
 
 type RendererEvents = {
-    click: unknown
+    $dom: {
+        click: () => void
+    }
 }
 
 type ButtonScope = {
@@ -16,8 +18,8 @@ type ButtonScope = {
     disabled: boolean
 }
 
-type ButtonProps<T> = {
-    as?: HtmlBlueprint<T>
+type ButtonProps<T, E> = {
+    as?: HtmlBlueprint<T, E>
     text?: string
     text$?: Injector<T>
     color?: string
@@ -26,14 +28,14 @@ type ButtonProps<T> = {
     leftIcon?: HtmlBlueprint<T>
     rightIcon?: HtmlBlueprint<T>
     icon?: HtmlBlueprint<T>
-    onClick?: Listener<T, unknown>
+    onClick?: Listener<T, void>
     css?: string|string[]
     disabled$?: Injector<T>
 }
 
 
-export const Button = <T>(props: ButtonProps<T&ButtonScope>) : HtmlBlueprint<T> => {
-    return mix<ButtonScope&{click?: () => any}>({
+export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : HtmlBlueprint<T, E> => {
+    return mix<ButtonScope, RendererEvents/*&{click?: () => any}*/>({
         tag: 'button',
         css: 'button',
         templates: {
@@ -42,7 +44,7 @@ export const Button = <T>(props: ButtonProps<T&ButtonScope>) : HtmlBlueprint<T> 
             },
             content: {
                 tag: 'span',
-                reactors: {
+                reactions: {
                     text: (v) => patch({text: v})
                 }
             },
@@ -50,7 +52,7 @@ export const Button = <T>(props: ButtonProps<T&ButtonScope>) : HtmlBlueprint<T> 
                 weight: 10
             }
         },
-        reactors: {
+        reactions: {
             color: (next, prev) => patch({
                 classes: {
                     [next]: true, 
@@ -78,13 +80,16 @@ export const Button = <T>(props: ButtonProps<T&ButtonScope>) : HtmlBlueprint<T> 
             icon: props.icon,
             content: (!!props.leftIcon || !!props.rightIcon),
         },
-        injectors: {
+        injections: {
             color: props.color$ || (() => observable(props.color)), //(ctx) => observable(props.color || ctx.color),
             text: props.text$, //|| ((ctx: any) => observable(props.text))
             disabled: props.disabled$,
         },
         events: {
-            click: props.onClick
+            $dom: {
+                click: props.onClick
+            }
+            //click: props.onClick
         }
     })
 }

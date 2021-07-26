@@ -100,13 +100,15 @@ const EVENT_MAP : Keyed<string> = {
 }
 
 export type DomEvents = {
-    click?: () => React.MouseEvent
-    change?: () => React.ChangeEvent
-    input?: () => React.FormEvent
-    focus?: () => React.FocusEvent
-    blur?: () => React.FocusEvent
-    keyUp?: () => React.KeyboardEvent
-    keyDown?: () => React.KeyboardEvent
+    $dom: {
+        click: () => React.MouseEvent
+        change: () => React.ChangeEvent
+        input: () => React.FormEvent
+        focus: () => React.FocusEvent
+        blur: () => React.FocusEvent
+        keyUp: () => React.KeyboardEvent
+        keyDown: () => React.KeyboardEvent
+    }
 }
 
 

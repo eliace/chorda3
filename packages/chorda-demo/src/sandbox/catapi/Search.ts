@@ -6,6 +6,11 @@ import { api, CatApi } from "./api"
 import { DomEvents } from "@chorda/react"
 import { faHeart, faRedo } from "@fortawesome/free-solid-svg-icons"
 
+const favourites = observable(null)
+
+api.searchFavourites({page: 1}).then(result => {
+    favourites.$value = result
+})
 
 
 type SearchScope = {
@@ -18,14 +23,12 @@ type SearchScope = {
     breeds: CatApi.Breed[]
     categories: CatApi.Category[]
     searchResults: CatApi.SearchResult[]
-    filters: CatApi.SearchImageFilter
-    bus: {
-        loadCategories: () => void
-        loadBreeds: () => void
-        search: (filter: CatApi.SearchImageFilter) => Promise<any>
-        loadNextPage: () => void
-        markAsFavourite: (image: CatApi.SearchResult) => void
-    }
+    filter: CatApi.SearchImageFilter
+    search: (filter: CatApi.SearchImageFilter) => void
+    loadNextPage: () => void
+    loadCategories: () => void
+    loadBreeds: () => void
+    markAsFavourite: (image: CatApi.SearchResult & {favourite?: boolean}) => void
 }
 
 type FavouriteScope = {
@@ -33,7 +36,7 @@ type FavouriteScope = {
 }
 
 type Record = {
-    id: string
+    id: any
     name: string
 }
 
@@ -66,74 +69,65 @@ const RECORD_NONE: Record = {id: null, name: 'None'}
 
 
 
-export const Search = () : HtmlBlueprint<SearchScope, SearchEvents&DomEvents> => {
+export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
     return {
-        injectors: {
+        initials: {
             orderId: () => observable('random'),
             typeId: () => observable('all'),
             categoryId: () => observable(null),
             breedId: () => observable(null),
             categories: () => observable([RECORD_NONE]),
-            breeds: () => observable([RECORD_NONE]),
-            filters: (scope) => computable(() => {
+            breeds: () => observable([RECORD_NONE as CatApi.Breed]),
+            page: () => observable(0),
+            limit: () => observable(9),
+            searchResults: () => observable([{}, {}, {}, {}, {}, {}, {}, {}, {}] as CatApi.SearchResult[]),
+        },
+        injections: {
+            filter: (scope) => computable(() => {
                 return {
                     breed_id: scope.breedId,
                     order: scope.orderId,
                     category_ids: scope.categoryId,
                     limit: scope.limit,
                     page: scope.page
-                } as CatApi.SearchImageFilter
+                }
             }),
-            page: () => observable(0),
-            limit: () => observable(9),
-            searchResults: () => observable([{}, {}, {}, {}, {}, {}, {}, {}, {}]),
-            bus: () => observable({})
+            search: ({searchResults}) => (filter: CatApi.SearchImageFilter) => {
+                api.searchImages(filter).then(result => {
+                    searchResults.$value = result
+                })
+            },
+            loadNextPage: ({page}) => () => {
+                page.$value = page + 1
+            },
+            loadBreeds: ({breeds, breedId}) => () => {
+                api.getBreeds().then(data => {
+                    breeds.$value = [RECORD_NONE as CatApi.Breed].concat(data)
+                    breedId.$value = breeds[0].id
+                })
+            },
+            loadCategories: ({categories, categoryId}) => () => {
+                api.getCategories().then(data => {
+                    categories.$value = [RECORD_NONE as CatApi.Category].concat(data)
+                    categoryId.$value = categories[0].id
+                })
+            },
+            markAsFavourite: () => (image) => {
+                image.favourite = true
+                api.saveAsFavourite(String(image.id))
+            }
         },
         joints: {
-            autoLoad: ({bus, breeds, categories, searchResults, filters}) => {
+            autoLoad: ({loadBreeds, loadCategories, search, filter}) => {
 
-                bus.search.$value = createValueEffect(searchResults, 'search', api.searchImages)
-                
-                bus.$event('loadNextPage')
-
-                bus.loadBreeds.$value = createValueEffect(breeds, 'loadBreeds', () => {
-                    return api.getBreeds().then(data => {
-                        return [RECORD_NONE].concat(data)
-                    })
-                })
-                bus.loadCategories.$value = createValueEffect(categories, 'loadCategories', () => {
-                    return api.getCategories().then(data => {
-                        return [RECORD_NONE].concat(data)
-                    })
-                })
-                bus.markAsFavourite = bus.$event('markAsFavourite') as any
-                bus.$on('markAsFavourite', (image: CatApi.SearchResult) => {
-                    api.saveAsFavourite(String(image.id))
-                })
-
-
-                filters.$subscribe((next) => {
-                    bus.search(next)
+                filter.$subscribe((next) => {
+                    search(next)
                 })
 
                 setTimeout(() => {
-                    bus.loadBreeds()
-                    bus.loadCategories()
+                    loadBreeds()
+                    loadCategories()
                 })
-            }
-        },
-        events: {
-            loadBreedsDone: (breeds, {breedId}) => {
-                breedId.$value = breeds[0].id
-            },
-            loadCategoriesDone: (categories, {categoryId}) => {
-                categoryId.$value = categories[0].id
-            },
-            loadNextPage: (e, {page}) => {
-                page.$value = page + 1
-            },
-            markAsFavourite: (image) => {
-                image.favourite = true
             }
         },
         styles: {
@@ -199,7 +193,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents&DomEvents> =>
                 ]
             },
             images: Coerced<IteratorScope<CatApi.SearchResult[]>, SearchScope>({
-                injectors: {
+                injections: {
                     __it: (scope) => iterable(scope.searchResults),
                 },
                 css: 'catapi-search',
@@ -215,23 +209,25 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents&DomEvents> =>
                                 favicon: FaIcon({
                                     icon: faHeart,
                                     as: {
-                                        injectors: {
+                                        injections: {
                                             favourite: (scope) => scope.__it.favourite
                                         },
-                                        reactors: {
+                                        reactions: {
                                             favourite: (v) => patch({classes: {'is-favourited': v}})
                                         },
-                                        events: {                                                                                                                
-                                            click: (e, {bus, __it}) => {
-                                                bus.markAsFavourite(__it)
-                                            }
+                                        events: {    
+                                            $dom: {
+                                                click: (e, {markAsFavourite, __it}) => {
+                                                    markAsFavourite(__it)
+                                                }    
+                                            }                                                                                                            
                                         }
                                     }
                                     
                                 })
                             },
                         }),
-                        reactors: {
+                        reactions: {
                             __it: (v) => patch({items: v})
                         }
                     }
@@ -258,9 +254,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents&DomEvents> =>
                                     text: 'More',
                                     css: 'is-info is-medium',
                                     rightIcon: FaIcon({icon: faRedo}),
-                                    onClick: (e, {bus}) => {
-                                        bus.$emit('loadNextPage')
-                                    }
+                                    onClick: (e, {loadNextPage}) => loadNextPage()
                                 }),
                             })
                         ]

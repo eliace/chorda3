@@ -81,7 +81,7 @@ export const MenuItem = <T>(props: MenuItemProps<T&MenuItemScope>) : HtmlBluepri
         templates: {
             content: {
                 tag: 'a',
-                reactors: {
+                reactions: {
                     text: (v) => patch({text: v}),
                     active: (v) => patch({classes: {'is-active': v}}),
                     link: (v) => patch({dom: {href: v}})
@@ -107,7 +107,7 @@ export const MenuItem = <T>(props: MenuItemProps<T&MenuItemScope>) : HtmlBluepri
         components: {
             list: !!props.items
         },
-        injectors: {
+        injections: {
             name: () => observable(props.name),
             link: () => observable(props.link),
             active: props.active$

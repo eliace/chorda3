@@ -55,12 +55,12 @@ export const ListBoxItem = <T>(props: ListBoxItemProps<T&ListBoxItemScope>) : Ht
                     subtitle: {
                         css: 'list-box-item__subtitle',
                         weight: 10,
-                        reactors: {
+                        reactions: {
                             subtitle: (v) => patch({text: v})
                         }
                     }
                 },
-                reactors: {
+                reactions: {
                     text: (v) => patch({text: v}),
                     subtitle: (v) => patch({components: {subtitle: !!v}})
                 }
@@ -89,7 +89,7 @@ export const ListBoxItem = <T>(props: ListBoxItemProps<T&ListBoxItemScope>) : Ht
                 },
             }
         },
-        injectors: {
+        injections: {
             text: props.text$,
             subtitle: props.subtitle$ || (() => observable(props.subtitle)),
             image: props.image$

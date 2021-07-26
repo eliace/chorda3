@@ -18,7 +18,7 @@ export const Image = <T>(props: ImageProps<T>) : HtmlBlueprint<T> => {
         templates: {
             image: {
                 tag: 'img',
-                reactors: {
+                reactions: {
                     url: (v) => patch({dom: {src: v}})
                 }
             }
@@ -35,7 +35,7 @@ export const Image = <T>(props: ImageProps<T>) : HtmlBlueprint<T> => {
                 }
             }
         },
-        injectors: {
+        injections: {
             url: props.url$
         }
     })

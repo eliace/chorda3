@@ -29,7 +29,7 @@ type FilterScope<I, V=I> = {
 }
 
 type FilterEvents<I> = {
-    itemsFilter?: () => string
+    itemsFilter: () => string
 } & DropdownEvents<I>
 
 type InputScope<V> = {
@@ -53,7 +53,7 @@ export default () : HtmlBlueprint => {
     return RowLayout([
         ColumnLayout([
             Custom<FilterScope<Country, string>, FilterEvents<Country>>({
-                injectors: {
+                injections: {
                     filter: () => observable(''),
                     filteredItems: ({filter}) => computable(() => {
     //                    debugger
@@ -77,24 +77,26 @@ export default () : HtmlBlueprint => {
                             tag: 'input',
                             css: 'input',
                             events: {
-                                input: (e, {value}) => {
-                                    value.$value = (e.target as any).value
-                                    value.$emit('itemsFilter')
-                                },
-                                focus: (e, {value}) => {
-//                                    active.$value = true
-                                    value.$emit('itemsFilter')
-                                },
-                                keyDown: (e, {filter, selected}) => {
-                                    if (e.code == 'Escape') {
-                                        filter.$value = filterFunc(selected)
-                                    }
+                                $dom: {
+                                    input: (e, {value}) => {
+                                        value.$value = (e.target as any).value
+                                        value.$emit('itemsFilter')
+                                    },
+                                    focus: (e, {value}) => {
+    //                                    active.$value = true
+                                        value.$emit('itemsFilter')
+                                    },
+                                    keyDown: (e, {filter, selected}) => {
+                                        if (e.code == 'Escape') {
+                                            filter.$value = filterFunc(selected)
+                                        }
+                                    }    
                                 }
                             },
-                            injectors: {
+                            injections: {
                                 value: (scope) => scope.filter
                             },
-                            reactors: {
+                            reactions: {
                                 value: (v) => patch({dom: {defaultValue: v || ''}})
                             },
                             joints: {

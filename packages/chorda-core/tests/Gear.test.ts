@@ -25,17 +25,17 @@ const createGear = <D>(o: Blueprint<D>) : Gear<D> => {
 const createGearList = <T>(list: any[]) : Gear<T> => {
     return createGear<any>({
         defaultItem: {
-            injectors: {               
+            injections: {               
                 name: (ctx) => (ctx as any).__it.$value
             }
         },
-        reactors: {
+        reactions: {
             items: (v) => {
 //                console.log('new value', iterator(v, ''))
                 return patch({items: v})
             }
         },
-        injectors: {
+        injections: {
             items: () => iterable(list)
         }
     })
@@ -58,7 +58,7 @@ describe ('Gear', () => {
                     a: {
                         components: {
                             b: {
-                                injectors: {
+                                injections: {
                                     x: () => 1,
                                     y: () => 2
                                 }
@@ -94,12 +94,12 @@ describe ('Gear', () => {
             })
 
             const h = createGear<{profile: any, postCode: any}>({
-                injectors: {
+                injections: {
                     profile: () => profile
                 },
                 components: {
                     a: {
-                        injectors: {
+                        injections: {
                             postCode: (scope) => scope.profile.address.city.postCode
                         }
                     }
@@ -114,12 +114,12 @@ describe ('Gear', () => {
         it ('Should redefine nested scope entry with the same name', () => {
 
             const g = createGear({
-                injectors: {
+                injections: {
                     data: () => observable({x: 7})
                 },
                 components: {
                     a: {
-                        injectors: {
+                        injections: {
                             data: (scope) => (scope.data as any).x
                         }
                     }
@@ -329,10 +329,10 @@ describe ('Gear', () => {
         it ('Should create components from iterator', () => {
 
             const g = createGear({
-                injectors: {
+                injections: {
                     data: () => iterable({a: 'a', b: 'b', c: 'c'})
                 },
-                reactors: {
+                reactions: {
                     data: (v) => patch({components: v})
                 }
             })
@@ -347,10 +347,10 @@ describe ('Gear', () => {
             const v = observable({})
 
             const g = createGear({
-                injectors: {
+                injections: {
                     data: () => iterable(v)
                 },
-                reactors: {
+                reactions: {
                     data: (v) => patch({components: v})
                 }
             })
@@ -370,10 +370,10 @@ describe ('Gear', () => {
             const v = observable({a: 1, b: 2})
 
             const g = createGear({
-                injectors: {
+                injections: {
                     data: () => iterable(v)
                 },
-                reactors: {
+                reactions: {
                     data: (v) => patch({components: v})
                 }
             })
@@ -393,10 +393,10 @@ describe ('Gear', () => {
             const v = observable({a: 1, b: 2})
 
             const g = createGear({
-                injectors: {
+                injections: {
                     data: () => iterable(v)
                 },
-                reactors: {
+                reactions: {
                     data: (v) => patch({components: v})
                 }
             })

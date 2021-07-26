@@ -18,10 +18,10 @@ export default () : HtmlBlueprint<AllIconsScope> => {
         defaultItem: FaIcon({
             icon$: (scope) => scope.__it
         }),
-        injectors: {
+        injections: {
             data: () => iterable(allIcons)
         },
-        reactors: {
+        reactions: {
             data: (v) => patch({items: v})
         }
     }

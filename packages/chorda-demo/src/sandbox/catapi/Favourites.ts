@@ -38,7 +38,7 @@ const LIMITS = observable([
 
 export const Favourites = () : HtmlBlueprint<FavouritesScope> => {
     return {
-        injectors: {
+        injections: {
             images: () => observable(null),
             limit: () => observable(9),
             page: () => observable(null),
@@ -89,10 +89,10 @@ export const Favourites = () : HtmlBlueprint<FavouritesScope> => {
                 templates: {
                     tiles: Coerced<IteratorScope<CatApi.Favourite[]>, FavouritesScope>({
                         css: 'flex-tiles',
-                        injectors: {
+                        injections: {
                             __it: (scope) => iterable(scope.images)
                         },
-                        reactors: {
+                        reactions: {
                             __it: (v) => patch({items: v})
                         },
                         defaultItem: Coerced<IteratorScope<CatApi.Favourite>>({

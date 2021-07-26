@@ -16,8 +16,8 @@ export type InfiniteScrollScope<I=any> = {
         lastPage: number
         totalPages: number
         loading: boolean
-        reset: () => void
-        update: (id: number, items: I[], total: number) => void
+        resetAndGetFirst?: () => void
+        update?: (id: number, items: I[], total: number) => void
     }
     onNextPage: (page: number) => number
     infiniteItems: I[]
@@ -41,10 +41,11 @@ export const withInfiniteScroll = <T, E>(props: HtmlBlueprint<T&InfiniteScrollSc
                 totalPages: 0,
                 lastPage: 0,
                 pages: [],
+                loading: false
             }),
             onNextPage: () => callable(null),
         },
-        injectors: {
+        injections: {
             infiniteItems: ({infiniteScroll}) => computable(() => {
                 let out: any[] = []
                 infiniteScroll.pages.forEach(page => {
@@ -58,7 +59,7 @@ export const withInfiniteScroll = <T, E>(props: HtmlBlueprint<T&InfiniteScrollSc
         joints: {
             initInfiniteScroll: ({$dom, infiniteScroll, onNextPage}) => {
 
-                const {lastPage, totalPages, loading, pages, reset, update} = infiniteScroll
+                const {lastPage, totalPages, loading, pages, resetAndGetFirst, update} = infiniteScroll
 
                 const callback: IntersectionObserverCallback = (entries) => {
                     entries.forEach(entry => {
@@ -81,7 +82,7 @@ export const withInfiniteScroll = <T, E>(props: HtmlBlueprint<T&InfiniteScrollSc
                     }
                 })
 
-                reset.$value = () => {
+                resetAndGetFirst.$value = () => {
                     pages.$value = []
                     totalPages.$value = 0
                     lastPage.$value = 0
@@ -102,16 +103,15 @@ export const withInfiniteScroll = <T, E>(props: HtmlBlueprint<T&InfiniteScrollSc
             infiniteTail: Custom<InfiniteScrollScope<any>&HtmlScope>({
                 weight: 10,
                 joints: {
-                    subscribeObserver: ({$dom, infiniteScroll}) => {
+                    subscribeObserver: ({$dom, infiniteScroll: {intersectionObserver}}) => {
 
                         watch(() => {
 
-                            if ($dom.$value && infiniteScroll.intersectionObserver.$value) {
-//                                infiniteScroll.observableItems.set($dom.$value, null)
-                                infiniteScroll.intersectionObserver.observe($dom.$value)
+                            if ($dom.$value && intersectionObserver.$value) {
+                                intersectionObserver.observe($dom.$value)
                             }
 
-                        }, [$dom, infiniteScroll.intersectionObserver])
+                        }, [$dom, intersectionObserver])
 
                     }
 

@@ -1,5 +1,5 @@
 import { computable, HtmlBlueprint, iterable, Keyed, mix, observable, patch } from "@chorda/core"
-import { ContentLayout, LevelLayout, Tab, Tabs } from "chorda-bulma"
+import { ContentLayout, LevelLayout, Tab, Tabs, TabScope, TabsScope } from "chorda-bulma"
 import { AppScope, Coerced, Custom } from "../utils"
 
 
@@ -26,7 +26,7 @@ type ExamplePanelProps<T> = {
 
 export const ExamplePanel = <T>(props: ExamplePanelProps<T&ExampleScope>) : HtmlBlueprint<T> => {
     return mix<ExampleScope&AppScope>({
-        injectors: {
+        injections: {
             tabs: () => observable(props.tabs, (v: ExampleTab) => v.name),
             title: () => observable(props.title),
             selected: (scope) => scope.router.route.params.element,
@@ -43,21 +43,27 @@ export const ExamplePanel = <T>(props: ExamplePanelProps<T&ExampleScope>) : Html
             header: Custom({
                 css: 'example-header', 
                 as: LevelLayout([{
-                    title: ContentLayout({
+                    title: Custom({
                         css: 'example-title',
-                        templates: {
-                            content: {
-                                tag: 'h4',
-                                reactors: {
-                                    title: (v) => patch({text: v})
-                                }
+                        as: ContentLayout([{
+                            tag: 'h4',
+                            reactions: {
+                                title: (v) => patch({text: v})
                             }
-                        }
+                        }])
+                        // templates: {
+                        //     content: {
+                        //         tag: 'h4',
+                        //         reactions: {
+                        //             title: (v) => patch({text: v})
+                        //         }
+                        //     }
+                        // }
                     })
                 }, {
                     tabs: Tabs({
                         tabs$: (scope) => iterable(scope.tabs),
-                        defaultTab: Coerced<{tab: ExampleTab, __it: ExampleTab}, ExampleScope>({
+                        defaultTab: Coerced<{tab: ExampleTab, __it: ExampleTab}, ExampleScope&TabsScope>({
                             as: Tab({
                                 text$: (scope) => scope.tab.title,
                                 link$: (scope) => scope.tab.link,
@@ -66,7 +72,7 @@ export const ExamplePanel = <T>(props: ExamplePanelProps<T&ExampleScope>) : Html
                                     return scope.selected == scope.tab.name
                                 })
                             }),
-                            injectors: {
+                            injections: {
                                 tab: (scope) => scope.__it// _next(scope.tabs) //next(scope, 'tabs')
                             }
                         })
@@ -76,7 +82,7 @@ export const ExamplePanel = <T>(props: ExamplePanelProps<T&ExampleScope>) : Html
             content: {
                 css: 'example-content',
                 components: false,
-                reactors: {
+                reactions: {
                     tabs: (v) => {
                         const templates = v.reduce((acc, tab) => {
                             acc[tab.name] = tab.example
@@ -92,3 +98,4 @@ export const ExamplePanel = <T>(props: ExamplePanelProps<T&ExampleScope>) : Html
         }
     })
 }
+

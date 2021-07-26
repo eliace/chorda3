@@ -3,6 +3,10 @@ import { Engine } from './engine'
 import { MixRules, mixin } from './mix'
 
 
+export type Scope = {
+    [k: string]: any
+}
+
 // Scope
 
 export type Scoped<D> = {
@@ -17,10 +21,10 @@ type ObservableScoped<D> = {
     [P in keyof D]?: D[P]&ObservableValue<D[P]>&EventBus<any>&ObservableScoped<D[P]>
 }
 
-// Scope injectors
+// Scope injections
 
 type Injectors<D> = {
-    [P in keyof D]?: Injector<D/*, D[P]*/>
+    [P in keyof D]?: Injector<D, D[P]>
 }
 
 export type Injector<D, R=any> = (scope: Scoped<D>&{$context?: Scoped<D>}) => R
@@ -122,14 +126,14 @@ type Joints<T> = {
 
 export interface HubOptions<D, E> {
     // инжекторы скоупа
-    injectors?: Injectors<D>
+    injections?: Injectors<D>
     // кастомизация скоупа
     joints?: Joints<D>
     // инжекторы по умолчанию
     initials?: Injectors<D>
 
     // изменения скоупа
-    reactors?: Reactors<D>
+    reactions?: Reactors<D>
     // слушатели скоупа
     events?: Listeners<MethodsAndObjectsOf<E>, D>
 }
@@ -265,8 +269,8 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 //                        return (target[p] && isAutoTerminal() && target[p].$isTerminal) ? target[p].$value : target[p]
                     }
 
-                    if (!isInjected && prop < PropState.Injector && this.options.injectors) {
-                        const injector: Injector<any> = (this.options.injectors as any)[p]
+                    if (!isInjected && prop < PropState.Injector && this.options.injections) {
+                        const injector: Injector<any, any> = (this.options.injections as any)[p]
                         if (injector !== undefined) {
                             if (typeof injector === 'function') {
                                 _InjectProps[String(p)] = PropState.Injector
@@ -300,7 +304,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
 
                 if (!isInjected && prop < PropState.Default && this.options.initials) {
-                    const injector: Injector<any> = (this.options.initials as any)[p]
+                    const injector: Injector<any, any> = (this.options.initials as any)[p]
                     if (injector !== undefined) {
                         if (typeof injector === 'function') {
                             _InjectProps[String(p)] = PropState.Default
@@ -355,16 +359,16 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
                 return true
             },
             has: (target, p) => {
-                return Reflect.has(target, p) || Reflect.has(context, p) || (this.options.injectors && Reflect.has(this.options.injectors, p))
+                return Reflect.has(target, p) || Reflect.has(context, p) || (this.options.injections && Reflect.has(this.options.injections, p))
             },
             ownKeys: (target) : ArrayLike<string|symbol> => {
-                const keys: any = {...context, ...target, ...this.options.injectors}
+                const keys: any = {...context, ...target, ...this.options.injections}
                 return Object.keys(keys)
             },
             getOwnPropertyDescriptor: (target, p) => {
                 return Reflect.getOwnPropertyDescriptor(target, p) 
                     || Reflect.getOwnPropertyDescriptor(context, p)
-                    || (this.options.injectors && Reflect.getOwnPropertyDescriptor(this.options.injectors, p))
+                    || (this.options.injections && Reflect.getOwnPropertyDescriptor(this.options.injections, p))
             },
         })
 
@@ -403,13 +407,13 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         let newHandlers: Handler<any>[] = []
 
         // Injectors
-        if (optPatch.injectors) {
+        if (optPatch.injections) {
             // здесь мы должны обновлять измененные инжекторы
 
-            // this._Injectors = o.injectors
-            // for (let k in o.injectors) {
+            // this._Injectors = o.injections
+            // for (let k in o.injections) {
             //     this.scope[k]
-            //     // const injector: Injector<any> = o.injectors[k]
+            //     // const injector: Injector<any> = o.injections[k]
             //     // if (injector !== undefined) {
             //     //     let entry = null
             //     //     if (typeof injector === 'function') {
@@ -452,11 +456,11 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
 
         // Reactors
-        if (optPatch.reactors) {
-            for (let k in o.reactors) {
-                if (o.reactors[k] && !this.bindings[k]) {
+        if (optPatch.reactions) {
+            for (let k in o.reactions) {
+                if (o.reactions[k] && !this.bindings[k]) {
 
-                    this.bindings[k] = this.patchAware(o.reactors[k])//scopeKeyAware.bind(this, k, this.patchAware(o.reactors[k])) 
+                    this.bindings[k] = this.patchAware(o.reactions[k])//scopeKeyAware.bind(this, k, this.patchAware(o.reactions[k])) 
 
                     const entry = this.scope[k]
                     const binding = this.bindings[k]

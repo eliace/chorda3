@@ -3,23 +3,23 @@ import { HtmlBlueprint, Injector, iterable, Keyed, mix, observable, patch } from
 
 type LevelLayoutScope = {
     level: HtmlBlueprint
-    left: HtmlBlueprint
-    right: HtmlBlueprint
+    left: Keyed<HtmlBlueprint>
+    right: Keyed<HtmlBlueprint>
 }
 
-type LevelLayoutProps<T> = {
-    tag?: string
-    css?: string
-    weight?: number,
-    atLeft?: Keyed<HtmlBlueprint<T>>
-    atRight?: Keyed<HtmlBlueprint<T>>
-    items?: [HtmlBlueprint<T>, HtmlBlueprint<T>]
-}
+// type LevelLayoutProps<T> = {
+//     tag?: string
+//     css?: string
+//     weight?: number,
+//     atLeft?: Keyed<HtmlBlueprint<T>>
+//     atRight?: Keyed<HtmlBlueprint<T>>
+//     items?: [HtmlBlueprint<T>, HtmlBlueprint<T>]
+// }
 
 
 
 
-export const LevelLayout = <T>(elements: [Keyed<HtmlBlueprint<T>>, Keyed<HtmlBlueprint<T>>]) : HtmlBlueprint<T> => {
+export const LevelLayout = <T>(elements: [Keyed<HtmlBlueprint<T>>, Keyed<HtmlBlueprint<T>>], as?: HtmlBlueprint<T>) : HtmlBlueprint<T> => {
     return mix<LevelLayoutScope>({
         css: 'level',
         templates: {
@@ -27,19 +27,19 @@ export const LevelLayout = <T>(elements: [Keyed<HtmlBlueprint<T>>, Keyed<HtmlBlu
                 css: 'level-left',
                 defaultComponent: {
                     css: 'level-item',
-                    reactors: {
+                    reactions: {
                         level: (v) => {
                             patch({components: {content: v}})
                         }
                     },
-                    injectors: {
+                    injections: {
                         level: (scope) => {
 //                            console.log(scope)
                             return (scope as any).__it
                         }
                     }
                 },
-                reactors: {
+                reactions: {
                     left: (next) => {
 //                        console.log(next)
                         patch({components: next})
@@ -50,26 +50,28 @@ export const LevelLayout = <T>(elements: [Keyed<HtmlBlueprint<T>>, Keyed<HtmlBlu
                 css: 'level-right',
                 defaultComponent: {
                     css: 'level-item',
-                    reactors: {
+                    reactions: {
                         level: (v) => {
 //                            console.log(v)
                             patch({components: {content: v}})
                         }
                     },
-                    injectors: {
+                    injections: {
                         level: (s) => {
 //                            console.log(s)
                             return (s as any).__it
                         }
                     }
                 },
-                reactors: {
+                reactions: {
                     right: (next) => patch({components: next})
                 }
             }
         }
-    }, {
-        injectors: {
+    }, 
+    as,
+    {
+        injections: {
             left: () => iterable(elements[0]),
             right: () => iterable(elements[1])
         },

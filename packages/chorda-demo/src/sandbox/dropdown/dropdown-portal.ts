@@ -70,7 +70,7 @@ export default <T>() : HtmlBlueprint<T> => {
                         trigger: true,
                         menu: false
                     },
-                    reactors: {
+                    reactions: {
                         active: (v) => {
                             patch({classes: {'is-active': v}, components: {menu: v}})
                         },
@@ -159,13 +159,13 @@ type PortalScope = {
 
 const Portal = <T>(props: HtmlBlueprint<T>) : HtmlBlueprint<T> => {
     return mix<PortalScope>({
-        injectors: {
+        injections: {
             $portal: () => observable(null)
         },
         templates: {
             portal: {
                 css: 'portal-host',
-                reactors: {
+                reactions: {
                     $portal: (v) => {
                         patch({components: {content: v}})
                     }

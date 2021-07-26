@@ -5,6 +5,9 @@ import { Icon } from "chorda-bulma"
 import { DataScope } from "../utils"
 
 
+const isIconDefinition = (icon: string|IconDefinition) : icon is IconDefinition => {
+    return !!(icon as IconDefinition).iconName
+}
 
 type FaIconProps<T, E> = {
     icon$?: Injector<T>
@@ -17,11 +20,11 @@ export const FaIcon = <T>(props: FaIconProps<T&DataScope<string>, DomEvents>): H
 
     const prefix = props?.prefix || 'fas'
 
-    return mix<DataScope<string|IconDefinition>>(Icon, {
+    return mix<DataScope<string|IconDefinition|(string|IconDefinition)[]>>(Icon, {
         tag: 'i',
         templates: {
             icon: {
-                reactors: {
+                reactions: {
                     data: (next, prev) => {
 //                        console.log('icon', next, prev)
                         const classes: any = {}
@@ -30,7 +33,7 @@ export const FaIcon = <T>(props: FaIconProps<T&DataScope<string>, DomEvents>): H
                                 next = next.$value
                             }
                             (Array.isArray(next) ? next : [next]).forEach(s => {
-                                if ((s as IconDefinition).iconName) {
+                                if (isIconDefinition(s)) {
                                     classes['fa-'+s.iconName] = true
                                     classes[s.prefix] = true
                                 }
@@ -45,7 +48,7 @@ export const FaIcon = <T>(props: FaIconProps<T&DataScope<string>, DomEvents>): H
                                 prev = prev.$value
                             }
                             (Array.isArray(prev) ? prev : [prev]).forEach(s => {
-                                if ((s as IconDefinition).iconName) {
+                                if (isIconDefinition(s)) {
                                     classes['fa-'+s.iconName] = false
                                     classes[s.prefix] = classes[s.prefix] || false
                                 }
@@ -70,7 +73,7 @@ export const FaIcon = <T>(props: FaIconProps<T&DataScope<string>, DomEvents>): H
         initials: {
             data: () => observable(props.icon)
         },
-        injectors: {
+        injections: {
             data: props.icon$
         }
     })

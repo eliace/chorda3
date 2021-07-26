@@ -19,7 +19,7 @@ type LinkProps<T> = {
 export const Link = <T>(props: LinkProps<T&LinkScope>) : HtmlBlueprint<T> => {
     return mix<LinkScope>({
         tag: 'a',
-        reactors: {
+        reactions: {
             text: (v) => patch({text: v}),
             link: (v) => patch({dom: {href: v}})
         }
@@ -28,7 +28,7 @@ export const Link = <T>(props: LinkProps<T&LinkScope>) : HtmlBlueprint<T> => {
             href: props.link
         },
         text: props.text,
-        injectors: {
+        injections: {
             text: props.text$,
             link: props.link$
         }

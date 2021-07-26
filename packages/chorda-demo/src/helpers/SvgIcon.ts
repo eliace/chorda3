@@ -38,7 +38,7 @@ export const SvgIcon = <T>(props: SvgIconProps<T&SvgIconScope>) : HtmlBlueprint<
                         // dom: {
                         //     d: props.icon.icon[4]
                         // },
-                        reactors: {
+                        reactions: {
                             data: (v) => patch({
                                 dom: {
                                     d: v.icon[4]
@@ -47,7 +47,7 @@ export const SvgIcon = <T>(props: SvgIconProps<T&SvgIconScope>) : HtmlBlueprint<
                         }
                     }
                 },
-                reactors: {
+                reactions: {
                     data: (v) => {
                          patch({
                             dom: {
@@ -60,14 +60,14 @@ export const SvgIcon = <T>(props: SvgIconProps<T&SvgIconScope>) : HtmlBlueprint<
                 }        
             }
         },
-        reactors: {
+        reactions: {
             tooltip: (v) => patch({dom: {title: v}})
         }
     }, props && {
         initials: {
             data: () => observable(props.icon)
         },
-        injectors: {
+        injections: {
 //            data: (scope, ctx) => observable(props.icon),
             tooltip: props.tooltip$,
             data: props.data$

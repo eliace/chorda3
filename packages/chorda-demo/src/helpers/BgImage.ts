@@ -20,7 +20,7 @@ export const BgImage = <T>(props: BgImageProps<T&BgImageScope>) : HtmlBlueprint<
         templates: {
             content: {
                 css: 'bg-image-content',
-                reactors: {
+                reactions: {
                     url: (v: any) => v && patch({
                         styles: {
                             backgroundImage: `url(${v})`
@@ -32,7 +32,7 @@ export const BgImage = <T>(props: BgImageProps<T&BgImageScope>) : HtmlBlueprint<
     },
     props?.as,
     props && {
-        injectors: {
+        injections: {
             url: props.url$
         },
         initials: {

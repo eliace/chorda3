@@ -15,11 +15,11 @@ type TitleProps<T> = {
 export const Title = <T>(props: TitleProps<T&TitleScope>) : HtmlBlueprint<T> => {
     return mix({
         css: 'title',
-        reactors: {
+        reactions: {
             text: (v: any) => patch({text: v})
         }
     }, {
-        injectors: {
+        injections: {
             text: props.text$// || ((ctx: any) => observable(props.text || ctx.text))
         },
         css: buildClassName(props.css, props.size),
@@ -32,11 +32,11 @@ export const Title = <T>(props: TitleProps<T&TitleScope>) : HtmlBlueprint<T> => 
 export const Subtitle = <T>(props: TitleProps<T&TitleScope>) : HtmlBlueprint => {
     return mix({
         css: 'subtitle',
-        reactors: {
+        reactions: {
             text: (v: any) => patch({text: v})
         }
     }, {
-        injectors: {
+        injections: {
             text: props.text$// (ctx: any) => observable(props.text || ctx.text)
         },
         css: buildClassName(props.css, props.size),

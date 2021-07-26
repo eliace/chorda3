@@ -73,7 +73,7 @@ export const Card = <T>(props: CardProps<T&CardScope>) : HtmlBlueprint<T> => {
                         css: 'card-header-icon'
                     }
                 },
-                reactors: {
+                reactions: {
                     model: (v) => patch({
                         components: {title: v.title, icon: v.titleIcon}
                     })

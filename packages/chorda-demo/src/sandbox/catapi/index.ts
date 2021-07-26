@@ -43,7 +43,7 @@ export const CatApi = () : HtmlBlueprint<CatApiScope> => {
                     search: Search,
                     favourites: Favourites,
                 },
-                reactors: {
+                reactions: {
                     selected: (v) => patch({components: {
                         vote: v == 'vote',
                         breeds: v == 'breeds',
@@ -53,7 +53,7 @@ export const CatApi = () : HtmlBlueprint<CatApiScope> => {
                 }
             })
         ],
-        injectors: {
+        injections: {
             selected: () => observable('vote')
         }
     })

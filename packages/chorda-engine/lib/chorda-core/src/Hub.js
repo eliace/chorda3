@@ -36,13 +36,13 @@ var Hub = /** @class */ (function () {
         var newSubscriptions = [];
         var newHandlers = [];
         // Injectors
-        if (optPatch.injectors) {
-            for (var k in o.injectors) {
-                var injector = o.injectors[k];
+        if (optPatch.injections) {
+            for (var k in o.injections) {
+                var injector = o.injections[k];
                 if (injector !== undefined) {
                     var entry = injector(this.scope); //, this)
                     // if (typeof entry === 'function') {
-                    //     entry = o.injectors[k](this.scope)//, this)
+                    //     entry = o.injections[k](this.scope)//, this)
                     // }
                     if (this.scope[k] != entry) {
                         // TODO здесь нужно отписываться от элемента скоупа 
@@ -67,10 +67,10 @@ var Hub = /** @class */ (function () {
             newSubscriptions = newSubscriptions.concat(subscriptions);
         }
         // Reactors
-        if (optPatch.reactors) {
+        if (optPatch.reactions) {
             var _loop_1 = function (k) {
-                if (o.reactors[k] && !this_1.bindings[k]) {
-                    this_1.bindings[k] = this_1.patchAware(o.reactors[k]);
+                if (o.reactions[k] && !this_1.bindings[k]) {
+                    this_1.bindings[k] = this_1.patchAware(o.reactions[k]);
                     var entry_1 = this_1.scope[k];
                     var binding_1 = this_1.bindings[k];
                     if (value_1.isObservable(entry_1)) {
@@ -85,7 +85,7 @@ var Hub = /** @class */ (function () {
                 }
             };
             var this_1 = this;
-            for (var k in o.reactors) {
+            for (var k in o.reactions) {
                 _loop_1(k);
             }
         }

@@ -67,10 +67,10 @@ export const App = () : HtmlBlueprint<AppScope> => {
                     content: {
                         column: 'is-four-fifth',
                         as: Selected({
-                            injectors: {
+                            injections: {
                                 selected: (scope) => scope.router.route.name
                             },
-                            reactors: {
+                            reactions: {
                                 selected: (v) => patch({
                                     components: {
                                         elements: v == 'elements',

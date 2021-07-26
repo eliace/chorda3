@@ -12,14 +12,14 @@ export const FaIcon = <T>(props: FaIconProps<T&DataScope<string>>): HtmlBlueprin
         templates: {
             icon: {
                 css: 'fas',
-                reactors: {
+                reactions: {
                     data: (next, prev) => patch({classes: {[next]: true, [prev]: false}})
                 }
             }
         }
     },
     props && {
-        injectors: {
+        injections: {
             data: props.icon$
         }
     })

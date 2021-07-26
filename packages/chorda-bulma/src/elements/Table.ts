@@ -55,7 +55,7 @@ export const Table = <T>(props: TableProps<T&TableScope>) : HtmlBlueprint<T> => 
                         tag: 'td'
                     }
                 },
-                reactors: {
+                reactions: {
                     data: (next) => {
 //                        debugger
                         patch({items: next})
@@ -76,7 +76,7 @@ export const Table = <T>(props: TableProps<T&TableScope>) : HtmlBlueprint<T> => 
                 defaultItem: props.defaultRow,
             }
         },
-        injectors: {
+        injections: {
             data: props.data$ || (() => observable(props.data))
         }
     })
@@ -128,10 +128,10 @@ export const Row = <T>(props: RowProps<T>) : HtmlBlueprint<T> => {
     }, {
         defaultItem: props.defaultCell,
         items: props.cells,
-        // injectors: {
+        // injections: {
         //     data: props.data$ || (() => props.data)
         // },
-        // reactors: {
+        // reactions: {
         //     data: (v) => patch({items: v})
         // }
     })
@@ -154,10 +154,10 @@ export const Cell = <T>(props: CellProps<T>) : HtmlBlueprint<T> => {
 //        tag: 'td'
     }, */{
 //        text: props.text,
-        reactors: {
+        reactions: {
             data: (v) => patch({text: (props.format || String)(v)})
         },
-        injectors: {
+        injections: {
             data: props.data$ || (() => props.text)
         }
     })

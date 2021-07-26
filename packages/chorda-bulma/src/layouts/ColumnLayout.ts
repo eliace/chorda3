@@ -11,15 +11,15 @@ export const ColumnLayout = <T>(elements: HtmlBlueprint<T>[]) : HtmlBlueprint<T>
         css: 'columns',
         defaultItem: {
             css: 'column',
-            reactors: {
+            reactions: {
                 columns: (v) => patch({components: {content: v}})
             }
         },
-        reactors: {
+        reactions: {
             columns: (v) => patch({items: v})
         }
     }, {
-        injectors: {
+        injections: {
             columns: () => iterable(elements, 'columns')
         }        
     })

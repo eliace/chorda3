@@ -22,7 +22,7 @@ type MoviesScope = {
     loading: boolean
     scrollHeightLock: boolean
     bus: {
-        nextPage: () => void
+        nextPage?: () => void
     }
 }
 
@@ -46,7 +46,7 @@ export default <T>() : HtmlBlueprint<T> => {
             as: {
 
         //Coerced<IteratorScope<Tmdb.Movie[]>&MoviesScope&HtmlScope>({
-                injectors: {
+                injections: {
     //                __it: () => iterable(movies),
                     totalPages: () => totalPages,
                     scrollTop: () => observable(0),
@@ -54,10 +54,10 @@ export default <T>() : HtmlBlueprint<T> => {
                     bounds: () => observable(null),
                     lastPage: () => lastPage,
                     loading: () => observable(null),
-                    bus: () => observable({}),
+                    bus: () => observable({nextPage: null}),
                     scrollHeightLock: () => observable(false),
                 },
-                // reactors: {
+                // reactions: {
                 //     __it: (v) => patch({items: v})
                 // },
                 joints: {

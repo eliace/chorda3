@@ -5,7 +5,7 @@ import { SvgIcon } from '../../helpers'
 const allIcons = Object.values(FaSvgLib).filter((icon:FaSvgLib.IconDefinition) => !!icon.icon && icon.iconName != 'font-awesome-logo-full')
 
 type AllIconsScope = {
-    data: FaSvgLib.IconDefinition[]
+    data: (FaSvgLib.IconDefinition|FaSvgLib.IconPrefix|FaSvgLib.IconPack)[]
     __it: FaSvgLib.IconDefinition
 }
 
@@ -15,10 +15,10 @@ export default () : HtmlBlueprint<AllIconsScope> => {
             tooltip$: (scope) => scope.data.iconName,
             data$: (scope) => scope.__it
         }),
-        injectors: {
+        injections: {
             data: () => iterable(allIcons)
         },
-        reactors: {
+        reactions: {
             data: (v) => patch({items: v})
         }
     }

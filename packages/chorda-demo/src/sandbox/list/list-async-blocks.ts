@@ -418,7 +418,7 @@ export default <T>() : HtmlBlueprint<T> => {
             defaultItem: DynamicList<Tmdb.Movie[], DynamicItemScope<LazyPage<Tmdb.Movie>>&LazyScrollScope<unknown>&{lazyPage: LazyPage<any>}&HtmlScope>({
                 as: {
 //                    layout: passthruLayout,
-                    injectors: {
+                    injections: {
                         lazyPage: (scope) => scope.item
                     },
                     joints: {

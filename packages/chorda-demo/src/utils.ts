@@ -1,4 +1,4 @@
-import { defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, Keyed, mix, Observable, observable, PublishFunc, Value } from "@chorda/core"
+import { defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, Keyed, mix, Observable, observable, PublishFunc, Scope, Value } from "@chorda/core"
 import { createPatchEngine } from "@chorda/engine"
 import { createRenderEngine, defaultVNodeFactory, DomEvents } from "@chorda/react"
 import { Route } from "router5"
@@ -161,6 +161,6 @@ export const createValueEffect = <T, F extends Function>(bus: EventBus<any>&Valu
 
 export const watch = <T>(f: PublishFunc<T>, objects: any[]) => {
     for (let obj of objects) {
-        (obj as Observable<unknown>).$subscribe(() => f.apply(this, objects))
+        (obj as Observable<unknown>).$subscribe(() => f.apply(this, objects.map(o => o.$value)))
     }
 }

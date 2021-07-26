@@ -18,10 +18,10 @@ type TextProps<T> = {
 }
 
 
-export const Text = <S, T=unknown>(props: TextProps<T&TextScope&S>) : HtmlBlueprint<T> => {
+export const Text = <T>(props: TextProps<T&TextScope>) : HtmlBlueprint<T> => {
     return mix<TextScope, DomEvents>(props.as || {tag: 'span'}, {
 //        tag: 'span',
-        reactors: {
+        reactions: {
             text: (v) => {
 //                console.log('s', v)
                 patch({text: String(v)})
@@ -29,11 +29,13 @@ export const Text = <S, T=unknown>(props: TextProps<T&TextScope&S>) : HtmlBluepr
         },
     }, {
         css: props.css,
-        injectors: {
+        injections: {
             text: props.text$
         },
         events: {
-            click: props.onClick
+            $dom: {
+                click: props.onClick
+            }
         }
     })
 }

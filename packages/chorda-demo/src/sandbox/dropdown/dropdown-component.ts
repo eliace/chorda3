@@ -66,7 +66,7 @@ export default <T>() : HtmlBlueprint<T> => {
                             menu: false,    // меню по умолчанию выключено
                             trigger: true   // триггер по умолчанию включен
                         },
-                        reactors: {
+                        reactions: {
                             active: (v) => {
                                  patch({classes: {'is-active': v}, components: {menu: v}})
                             }

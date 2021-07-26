@@ -30,15 +30,15 @@ describe ('Data', () => {
 
         const List = <K, T=unknown>(props: ListProps<T&ListScope<K>>) : Blueprint<T> => {
             return {
-                injectors: {
+                injections: {
                     data: props.data$,
                     __it: (scope) => iterable(scope.data, '_it')
                 },
-                reactors: {
+                reactions: {
                     data: (v) => patch({items: v})
                 },
                 defaultItem: Item<number>({
-                    injectors: {
+                    injections: {
                         data: (s) => (s as any)._it
                     }
                 })
@@ -53,7 +53,7 @@ describe ('Data', () => {
             List<number>({
                 data$: () => observable([1, 2, 3]),
                 item: Item<number>({
-                    reactors: {
+                    reactions: {
                         data: (v) => patch({test: v}),
                     }
                 })
@@ -123,14 +123,14 @@ describe ('Data', () => {
         //     }
 
         //     const s = createAndRun(List({
-        //         injectors: {
+        //         injections: {
         //             items: () => observable([1, 2, 3])
         //         },
         //         bindings: {
         //             items: (v) => patch({items: stream(v, '@item')})
         //         },
         //         defaultItem: Item({
-        //             injectors: {
+        //             injections: {
         //             }
         //         })
         //     }))

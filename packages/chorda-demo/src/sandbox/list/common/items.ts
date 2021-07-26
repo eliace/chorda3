@@ -1,9 +1,10 @@
 import { computable, HtmlBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core";
-import { MediaLayout, Image, Tags } from "chorda-bulma";
+import { MediaLayout, Image, Tags, ContentLayout, LevelLayout } from "chorda-bulma";
 import { Tmdb } from "../../../api";
 import { Coerced, IteratorScope } from "../../../utils";
 import { Paragraph, Text } from "../../../helpers";
 import { DynamicList } from "./utils";
+import * as dayjs from 'dayjs'
 
 
 type MovieListItemScope = {
@@ -26,66 +27,61 @@ export const MovieListItem = <I, T=IteratorScope<Tmdb.Movie[]>>(props: MovieList
                 content: Image({
                     url$: ({movie}) => computable(() => Tmdb.toImageUrl(movie.poster_path, 'w92')) 
                 }),
-                rate: Text({
-                    as: {
-                        css: 'movie-rate'
-                    },
-                    text$: ({movie}) => movie.vote_average
-                })
             }
-        }, {
-            templates: {
+        },
+        ContentLayout([
+            LevelLayout([{
                 title: Text({
                     as: {
-                        css: 'movie-title'
+//                        tag: 'h6',
+                        css: 'movie-title mb-2 has-text-weight-medium',
+                        templates: {
+                            date: Text({
+                                text$: ({movie}) => computable(() => dayjs(movie.release_date, 'YYYY-MM-DD').format('YYYY')),
+                                as: {
+                                    tag: 'span',
+                                    css: 'ml-2 has-text-grey-light has-text-weight-normal is-size-7',
+                                    weight: 10,
+                                }
+                            }), 
+                        }
                     },
                     text$: ({movie}) => movie.title
-                }),
-                originalTitle: Text({
-                    text$: ({movie}) => movie.original_title
-                }),
-                date: Text({
-                    text$: ({movie}) => movie.release_date
-                }),
-                description: Text({
-                    as: Paragraph,
-                    text$: ({movie}) => movie.overview
-                }),
-                genres: DynamicList<Tmdb.Movie['genre_ids'], MovieListItemScope>({
-                    as: Tags,
-                    defaultItem: Text({
-                        text$: (scope) => computable(() => {
-                            return scope.genres.filter(g => g.id == scope.item)[0].name
-                        })
+                })
+            }, {
+                rating: Text({
+                    as: {
+                        css: 'movie-rate has-text-grey mr-4'
+                    },
+                    text$: ({movie}) => computable(() => `${movie.vote_average} / ${movie.vote_count}`)
+                })
+            }], {css: 'mb-0'}),
+            Text({
+                as: Paragraph,
+                text$: ({movie}) => movie.overview,
+                css: 'is-size-0_85'
+            }),
+            DynamicList<Tmdb.Movie['genre_ids'], MovieListItemScope>({
+                as: Tags,
+                defaultItem: Text({
+                    text$: (scope) => computable(() => {
+                        return scope.genres.filter(g => g.id == scope.item)[0].name
                     }),
-                    items$: ({movie}) => movie.genre_ids,
+                    css: 'is-info is-light'
                 }),
-                // genres2: Coerced<IteratorScope<number[]>, MovieListItemScope>({
-                //     as: Tags({
-                //         defaultTag: Coerced<IteratorScope<number>, MovieListItemScope>({
-                //             as: Text({
-                //                 text$: (scope) => computable(() => {
-                //                     return scope.genres.filter(g => g.id == scope.__it)[0].name
-                //                 })
-                //             })
-                //         })
-                //     }),
-                //     reactors: {
-                //         __it: (v) => patch({items: v})
-                //     },
-                //     injectors :{
-                //         __it: (scope) => iterable(scope.movie.genre_ids)
-                //     }
-                // })
-            }
-        }),
+                items$: ({movie}) => movie.genre_ids,
+            }),
+            Text({
+                text$: ({movie}) => computable(() => movie.adult ? '18+' : '')
+            })
+        ])),
         props?.as,
         props && {
             initials: {
                 noOriginalTitle: () => observable(null),
                 noPoster: () => observable(null),
             },
-            injectors: {
+            injections: {
                 movie: props.movie$,
                 genres: props.genres$,
             }

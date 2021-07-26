@@ -24,10 +24,10 @@ export default () : HtmlBlueprint => {
                     })
                 })
             }),
-            reactors: {
+            reactions: {
                 data: (v) => patch({items: v})
             },
-            injectors: {
+            injections: {
                 data: () => iterable(users, 'data')
             }
         })

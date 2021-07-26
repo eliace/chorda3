@@ -18,7 +18,7 @@ export type HtmlScope = {
 //    afterRender?: any
 } & GearScope
 
-export type HtmlBlueprint<D=unknown, E=unknown, H=any> = HtmlOptions<D, E, H>|string|boolean|Function|Mixed<HtmlBlueprint<D, E, H>>
+export type HtmlBlueprint<D=unknown, E=unknown, H=any> = HtmlOptions<D, E, H>|string|boolean|Function|Mixed<HtmlBlueprint>
 
 export interface HtmlOptions<D, E, H, B=HtmlBlueprint<D, E, H>> extends GearOptions<D, E, B> {
     layout?: Function

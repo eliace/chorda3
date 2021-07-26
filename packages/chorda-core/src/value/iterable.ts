@@ -82,8 +82,8 @@ export class IterableNode<T, K extends keyof T=keyof T> extends Node<T> implemen
 
 
 
-export const iterable = <T>(source: ObservableValueSet<T>|T, key: string = '__it') : IterableValue<T> => {
-    return (isObservable(source) ? new IterableNode(null, source, key) : new IterableNode(source, null, key))
+export const iterable = <T>(source: ObservableValueSet<T>|T, key: string = '__it') : IterableValue<T>&T => {
+    return (isObservable(source) ? new IterableNode(null, source, key) : new IterableNode(source, null, key)) as any
 }
 
 

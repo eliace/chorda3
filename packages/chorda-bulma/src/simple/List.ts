@@ -14,19 +14,19 @@ type ListProps<T> = {
 
 
 export const List = <T>(props: ListProps<T&ListScope>) : HtmlBlueprint<T> => {
-    return mix<ListScope&{a: number}>({
+    return mix<ListScope>({
         tag: 'ul',
         defaultItem: {
             tag: 'li'
         },
-        reactors: {
+        reactions: {
             items: (v) => patch({items: v})
         },
     }, 
     props && {
         items: props.items,
         defaultItem: props.defaultItem,
-        injectors: {
+        injections: {
             items: props.items$
         }
     })
@@ -46,13 +46,13 @@ type ListItemProps<T> = {
 
 export const ListItem = <T>(props: ListItemProps<T&ListItemScope>) : HtmlBlueprint<T> => {
     return mix<ListItemScope>({
-        reactors: {
+        reactions: {
             text: (v) => patch({text: v})
         }
     }, props && {
         css: props.css,
         text: props.text,
-        injectors: {
+        injections: {
             text: props.text$
         }
     })

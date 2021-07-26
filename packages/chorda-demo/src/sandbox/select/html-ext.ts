@@ -20,7 +20,7 @@ export default () : HtmlBlueprint => {
             })
         }),
         Coerced<SelectedScope>({
-            injectors: {
+            injections: {
                 selected: () => observable('Andorra')
             },
             items: [
@@ -38,7 +38,7 @@ export default () : HtmlBlueprint => {
             ]
         }),
         Coerced<SelectedScope>({
-            injectors: {
+            injections: {
                 selected: () => observable('TH')
             },
             items: [

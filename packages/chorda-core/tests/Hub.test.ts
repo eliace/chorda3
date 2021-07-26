@@ -24,7 +24,7 @@ describe ('Hub', () => {
         it ('Should iterate through scope entries', () => {
 
             const s = createHub({
-                injectors: {
+                injections: {
                     a: () => 5,
                     b: () => 'hello'
                 }
@@ -48,7 +48,7 @@ describe ('Hub', () => {
             }
 
             const s = createHub<Data>({
-                injectors: {
+                injections: {
                     a: () => 5,
                     b: () => observable('hello')
                 }
@@ -65,7 +65,7 @@ describe ('Hub', () => {
         })
     })
 
-    describe ('Injectors + reactors', () => {
+    describe ('Injectors + reactions', () => {
 
         it ('Should be initialized with empty options', () => {
 
@@ -74,10 +74,10 @@ describe ('Hub', () => {
             expect(s.state).to.be.eq(State.Initialized)
         })
     
-        it ('Should be initialized with injectors', () => {
+        it ('Should be initialized with injections', () => {
     
             const s = createHub({
-                injectors: {
+                injections: {
                     _injector: () => 'Alice',
                     _undefined: undefined,
                     _null: null,
@@ -97,10 +97,10 @@ describe ('Hub', () => {
             }
     
             const s = createHub<Data>({
-                injectors: {
+                injections: {
                     name: () => observable([1, 2, 3])
                 },
-                reactors: {
+                reactions: {
                     name: (v) => {
     //                    console.log(v)
                     }
@@ -122,7 +122,7 @@ describe ('Hub', () => {
             }
     
             const s = createHub<Data>({
-                reactors: {
+                reactions: {
                     name: (v) => {}
                 }
             });
@@ -148,7 +148,7 @@ describe ('Hub', () => {
             })
     
             const s = createHub<{postCode: number}>({
-                injectors: {
+                injections: {
                     postCode: () => profile.address.city.postCode
                 }
             });
@@ -169,7 +169,7 @@ describe ('Hub', () => {
             })
 
             const h = createHub({
-                injectors: {
+                injections: {
                     postCode: () => profile.address.city.postCode,
                     reverted: (scope) => computable(() => {
 //                        console.log(scope.postCode)
@@ -212,7 +212,7 @@ describe ('Hub', () => {
             v.$event('test')
 
             const hub = createHub({
-                injectors: {
+                injections: {
                     data: () => v
                 },
                 events: {
@@ -242,7 +242,7 @@ describe ('Hub', () => {
             const result: string[] = []
     
             const s = createHub<{name: string}>({
-                injectors: {
+                injections: {
                     name: () => observable('Alice')
                 },
                 joints: {
@@ -265,7 +265,7 @@ describe ('Hub', () => {
             const result: string[] = []
 
             const s = createHub<{name: string}>({
-                injectors: {
+                injections: {
                     name: () => observable('Alice')
                 },
                 joints: {
@@ -284,7 +284,7 @@ describe ('Hub', () => {
         it ('Should defer disjoin', (done) => {
 
             const s = createHub<{name: string}>({
-                injectors: {
+                injections: {
                     name: () => observable('Alice')
                 },
                 joints: {

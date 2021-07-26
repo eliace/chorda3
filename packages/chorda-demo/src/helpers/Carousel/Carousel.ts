@@ -46,7 +46,7 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : HtmlBluepri
                     css: 'carousel__slide',
                     templates: {
                         content: Coerced<CarouselSlideScope, CarouselScope>({
-                            reactors: {
+                            reactions: {
                                 slide: (v) => {patch({
                                     styles: {
                                         backgroundImage: `url(${v.url})`
@@ -62,7 +62,7 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : HtmlBluepri
                         }),
                     }
                 },
-                reactors: {
+                reactions: {
                     __it: (v) => patch({items: v})
                 }
             },
@@ -71,7 +71,7 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : HtmlBluepri
                 css: 'carousel__indicators',
                 defaultItem: Coerced<CarouselSlideScope, CarouselScope&DomEvents>({
                     tag: 'li',
-                    reactors: {
+                    reactions: {
                         slide: (v) => patch({
                             classes: {
                                 'active': !v.hidden//.valueOf()
@@ -79,13 +79,15 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : HtmlBluepri
                         })
                     },
                     events: {
-                        click: (e, {current, slide}) => {
-                            current.$value = slide.id
-                            e.stopPropagation()
+                        $dom: {
+                            click: (e, {current, slide}) => {
+                                current.$value = slide.id
+                                e.stopPropagation()
+                            }    
                         }
                     }
                 }),
-                reactors: {
+                reactions: {
                     __it: (v) => patch({items: v})
                 }
             },
@@ -106,7 +108,7 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : HtmlBluepri
             current: () => observable(props.current || 0),
 //            slides: () => observable([]),
         },
-        injectors: {
+        injections: {
             images: props.images$,
             slides: ({images, current}) => computable(() => {
                 return images.map((img, i) => {
@@ -136,15 +138,17 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : HtmlBluepri
             // }
         },
         events: {
-            click: (e, {current, slides}) => {
-                console.log('slides', slides)
-                if (current.$value >= slides.length - 1) {
-                    current.$value = 0
-                }
-                else {
-                    current.$value = current + 1
-                    console.log('current', current.$value)
-                }
+            $dom: {
+                click: (e, {current, slides}) => {
+                    console.log('slides', slides)
+                    if (current.$value >= slides.length - 1) {
+                        current.$value = 0
+                    }
+                    else {
+                        current.$value = current + 1
+                        console.log('current', current.$value)
+                    }
+                }    
             }
         }
     })

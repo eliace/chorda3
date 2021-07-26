@@ -13,7 +13,7 @@ type VoteScope = {
 
 export const Vote = () : HtmlBlueprint => {
     return mix<VoteScope&HtmlScope>({
-        injectors: {
+        injections: {
             imageUrl: () => observable(null),
             imageLoading: () => observable(false)
         },
@@ -102,7 +102,7 @@ export const Vote = () : HtmlBlueprint => {
         
                                             }
                                         },
-                                        // reactors: {
+                                        // reactions: {
                                         //     imageLoading: (v) => patch({classes: {'blurry-placeholder': v}})
                                         // },
                                     }

@@ -1,5 +1,6 @@
 import { HtmlBlueprint, HtmlScope, Injector, Listener, mix, observable, patch } from "@chorda/core";
 import { DomEvents } from "@chorda/react";
+import { watch } from "../utils";
 
 
 type TextInputScope = {
@@ -20,43 +21,54 @@ export const TextInput = <T>(props: TextInputProps<T&TextInputScope>) : HtmlBlue
     },
     props && {
         events: {
-            input: (e, scope) => {
-                scope.value.$value = (e.target as any).value
-                props.onInput?.(scope.value, scope as any)
-            },
-            focus: (e, scope) => {
-                props.onFocus?.(null, scope as any)
-            },
-            keyDown: (e, scope) => {
-                if (e.code == 'Escape') {
-                    props.onEsc?.(null, scope as any)
-                }
+            $dom: {
+                input: (e, scope) => {
+                    scope.value.$value = (e.target as any).value
+                    props.onInput?.(scope.value, scope as any)
+                },
+                focus: (e, scope) => {
+                    props.onFocus?.(null, scope as any)
+                },
+                keyDown: (e, scope) => {
+                    if (e.code == 'Escape') {
+                        props.onEsc?.(null, scope as any)
+                    }
+                }    
             }
         },
         initials: {
             value: () => observable(''),
         },
-        injectors: {
+        injections: {
             value: props.value$
         },
-        reactors: {
+        reactions: {
             value: (v) => patch({dom: {defaultValue: v || ''}})
         },
         joints: {
             domValue: ({value, $dom}) => {
 
-                const changeValue = () => {
-                    const el = $dom.$value
+                watch(() => {
+                    const el = $dom.$value as HTMLInputElement
                     if (el) {
-                        const htmlValue = (el as HTMLInputElement).value
-                        if (htmlValue != value.$value) {
-                            (el as HTMLInputElement).value = value
+                        if (el.value != value.$value) {
+                            el.value = value
                         }
                     }
-                }
+                }, [$dom, value])
 
-                value.$subscribe(changeValue)
-                $dom.$subscribe(changeValue)
+                // const changeValue = () => {
+                //     const el = $dom.$value
+                //     if (el) {
+                //         const htmlValue = (el as HTMLInputElement).value
+                //         if (htmlValue != value.$value) {
+                //             (el as HTMLInputElement).value = value
+                //         }
+                //     }
+                // }
+
+                // value.$subscribe(changeValue)
+                // $dom.$subscribe(changeValue)
 
             },
         }

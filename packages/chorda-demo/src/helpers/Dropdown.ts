@@ -74,7 +74,7 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
                         active.$value = !active.$value
                     },
                     as: {
-                        // events: {
+                       // events: {
                         //     blur: (e, {active}) => {
                         //         active.$value = false
                         //     }
@@ -133,10 +133,10 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
                             currentOffset$: (scope) => scope.$context.currentOffset,
                             currentHeight$: (scope) => scope.$context.currentHeight,
                         }),
-                        injectors: {
+                        injections: {
                             __it: (scope) => iterable(scope.items)
                         },
-                        reactors: {
+                        reactions: {
                             __it: (v) => patch({items: v}),
                             // activeOffset: (v) => {
                             //     patch({}) // FIXME еще один дурацкий хак
@@ -228,7 +228,7 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
                 },
             },
         },
-        reactors: {
+        reactions: {
             active: (v) => {
                 patch({classes: {'is-active': v}})
             },
@@ -255,7 +255,7 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
 //            icon: () => observable(faAngleDown.iconName),
 //            text: () => observable(''),
         },
-        injectors: {
+        injections: {
             items: props.items$,
             active: props.active$,
             text: props.text$,
@@ -331,38 +331,41 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
             cancelSelect: (e, {active}) => {
                 active.$value = false
             },
-            keyDown: (e, {current, items, active, selected}) => {
-//                console.log(e.code)
-                if (active.$value) {
-//                    console.log(e.code)
-                    if (e.code == 'ArrowDown') {
-                        let i = items.indexOf(current.$value)
-                        if (i == items.length - 1) {
-                            i = -1
+            $dom: {
+                keyDown: (e, {current, items, active, selected}) => {
+    //                console.log(e.code)
+                    if (active.$value) {
+    //                    console.log(e.code)
+                        if (e.code == 'ArrowDown') {
+                            let i = items.indexOf(current.$value)
+                            if (i == items.length - 1) {
+                                i = -1
+                            }
+                            current.$value = items[i+1]
+        //                    console.log('current', items.indexOf(current.$value))
                         }
-                        current.$value = items[i+1]
-    //                    console.log('current', items.indexOf(current.$value))
-                    }
-                    else if (e.code == 'ArrowUp') {
-                        let i = items.indexOf(current.$value)
-                        if (i == 0) {
-                            i = items.length
+                        else if (e.code == 'ArrowUp') {
+                            let i = items.indexOf(current.$value)
+                            if (i == 0) {
+                                i = items.length
+                            }
+                            current.$value = items[i-1]                    
                         }
-                        current.$value = items[i-1]                    
+                        else if (e.code == 'Enter') {
+                            selected.$value = current
+                            selected.$emit('itemSelect', current)
+                        }
+                        else if (e.code == 'Escape') {
+                            selected.$emit('cancelSelect')
+                        }
+                        else {
+                            return
+                        }
+                        e.preventDefault()
+                        return false    
                     }
-                    else if (e.code == 'Enter') {
-                        selected.$value = current
-                        selected.$emit('itemSelect', current)
-                    }
-                    else if (e.code == 'Escape') {
-                        selected.$emit('cancelSelect')
-                    }
-                    else {
-                        return
-                    }
-                    e.preventDefault()
-                    return false    
                 }
+                    
             }
             
         },
@@ -415,7 +418,7 @@ type DropdownItemProps<T> = {
     as?: HtmlBlueprint<T>
     item$?: Injector<T>
     text$?: Injector<T>
-    onClick?: Listener<T, ReturnType<DomEvents['click']>>
+    onClick?: Listener<T, ReturnType<DomEvents['$dom']['click']>>
     active$?: Injector<T>
     offset$?: Injector<T>
     current$?: Injector<T>
@@ -427,7 +430,7 @@ export const DropdownItem = <I, V=I, T=DropdownScope<I, V>>(props: DropdownItemP
     return mix<DropdownItemScope<I>&{__it: I}&HtmlScope, DomEvents>(props?.as, {
         css: 'dropdown-item',
         tag: 'a',
-        reactors: {
+        reactions: {
             text: (v) => {
 //                console.log('patch text')
                 patch({text: v})
@@ -447,7 +450,7 @@ export const DropdownItem = <I, V=I, T=DropdownScope<I, V>>(props: DropdownItemP
             text: () => observable(null),
             currentOffset: () => observable(null),
         },
-        injectors: {
+        injections: {
             item: props.item$,
             text: props.text$,
             active: props.active$,
@@ -457,7 +460,9 @@ export const DropdownItem = <I, V=I, T=DropdownScope<I, V>>(props: DropdownItemP
             currentHeight: props.currentHeight$,            
         },
         events: {
-            click: props.onClick
+            $dom: {
+                click: props.onClick
+            }
         },
         joints: {
             itemPosition: ({$dom, offset, active}) => {

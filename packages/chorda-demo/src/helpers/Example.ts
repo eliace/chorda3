@@ -91,10 +91,10 @@ export const Example = <T>(props: ExampleBoxProps<T&ExampleBoxScope>) : HtmlBlue
                             })
                             return acc
                         }, {} as any),
-                        reactors: {
+                        reactions: {
                             selected: (v) => patch({components: v})
                         },
-                        injectors: {
+                        injections: {
                             selected: (ctx) => computable(() => {
                                 return files?.reduce((acc, file) => {
                                     acc[file.name] = file.name == ctx.activeFile
@@ -122,10 +122,10 @@ export const Example = <T>(props: ExampleBoxProps<T&ExampleBoxScope>) : HtmlBlue
                 }
             }        
         },
-        reactors: {
+        reactions: {
             isShowCode: (v) => patch({components: {code: v}})
         },
-        injectors: {
+        injections: {
             title: props.title$ || (() => observable(props.title)),
             isShowCode: () => observable(false),
             activeFile: () => observable(files ? files[0].name : null)

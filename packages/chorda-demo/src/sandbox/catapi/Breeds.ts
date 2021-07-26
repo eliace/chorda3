@@ -1,16 +1,8 @@
-import { computable, EventBus, HtmlBlueprint, observable, Value } from "@chorda/core"
+import { callable, computable, EventBus, HtmlBlueprint, observable, Value } from "@chorda/core"
 import { Card, Field, Title } from "chorda-bulma"
 import { Coerced, createValueEffect, Custom } from "../../utils"
 import { Carousel, Dropdown, DropdownItem, Paragraph, Text } from "../../helpers"
 import { CatApi , api} from "./api"
-
-
-// console.log('toJSON', observable(5))
-// console.log('stringify', JSON.stringify(observable(5)))
-// console.log('stringify', JSON.stringify(5))
-// console.log('stringify', JSON.stringify(observable("hello")))
-// console.log('stringify', JSON.stringify("hello"))
-// console.log('typeof', typeof observable("hello"))
 
 
 type BreedsScope = {
@@ -20,13 +12,15 @@ type BreedsScope = {
     images: CatApi.Image[]
     imageUrls: string[]
     loadingBreeds: boolean
+    loadingImages: boolean
+    onLoadBreeds: () => void
 }
 
-type BreedsEvents = {
-    loadBreedsStart?: () => any
-    loadBreedsDone?: () => CatApi.Breed[]
-    loadImagesDone?: () => CatApi.Image[]
-    selectBreed?: () => CatApi.Breed
+type BreedsEvents = Pick<BreedsScope, 'onLoadBreeds'> & {
+    // loadBreedsStart?: () => any
+    // loadBreedsDone?: () => CatApi.Breed[]
+    // loadImagesDone?: () => CatApi.Image[]
+//    selectBreed?: () => CatApi.Breed
 }
 
 
@@ -35,25 +29,41 @@ type BreedsEvents = {
 
 export const Breeds = () : HtmlBlueprint<BreedsScope, BreedsEvents> => {
     return {
-        injectors: {
+        injections: {
             images: () => observable([]),
             imageUrls: ({images}) => computable(() => {
                 return images.map(img => img.url)
             }),
             breeds: () => observable([]),
             selected: () => observable(null),
-            loadingBreeds: () => observable(null)
+            loadingBreeds: () => observable(null),
+            loadingImages: () => observable(null),
+            onLoadBreeds: () => callable(null),
         },
         joints: {
-            autoLoad: ({breeds, images, selected}) => {
+            autoLoad: ({breeds, images, selected, loadingBreeds, onLoadBreeds, loadingImages}) => {
 
-                const loadImages = createValueEffect(images, 'loadImages', api.searchImages)
-                const loadBreeds = createValueEffect(breeds, 'loadBreeds', api.getBreeds)
+                const loadBreeds = () => {
+                    loadingBreeds.$value = true
+                    api.getBreeds().then(data => {
+                        loadingBreeds.$value = false
+                        breeds.$value = data
+                        onLoadBreeds()
+                    })
+                }
+
+                const loadImages = (filter: CatApi.SearchImageFilter) => {
+                    loadingImages.$value = true
+                    images.$value = []
+                    api.searchImages(filter).then(data => {
+                        loadingImages.$value = false
+                        images.$value = data
+                    })
+                }
 
                 // при изменении выбранной породы загружаем список изображений
                 selected.$subscribe((next) => {
                     if (next) {
-                        images.$value = []
                         loadImages({breed_id: next.id, limit: 8})    
                     }
                 })
@@ -65,18 +75,9 @@ export const Breeds = () : HtmlBlueprint<BreedsScope, BreedsEvents> => {
             },
         },
         events: {
-            loadBreedsStart: (breeds, {loadingBreeds}) => {
-                console.log('breeds:start')
-                loadingBreeds.$value = true
-            },
-            loadBreedsDone: (breeds, {selected, loadingBreeds}) => {
-                console.log('breeds:done', breeds)
+            onLoadBreeds: (e, {selected, breeds}) => {
                 selected.$value = breeds[0]
-                loadingBreeds.$value = false
             },
-            loadImagesDone: (images, {}) => {
-                console.log('images:done', images)
-            }
         },
         templates: {
             breedSelect: {
@@ -116,7 +117,7 @@ export const Breeds = () : HtmlBlueprint<BreedsScope, BreedsEvents> => {
                 content: Card({
                     header: false,
                     content: Coerced<{data: CatApi.Breed}, BreedsScope>({
-                        injectors: {
+                        injections: {
                             data: (scope) => scope.selected
                         },
                         css: 'has-text-centered',

@@ -120,7 +120,7 @@ describe ('Html', () => {
                 a: {
                     components: {
                         c: {
-                            injectors: {
+                            injections: {
                                 portal: () => portal
                             },
                             events: {
@@ -132,10 +132,10 @@ describe ('Html', () => {
                     }
                 },
                 b: {
-                    injectors: {
+                    injections: {
                         portal: () => portal,
                     },
-                    reactors: {
+                    reactions: {
                         portal: (v) => patch({items: v})
                     }
                 }
@@ -186,7 +186,7 @@ describe ('Html', () => {
         const portal = observable([])
 
         const html = createHtml<{portal: Gear[]}, HtmlEvents>({
-            injectors: {
+            injections: {
                 portal: () => portal
             },
             components: {
@@ -200,7 +200,7 @@ describe ('Html', () => {
                     }
                 },
                 b: {
-                    reactors: {
+                    reactions: {
                         portal: (v) => patch({items: v})
                     }
                 }

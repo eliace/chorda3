@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, Listener, mix, patch } from "@chorda/core"
+import { HtmlBlueprint, Injector, Listener, mix, patch, Scope } from "@chorda/core"
 import { Link, List, ListScope } from "../simple"
 
 
@@ -32,11 +32,11 @@ export const Tab = <T>(props: TabProps<T&TabScope>) : HtmlBlueprint<T> => {
         templates: {
             content: Link
         },
-        reactors: {
+        reactions: {
             active: (v) => patch({classes: {'is-active': v}})
         },
     }, {
-        injectors: {
+        injections: {
             text: props.text$,
             link: props.link$,
             active: props.active$,
@@ -64,7 +64,7 @@ export const Tab = <T>(props: TabProps<T&TabScope>) : HtmlBlueprint<T> => {
 //----------------------------------------------
 
 export type TabsScope = {
-    tabs: TabScope
+    tabs: TabScope[]
 }
 
 type TabsProps<T> = {
@@ -74,7 +74,7 @@ type TabsProps<T> = {
     centered?: boolean
 }
 
-export const Tabs = <T>(props: TabsProps<T&TabsScope>) : HtmlBlueprint<T> => {
+export const Tabs = <T extends Scope>(props: TabsProps<T&TabsScope>) : HtmlBlueprint<T> => {
     return mix<TabsScope>({
         css: 'tabs',
         templates: {
@@ -85,7 +85,7 @@ export const Tabs = <T>(props: TabsProps<T&TabsScope>) : HtmlBlueprint<T> => {
         classes: {
             'is-centered': props.centered
         },
-        injectors: {
+        injections: {
             tabs: props.tabs$ || null
         },
         templates: {

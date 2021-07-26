@@ -52,10 +52,10 @@ export default <T>() : HtmlBlueprint<T> => {
                     overflowY: 'auto'
                 },
                 joints: {
-                    init: async ({infiniteScroll}) => {
+                    autoLoad: async ({infiniteScroll}) => {
 
                         query.$subscribe(() => {
-                            infiniteScroll.reset()
+                            infiniteScroll.resetAndGetFirst()
                         })
 
                         await loadConfig()

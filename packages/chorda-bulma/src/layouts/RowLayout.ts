@@ -11,15 +11,15 @@ export const RowLayout = <T>(elements: HtmlBlueprint<T>[]) : HtmlBlueprint<T> =>
         css: 'rows',
         defaultItem: {
             css: 'row',
-            reactors: {
+            reactions: {
                 rows: (v) => patch({components: {content: v}})
             }
         },
-        reactors: {
+        reactions: {
             rows: (v) => patch({items: v})
         }
     }, {
-        injectors: {
+        injections: {
             rows: () => iterable(elements, 'rows')
         }
     })

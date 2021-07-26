@@ -23,18 +23,18 @@ export default () : HtmlBlueprint => {
             options: COUNTRIES.map(country => Option({text: country.name, value: country.alpha2Code}))
         }),
         Coerced<{countries: Country[]}>({
-            injectors: {
+            injections: {
                 countries: () => iterable(COUNTRIES)
             },
-            reactors: {
+            reactions: {
                 countries: (v) => patch({items: v})
             },
             as: Select({
                 defaultOption: Coerced<Country&{__it: Country}, {countries: Country[]}>({
-                    injectors: {
+                    injections: {
                         name: (scope) => scope.__it.name
                     },
-                    reactors: {
+                    reactions: {
                         name: (v) => patch({text: v})
                     },
                     as: Option

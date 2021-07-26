@@ -21,17 +21,17 @@ type DynamicListProps<I, T, E> = {
 
 export const DynamicList = <A extends any[], S=unknown, T=unknown, E=unknown, I=ItemOf<A>>(props: DynamicListProps<I, T&S&DynamicListScope<A>, E>) : HtmlBlueprint<T, E> => {
     return mix<DynamicListScope<A>&IteratorScope<A>>({
-        reactors: {
+        reactions: {
             __it: (v) => patch({items: v}),
         },
-        injectors: {
+        injections: {
             __it: (scope) => {
 //                console.log('__it', scope.items)
                 return iterable(scope.items, '__item')
             }
         },
         defaultItem: Coerced<DynamicItemScope<I>&ItemScope<I>>({
-            injectors: {
+            injections: {
                 item: (scope) => {
 //                    console.log('item', scope.$context.__it)
                     return scope.__item
@@ -42,7 +42,7 @@ export const DynamicList = <A extends any[], S=unknown, T=unknown, E=unknown, I=
     props?.as,
 //    ...props?.with,
     props && {
-        injectors: {
+        injections: {
             items: props.items$
         },
         defaultItem: props.defaultItem
