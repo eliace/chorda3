@@ -5,9 +5,17 @@ import { Button } from "chorda-bulma";
 import { SvgIcon } from "./SvgIcon";
 import { onOuterClick, OuterClickEvent, stopMouseDown, autoFocus } from './events'
 import { FaIcon } from "./FaIcon";
+import { watch } from "../utils";
+import { dom } from "@fortawesome/fontawesome-svg-core";
 
 
-export type DropdownScope<T, V=T> = {
+// type MenuItem = {
+//     id: any
+//     name: string
+// }
+
+
+export type DropdownOldScope<T, V=T> = {
     items: T[]
     active: boolean
     selected: T
@@ -22,11 +30,9 @@ export type DropdownScope<T, V=T> = {
     bounds: DOMRect
     menuBounds: DOMRect
     up: boolean
-//    parentScrollTop: number
-//    icon: string
-} //& HtmlScope
+}
 
-export type DropdownProps<T, I, V=I, E=unknown> = {
+export type DropdownOldProps<T, I, V=I, E=unknown> = {
     items$?: Injector<T>
     active$?: Injector<T>
     active?: boolean
@@ -41,26 +47,25 @@ export type DropdownProps<T, I, V=I, E=unknown> = {
     as?: HtmlBlueprint<T, E>
     loading$?: Injector<T>
     maxHeight?: number
-//    watchers?: {[K in keyof T]: Joint<T[K]>}
 }
 
-export type DropdownEvents<I> = {
+export type DropdownOldEvents<I> = {
     itemSelect?: () => I
     cancelSelect?: () => void
 } & OuterClickEvent & DomEvents
 
 
 
-export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope<I, V>&HtmlScope, I, V, DropdownEvents<I>>) : HtmlBlueprint<T> => {
+export const DropdownOld = <I, V=I, T=unknown>(props: DropdownOldProps<T&DropdownOldScope<I, V>&HtmlScope, I, V, DropdownOldEvents<I>>) : HtmlBlueprint<T> => {
     
     const itemToValue = props.itemToValue || ((v: I&Value<I>): V => (v as any).id)
     const itemToKey = props.itemToKey || ((v: I&Value<I>): string|symbol|number => (v as any).id)
     const valueToKey = props.valueToKey || ((v: V&Value<V>): string|symbol|number => (v as any))
     
-    return mix<DropdownScope<I, V>&HtmlScope, DropdownEvents<I>>({
+    return mix<DropdownOldScope<I, V>&HtmlScope, DropdownOldEvents<I>>({
         css: 'dropdown',
         templates: {
-            trigger: DropdownTrigger({
+            trigger: DropdownOldTrigger({
                 content: Button({
                     rightIcon: FaIcon({
                         icon$: ({loading, up}) => computable(() => {
@@ -81,11 +86,18 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
                         // },
                         joints: {
                             autoFocus: ({$dom, active}) => {
-                                active.$subscribe(next => {
-                                    if (next && $dom.$value) {
-                                        $dom.$value.focus()
+
+                                watch(() => {
+                                    if ($dom.$value && active.$value) {
+                                        $dom.focus()
                                     }
-                                })
+                                }, [$dom, active])
+
+                                // active.$subscribe(next => {
+                                //     if (next && $dom.$value) {
+                                //         $dom.$value.focus()
+                                //     }
+                                // })
                             },
                             initEl: ({$dom, active}) => {
                                 $dom.$subscribe(el => {
@@ -116,7 +128,7 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
                 templates: {
                     content: {
                         css: 'dropdown-content',
-                        defaultItem: DropdownItem<I, V, DropdownScope<I, V>>({
+                        defaultItem: DropdownOldItem<I, V, DropdownOldScope<I, V>>({
                             onClick: (e, {selected, item, items, value}) => {
 //                                console.log('set selected', item)
                                 selected.$value = item
@@ -388,11 +400,11 @@ export const Dropdown = <I, V=I, T=unknown>(props: DropdownProps<T&DropdownScope
 
 
 
-export type DropdownTriggerProps<T, E> = {
+export type DropdownOldTriggerProps<T, E> = {
     content?: HtmlBlueprint<T, E>
 }
 
-export const DropdownTrigger = <T, E>(props: DropdownTriggerProps<T, E>) : HtmlBlueprint<T, E> => {
+export const DropdownOldTrigger = <T, E>(props: DropdownOldTriggerProps<T, E>) : HtmlBlueprint<T, E> => {
     return mix({
         css: 'dropdown-trigger',
     }, {
@@ -404,7 +416,7 @@ export const DropdownTrigger = <T, E>(props: DropdownTriggerProps<T, E>) : HtmlB
 
 
 
-type DropdownItemScope<I> = {
+type DropdownOldItemScope<I> = {
     item: I
     text: string
     active: boolean
@@ -414,7 +426,7 @@ type DropdownItemScope<I> = {
     currentHeight: number
 }
 
-type DropdownItemProps<T> = {
+type DropdownOldItemProps<T> = {
     as?: HtmlBlueprint<T>
     item$?: Injector<T>
     text$?: Injector<T>
@@ -426,8 +438,8 @@ type DropdownItemProps<T> = {
     currentHeight$?: Injector<T>
 }
 
-export const DropdownItem = <I, V=I, T=DropdownScope<I, V>>(props: DropdownItemProps<T&DropdownItemScope<I>&{__it: I}&HtmlScope>) : HtmlBlueprint<T> => {
-    return mix<DropdownItemScope<I>&{__it: I}&HtmlScope, DomEvents>(props?.as, {
+export const DropdownOldItem = <I, V=I, T=DropdownOldScope<I, V>>(props: DropdownOldItemProps<T&DropdownOldItemScope<I>&{__it: I}&HtmlScope>) : HtmlBlueprint<T> => {
+    return mix<DropdownOldItemScope<I>&{__it: I}&HtmlScope, DomEvents>(props?.as, {
         css: 'dropdown-item',
         tag: 'a',
         reactions: {
@@ -465,14 +477,14 @@ export const DropdownItem = <I, V=I, T=DropdownScope<I, V>>(props: DropdownItemP
             }
         },
         joints: {
-            itemPosition: ({$dom, offset, active}) => {
-                $dom.$subscribe(el => {
-                    if (el && active.$value) {
-                        offset.$value = el.offsetTop
-//                            console.log('offset', el.offsetTop)
-                    }
-                })
-            },
+//             itemPosition: ({$dom, offset, active}) => {
+//                 $dom.$subscribe(el => {
+//                     if (el && active.$value) {
+//                         offset.$value = el.offsetTop
+// //                            console.log('offset', el.offsetTop)
+//                     }
+//                 })
+//             },
             currentItemPosition: ({current, $dom, currentOffset, currentHeight}) => {
                 current.$subscribe(next => {
                     const el = $dom.$value

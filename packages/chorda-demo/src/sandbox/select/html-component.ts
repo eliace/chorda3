@@ -1,8 +1,9 @@
-import { HtmlBlueprint, iterable, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, iterable, mix, observable, patch } from "@chorda/core"
 import { RowLayout } from "chorda-bulma"
-import { Coerced, DataScope } from "../../utils"
+import { Coerced, DataScope, withScope } from "../../utils"
 import { COUNTRIES, Country } from "../../data"
 import { Option, Select } from "./common/select"
+import { withItem, withIterableItems } from "../list/common/utils"
 
 
 export default () : HtmlBlueprint => {
@@ -22,24 +23,38 @@ export default () : HtmlBlueprint => {
             value: 'AD',
             options: COUNTRIES.map(country => Option({text: country.name, value: country.alpha2Code}))
         }),
-        Coerced<{countries: Country[]}>({
-            injections: {
-                countries: () => iterable(COUNTRIES)
-            },
-            reactions: {
-                countries: (v) => patch({items: v})
-            },
-            as: Select({
-                defaultOption: Coerced<Country&{__it: Country}, {countries: Country[]}>({
-                    injections: {
-                        name: (scope) => scope.__it.name
-                    },
+        Select({
+            defaultOption: Option({
+                as: withItem<Country>({
                     reactions: {
-                        name: (v) => patch({text: v})
-                    },
-                    as: Option
-                })
+                        item: (v) => patch({text: v.name})
+                    }                    
+                }),
             }),
-        })
+            as: withIterableItems<Country[]>({
+                injections: {
+                    list: () => COUNTRIES
+                },
+            })
+        }),
+        // Coerced<{countries: Country[]}>({
+        //     injections: {
+        //         countries: () => iterable(COUNTRIES)
+        //     },
+        //     reactions: {
+        //         countries: (v) => patch({items: v})
+        //     },
+        //     as: Select({
+        //         defaultOption: Coerced<Country&{__it: Country}, {countries: Country[]}>({
+        //             injections: {
+        //                 name: (scope) => scope.__it.name
+        //             },
+        //             reactions: {
+        //                 name: (v) => patch({text: v})
+        //             },
+        //             as: Option
+        //         })
+        //     }),
+        // })
     ])
 }

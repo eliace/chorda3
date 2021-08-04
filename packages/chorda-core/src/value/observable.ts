@@ -91,6 +91,12 @@ export const observable = <T>(initValue: ObservableValueSet<T>|T, uidFunc?: UidF
 }
 
 
+export const reactive = <T>(initValue?: T, uidFunc?: UidFunc) : T => {
+    const value = isValueSet(initValue) ? initValue.$value : initValue
+    return proxify(value, new ObservableNode(value, null, null, uidFunc))
+}
+
+
 // export const iterable = <T>(initValue: ObservableValueSet<T>|T, uidFunc: UidFunc) : ObservableValueSet<T>&T => {
 //     return observable(initValue, uidFunc)
 // }

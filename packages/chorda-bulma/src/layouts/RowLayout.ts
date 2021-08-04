@@ -1,12 +1,12 @@
-import { HtmlBlueprint, iterable, mix, observable, patch } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, iterable, mix, observable, patch } from "@chorda/core"
 
 
 export type RowLayoutScope = {
-    rows: HtmlBlueprint[]
+    rows: Blueprint<any>[]
 }
 
 
-export const RowLayout = <T>(elements: HtmlBlueprint<T>[]) : HtmlBlueprint<T> => {
+export const RowLayout = <T>(elements: Blueprint<T>[]) : InferBlueprint<T> => {
     return mix<RowLayoutScope>({
         css: 'rows',
         defaultItem: {

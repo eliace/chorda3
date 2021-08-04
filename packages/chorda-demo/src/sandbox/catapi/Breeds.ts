@@ -1,7 +1,7 @@
 import { callable, computable, EventBus, HtmlBlueprint, observable, Value } from "@chorda/core"
 import { Card, Field, Title } from "chorda-bulma"
 import { Coerced, createValueEffect, Custom } from "../../utils"
-import { Carousel, Dropdown, DropdownItem, Paragraph, Text } from "../../helpers"
+import { Carousel, DropdownOld, DropdownOldItem, Paragraph, Text } from "../../helpers"
 import { CatApi , api} from "./api"
 
 
@@ -89,11 +89,11 @@ export const Breeds = () : HtmlBlueprint<BreedsScope, BreedsEvents> => {
                 templates: {
                     content: Field({
                         label: 'Breeds',
-                        control: Dropdown<CatApi.Breed, CatApi.Breed, BreedsScope>({
+                        control: DropdownOld<CatApi.Breed, CatApi.Breed, BreedsScope>({
                             as: {
                                 css: 'catapi-breed-dropdown'
                             },
-                            defaultItem: DropdownItem<CatApi.Breed>({
+                            defaultItem: DropdownOldItem<CatApi.Breed>({
                                 text$: (scope) => scope.__it.name
                             }),
                             items$: (scope) => scope.breeds,

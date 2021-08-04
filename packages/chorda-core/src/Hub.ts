@@ -7,6 +7,9 @@ export type Scope = {
     [k: string]: any
 }
 
+// https://stackoverflow.com/a/56688073
+export type NoInfer<T> = [T][T extends any ? 0 : never]
+
 // Scope
 
 export type Scoped<D> = {
@@ -24,7 +27,7 @@ type ObservableScoped<D> = {
 // Scope injections
 
 type Injectors<D> = {
-    [P in keyof D]?: Injector<D, D[P]>
+    [P in keyof NoInfer<D>]?: Injector<D, D[P]>
 }
 
 export type Injector<D, R=any> = (scope: Scoped<D>&{$context?: Scoped<D>}) => R
@@ -98,14 +101,14 @@ for (let k in l2) {
 }
 */
 
-export type Listener<D, R> = (event: R, scope: EventScoped<D>) => boolean | void
+export type Listener<D, R> = (event: R, scope: EventScoped<D>) => boolean | unknown
 
 // Scope bindings
 
 type Reactor<T> = (next: T, prev: T) => void
 
 type Reactors<T> = {
-    [P in keyof T]?: Reactor<T[P]>
+    [P in keyof T]?: Reactor<NoInfer<T[P]>>
 }
 
 // Scope joints
@@ -117,7 +120,7 @@ type EventActions<E> = {
 export type Joint<T/*, P extends keyof T=keyof T*/> = (/*o: ObservableValue<T[P]>&EventBus<any>&T[P],*/ scope: ObservableScoped<T>) => Function|Promise<void>|void
 
 type Joints<T> = {
-    [key: string]: Joint<T>
+    [key: string]: Joint<NoInfer<T>>
     // [P in keyof T]?: {
     //     [key: string]: Joint<T, P>
     // }
@@ -533,7 +536,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
                             const callback = events[k]
                             
-                            if (isEventBus(bus) /*&& bus.$hasEvent(i)*/) {
+                            if (callback && isEventBus(bus) /*&& bus.$hasEvent(i)*/) {
     
                                 const handler = bus.$on(k, (...args: any[]) => {
                                     noAutoTerminal(() => {

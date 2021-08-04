@@ -1,4 +1,4 @@
-import { HtmlBlueprint, HtmlScope, Injector, iterable, Joint, mix, mix2, Mixed, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, HtmlOptions, HtmlScope, Injector, iterable, Joint, mix, mix2, Mixed, NoInfer, observable, patch, Scope } from "@chorda/core"
 import { Coerced, ItemScope, IteratorScope } from "../../../utils"
 
 
@@ -10,6 +10,7 @@ export type DynamicItemScope<I> = {
 
 export type DynamicListScope<I> = {
     items: I
+    list: I
 }
 
 type DynamicListProps<I, T, E> = {
@@ -47,6 +48,35 @@ export const DynamicList = <A extends any[], S=unknown, T=unknown, E=unknown, I=
         },
         defaultItem: props.defaultItem
     })
+}
+
+
+type diProps<T, I> = Omit<HtmlOptions<T, unknown, any>, 'defaultItem'> & {
+    defaultItem?: HtmlBlueprint<T&I>,
+    as?: HtmlBlueprint<T>
+}
+
+export const withIterableItems = <A extends any[], T=unknown, I=ItemOf<A>>(props: diProps<T&DynamicListScope<A>, DynamicItemScope<I>>) : HtmlBlueprint<T> => {
+    return mix<DynamicListScope<any[]>&IteratorScope<any[]>>({
+        reactions: {
+            __it: (v) => patch({items: v}),
+        },
+        injections: {
+            __it: (scope) => {
+                return iterable(scope.items, '__item')
+            }
+        },
+        defaultItem: mix<DynamicItemScope<any>&ItemScope<any>>({
+            injections: {
+                item: (scope) => scope.__item
+            }
+        })
+    }, props?.as, props)
+}
+
+
+export const withItem = <I, T=unknown>(props: HtmlBlueprint<T&DynamicListScope<I[]>&DynamicItemScope<I>>) : HtmlBlueprint<T> => {
+    return mix(props)
 }
 
 

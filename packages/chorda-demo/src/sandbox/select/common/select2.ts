@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, iterable, Listener, mix, patch } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, iterable, Listener, mix, patch, Scope } from "@chorda/core"
 import { DomEvents } from "@chorda/react"
 import { OptionProps, Select, SelectProps, Option } from "./select"
 
@@ -9,17 +9,17 @@ type Select2Scope<D> = {
     __it: D[]
 }
 
-type Select2Props<T, I> = SelectProps<T> & {
+interface Select2Props<T, I> extends Omit<SelectProps<T>, 'defaultOption'> {
     options$?: Injector<T>
-    defaultOption?: HtmlBlueprint<Omit<T, keyof I>&I>
+    defaultOption?: Blueprint<Omit<T, keyof I>&I>
 //    onChange?: Listener<T, any>
     value$?: Injector<T>
 }
 
 
 
-export const Select2 = <D, T=unknown>(props: Select2Props<T&Select2Scope<D>, Option2Scope<D>>) : HtmlBlueprint<T> => {
-    return mix<Select2Scope<D>, DomEvents>(Select(props), {
+export const Select2 = <D, T extends Scope=unknown>(props: Select2Props<T&Select2Scope<D>, Option2Scope<D>>) : InferBlueprint<T> => {
+    return mix<Select2Scope<D>, DomEvents>(Select(props as SelectProps<T>), {
         injections: {
             options: props.options$,
             value: props.value$,
@@ -50,13 +50,13 @@ type Option2Scope<D> = {
     key: string
 }
 
-type Option2Props<T> = OptionProps & {
+type Option2Props<T> = OptionProps<T> & {
     text$?: Injector<T>
     option$?: Injector<T>
     key$?: Injector<T>
 }
 
-export const Option2 = <D, T=unknown>(props: Option2Props<T&Option2Scope<D>>) : HtmlBlueprint<T> => {
+export const Option2 = <D, T=unknown>(props: Option2Props<T&Option2Scope<D>>) : InferBlueprint<T> => {
     return mix<Option2Scope<D>>(Option(props), {
         injections: {
             text: props.text$,

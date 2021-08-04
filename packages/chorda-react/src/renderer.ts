@@ -20,12 +20,17 @@ export class ReactRenderer implements Renderer, Engine<any> {
     isScheduled: boolean
     roots: RenderRoot[]
     tasks: RenderTask[]
+    isProcessing: boolean
 
     constructor () {
         this.roots = []
         this.isScheduled = false
         this.tasks = []
     }
+    get processing () {
+        return this.isProcessing
+    }
+    
     pipeTask: (fn: Function, arg?: any, target?: any) => void
 
     addPostEffect: (fn: Function) => void;
@@ -56,13 +61,15 @@ export class ReactRenderer implements Renderer, Engine<any> {
                 const tasks = this.tasks
                 this.tasks = []
                 this.isScheduled = false
+                this.isProcessing = true
 
                 const rendered = this.roots.map(root => root.node.render())
 
                 // requestAnimationFrame(() => {
                 this.roots.forEach((root, i) => {
                     ReactDOM.render(rendered[i], root.el, () => {
-//                            console.log('react render end')
+                        this.isProcessing = false
+                        console.log('react render end')
                         tasks.forEach(task => {
                             task.fn.call(task.target, task.arg)
                         })

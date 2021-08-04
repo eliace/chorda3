@@ -1,29 +1,138 @@
-import { computable, HtmlBlueprint, HtmlEvents, HtmlScope, mix, observable, patch } from "@chorda/core"
-import { ColumnLayout, RowLayout } from "chorda-bulma"
-import { Dropdown, DropdownItem, DropdownScope } from "../../helpers"
+import { Blueprint, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, mix, observable, patch, Scope } from "@chorda/core"
+import { ColumnLayout, MenuItem, RowLayout } from "chorda-bulma"
+import { Dropdown, DropdownOld, DropdownOldItem, DropdownOldScope, DropdownScope, withBounds } from "../../helpers"
 import { COUNTRIES, Country } from "../../data"
-import { Coerced } from "../../utils"
+import { Coerced, watch, withHtml, withScope } from "../../utils"
 import { DomEvents } from "@chorda/react"
 
+type CountryRecord = Country & {id: any}
 
-const countries = observable(COUNTRIES.map(country => ({...country, id: country.alpha2Code})))
+const countries: CountryRecord[] = observable(COUNTRIES.slice(0, 50).map(country => ({...country, id: country.alpha2Code})))
 
-type ParentScrollScope = {
-    parentScrollTop: number
-}
 
-export default <T>() : HtmlBlueprint<T> => {
-    return RowLayout([
-        Portal(
-            Dropdown<Country, string, PortalScope>({
+export default <T>() : InferBlueprint<T> => {
+    return withPortal(ColumnLayout([
+        RowLayout([
+            Dropdown({
+                value$: () => observable('BE'),
+                items$: () => computable(() => countries),
+//                up: true,
+                as: withParentScrollTop(withHtml({
+                    events: {
+                        afterAddKeyed: (keyed, {portal}) => {
+                            if (keyed.key == 'menu') {
+                                // компонент поменяет родителя и будет исключен из children
+                                portal.$value = keyed
+                            }
+                        },
+                        beforeRemoveKeyed: (key, {portal}) => {
+                            if (key == 'menu') {
+                                // компонент будет удален как дочерний portal-а
+                                portal.$value = false
+                            }
+                        }
+                    },
+                    styles: {
+                        marginBottom: 140
+                    },
+                    templates: {
+                        menu: {
+                            joints: {
+                                updateMenuPosition: ({$dom, dropdownBounds, parentScrollTop, up, menuBounds}) => {
+
+                                    watch(() => {
+                                        const el = $dom.$value
+                                        if (el) {
+                                            el.style.left = dropdownBounds.left + 'px'
+                                            if (up.$value) {
+                                                el.style.top = (dropdownBounds.top - menuBounds.height - parentScrollTop) + 'px'
+                                            }
+                                            else {
+                                                el.style.top = (dropdownBounds.bottom - parentScrollTop) + 'px'
+                                            }
+                                        }
+                                    }, [$dom, parentScrollTop, dropdownBounds])
+                                }
+                            },
+                            reactions: {
+                                active: (v) => patch({
+                                    styles: {display: v ? 'block' : 'none'}
+                                })
+                            }
+                        }
+                    }
+                }))
+            }),
+        ]),
+        RowLayout([
+            Dropdown({
+                value$: () => observable('CA'),
+                items$: () => computable(() => countries),
+                as: withParentScrollTop(withHtml({
+                    joints: {
+                        autoUp: ({dropdownBounds, menuBounds, parentScrollTop, up}) => {
+
+                            // также можно подписаться window resize
+                            watch(() => {
+                                if (menuBounds.height > 0) {
+                                    const menuBottom = dropdownBounds.bottom - parentScrollTop + (menuBounds.height)
+                                    if (menuBottom > window.visualViewport.height) {
+                                        up.$value = true
+                                    }
+                                    else {
+                                        up.$value = false
+                                    }
+//                                    console.log('bounds', , window.visualViewport.height)
+                                }
+                                else {
+                                    up.$value = false
+                                }
+//                                console.log('auto up', up.$value, parentScrollTop.$value)
+                            }, [dropdownBounds, menuBounds, parentScrollTop])
+
+                        },
+                        // resetBoundsOnClose: ({active, menuBounds}) => {
+
+                        //     watch(() => {
+                        //         if (active.$value == false) {
+                        //             menuBounds.$value = null
+                        //         }
+                        //     }, [active])
+
+                        // }
+                    },
+                    templates: {
+                        menu: withBounds({
+                            joints: {
+                                updateBounds: ({$dom, bounds, active, $engine}) => {
+                                    watch(() => {
+                                        if ($dom.$value /*&& active.$value*/) {
+                                            $engine.pipeTask(() => {
+                                                const prevDisplay = $dom.$value.style.display
+                                                $dom.$value.style.display = 'block'
+                                                bounds.$value = $dom.$value.getBoundingClientRect()
+                                                $dom.$value.style.display = prevDisplay
+                                            })
+                                        }
+                                    }, [$dom/*, active*/])
+                                }                    
+                            }
+                        })
+                    }
+                }))
+            })
+        ])
+/*        
+        withPortal(
+            DropdownOld<CountryRecord, string, PortalScope>({
                 maxHeight: 250,
                 items$: () => countries,
                 value$: () => observable(countries[8].id),
                 text$: ({selected}) => selected.name,
-                defaultItem: DropdownItem<Country, string>({
+                defaultItem: DropdownOldItem<CountryRecord, string>({
                     text$: ({item}) => item.name
                 }),
-                as: Coerced<DropdownScope<Country, string>&ParentScrollScope&HtmlScope, PortalScope>({
+                as: Coerced<DropdownOldScope<CountryRecord, string>&ParentScrollScope&HtmlScope, PortalScope>({
                     events: {
                         afterAddKeyed: (keyed, {$portal}) => {
                             if (keyed.key == 'menu') {
@@ -147,31 +256,89 @@ export default <T>() : HtmlBlueprint<T> => {
                 })
             })
         )
-    ])
+*/        
+        
+    ]))
 }
 
 
 
 type PortalScope = {
-    $portal: any
+    portal: any
 }
 
 
-const Portal = <T>(props: HtmlBlueprint<T>) : HtmlBlueprint<T> => {
+const withPortal = <T, E>(props: Blueprint<T&PortalScope, E>) : InferBlueprint<T, E> => {
     return mix<PortalScope>({
         injections: {
-            $portal: () => observable(null)
+            portal: () => observable(null)
         },
         templates: {
             portal: {
                 css: 'portal-host',
                 reactions: {
-                    $portal: (v) => {
-                        patch({components: {content: v}})
-                    }
+                    portal: (v) => patch({components: {content: v}})
                 }
             },
             content: props
         }
     })
 }
+
+
+type ParentScrollScope = {
+    parentScrollTop: number
+}
+
+const withParentScrollTop = <T>(props: Blueprint<T&ParentScrollScope>) : InferBlueprint<T> => {
+    return mix<ParentScrollScope&HtmlScope>({
+        initials: {
+            parentScrollTop: () => observable(null)
+        },
+        joints: {
+            initParentScrollTop: ({$dom, parentScrollTop}) => {
+
+                let scrollListeners: {target: Element, scroll: number}[] = []
+
+                const listener = (e?: Event) => {
+                    if (e) {
+                        scrollListeners.forEach(l => {
+                            if (l.target == e.target) {
+                                l.scroll = (e.target as Element).scrollTop
+                            }
+                        })    
+                    }
+                    parentScrollTop.$value = scrollListeners.reduce((scroll, l) => scroll + l.scroll, 0)
+                }
+
+
+                watch(() => {
+                    if ($dom.$value) {
+                        parents($dom.$value).forEach(el => {
+                            el.addEventListener('scroll', listener)
+                            scrollListeners.push({target: el, scroll: el.scrollTop})
+                        })
+                        listener()
+                    }
+                    else {
+                        scrollListeners.forEach(l => {
+                            l.target.removeEventListener('scroll', listener)
+                        })
+                    }
+                }, [$dom])
+            }
+        }
+    }, props)
+}
+
+const parents = (el: Element) : Element[] => {
+    const out: Element[] = []
+    let parent = el.parentElement
+    while (parent != null) {
+        out.push(parent)
+        parent = parent.parentElement
+    }
+    return out
+}
+
+

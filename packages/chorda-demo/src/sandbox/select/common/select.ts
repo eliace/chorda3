@@ -1,18 +1,21 @@
-import { HtmlBlueprint, mix } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, mix } from "@chorda/core"
 
 
-export type SelectProps<T> = {
-    options?: HtmlBlueprint<T>[]
+export interface SelectProps<T> {
+    options?: Blueprint<T>[]
     size?: number
     value?: string
-    defaultOption?: HtmlBlueprint<T>
+    defaultOption?: Blueprint<T>
+    as?: Blueprint<T>
 }
 
-export const Select = <T>(props: SelectProps<T>) : HtmlBlueprint<T> => {
+export const Select = <T>(props: SelectProps<T>) : InferBlueprint<T> => {
     return mix({
         tag: 'select',
         defaultItem: Option
-    }, props && {
+    }, 
+    props?.as, 
+    props && {
         items: props.options,
         defaultItem: props.defaultOption,
         dom: {
@@ -23,16 +26,19 @@ export const Select = <T>(props: SelectProps<T>) : HtmlBlueprint<T> => {
 }
 
 
-export type OptionProps = {
+export type OptionProps<T> = {
     text?: string
     value?: string
     selected?: boolean
+    as?: Blueprint<T>
 }
 
-export const Option = <T>(props: OptionProps) : HtmlBlueprint<T> => {
+export const Option = <T>(props: OptionProps<T>) : InferBlueprint<T> => {
     return mix({
         tag: 'option'
-    }, props && {
+    },
+    props?.as, 
+    props && {
         text: props.text,
         dom: {
             value: props.value,

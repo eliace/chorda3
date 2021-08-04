@@ -1,6 +1,6 @@
 import { Engine } from './engine'
 import { defaultInitRules, defaultPatchRules, Gear, GearEvents, GearOptions, GearScope } from './Gear'
-import { Keyed } from './Hub'
+import { Keyed, NoInfer } from './Hub'
 import { Mixed, mixin, MixRules } from './mix'
 import { buildClassName, Dom, DomNode, Renderable, Renderer, VNodeFactory } from './render'
 import { DefaultRules } from './rules'
@@ -18,9 +18,9 @@ export type HtmlScope = {
 //    afterRender?: any
 } & GearScope
 
-export type HtmlBlueprint<D=unknown, E=unknown, H=any> = HtmlOptions<D, E, H>|string|boolean|Function|Mixed<HtmlBlueprint>
+export type HtmlBlueprint<D=unknown, E=unknown, H=any> = HtmlOptions<D, E, H>|string|boolean|Function|Mixed<any>//<HtmlBlueprint>
 
-export interface HtmlOptions<D, E, H, B=HtmlBlueprint<D, E, H>> extends GearOptions<D, E, B> {
+export interface HtmlOptions<D, E, H, B=HtmlBlueprint<NoInfer<D>, NoInfer<E>, H>> extends GearOptions<D, E, B> {
     layout?: Function
     renderer?: Renderer
     dom?: H
@@ -32,7 +32,13 @@ export interface HtmlOptions<D, E, H, B=HtmlBlueprint<D, E, H>> extends GearOpti
     css?: string|string[]
     styles?: {[key: string]: string|number}
     html?: string
+
 }
+
+//const o: HtmlOptions<any, any, any> = {}
+
+
+
 
 export type HtmlEvents = GearEvents & {
     afterRender?: () => any
@@ -74,14 +80,6 @@ export const defaultLayout = (factory: VNodeFactory, key: string, props: any, do
     return factory(key, props, dom, children && children.map(defaultRender))
 }
 
-
-export const mix = <T, E=unknown>(...args: HtmlBlueprint<T, E>[]) : HtmlBlueprint => {
-    return mixin.apply(this, args)
-}
-
-export const mix2 = <T, X>(a: HtmlBlueprint<T>, b?: HtmlBlueprint<X>) : Mixed<HtmlBlueprint<T&X>> => {
-    return mixin(b as any, a as any) as Mixed<HtmlBlueprint<T&X>>
-}
 
 
 export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O extends HtmlOptions<D, E, H>=HtmlOptions<D, E, H>, B extends HtmlBlueprint<D, E, H>=HtmlBlueprint<D, E, H>> extends Gear<D, E, S, O, B> implements Renderable {

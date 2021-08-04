@@ -1,6 +1,6 @@
 import { EventNode } from "./bus"
 import { ObservableValueSet, ValueSet, Node } from "./node"
-import { proxify } from "./observable"
+import { isValueSet, proxify } from "./observable"
 import { EventBus, Handler, Observable, PublishFunc, Subscriber, Subscription, Thenable, Value } from "./utils"
 
 
@@ -45,6 +45,9 @@ class CallableNode<T extends Function, E=any> extends Function implements Value<
 
     $call(thisArg: any, args: any[]) {
         let result = this._memoValue ? this._memoValue.apply(thisArg, args) : args[0]
+        if (isValueSet(result)) {
+            result = result.$value
+        }
         if (result && (result as Thenable).then) {
             result = result.then((response: any) => {
                 this.$emit('done', response)
@@ -107,7 +110,7 @@ class CallableNode<T extends Function, E=any> extends Function implements Value<
 
 
 
-export const callable = <T extends Function>(initValue: T) : Value<T>&T => {
+export const callable = <T extends Function>(initValue: T) : /*Value<T>&*/T => {
     //const value = isValueSet(initValue) ? initValue.$value : initValue
     return proxify(initValue, new CallableNode(initValue) as any)
 }

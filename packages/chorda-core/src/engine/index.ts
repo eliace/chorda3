@@ -7,5 +7,6 @@ export interface Engine<T> {
     addPostEffect: (fn: Function) => void
     schedule () : void
     chain: (link: Engine<any>) => void
+    readonly processing: boolean
 }
 

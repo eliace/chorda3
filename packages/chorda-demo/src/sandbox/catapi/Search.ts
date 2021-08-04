@@ -1,7 +1,7 @@
 import { computable, HtmlBlueprint, iterable, observable, patch } from "@chorda/core"
 import { Button, Field, Fields } from "chorda-bulma"
 import { Coerced, createAppScope, createValueEffect, IteratorScope } from "../../utils"
-import { BgImage, Dropdown, DropdownItem, FaIcon } from "../../helpers"
+import { BgImage, DropdownOld, DropdownOldItem, FaIcon } from "../../helpers"
 import { api, CatApi } from "./api"
 import { DomEvents } from "@chorda/react"
 import { faHeart, faRedo } from "@fortawesome/free-solid-svg-icons"
@@ -142,22 +142,22 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                         fields: [
                             Field({
                                 label: 'Order',
-                                control: Dropdown<Record, string, SearchScope>({
+                                control: DropdownOld<Record, string, SearchScope>({
                                     items$: () => ORDERS,
                                     value$: (scope) => scope.orderId,
                                     text$: (scope) => scope.selected.name,
-                                    defaultItem: DropdownItem<Record, string>({
+                                    defaultItem: DropdownOldItem<Record, string>({
                                         text$: (scope) => scope.item.name
                                     })
                                 })
                             }),
                             Field({
                                 label: 'Type',
-                                control: Dropdown<Record, string, SearchScope>({
+                                control: DropdownOld<Record, string, SearchScope>({
                                     items$: () => TYPES,
                                     value$: (scope) => scope.typeId,
                                     text$: (scope) => scope.selected.name,
-                                    defaultItem: DropdownItem<Record, string>({
+                                    defaultItem: DropdownOldItem<Record, string>({
                                         text$: (scope) => scope.item.name
                                     })
                                 })
@@ -168,22 +168,22 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                         fields: [
                             Field({
                                 label: 'Category',
-                                control: Dropdown<Record, string, SearchScope>({
+                                control: DropdownOld<Record, string, SearchScope>({
                                     items$: (scope) => scope.categories,
                                     value$: (scope) => scope.categoryId,
                                     text$: (scope) => scope.selected.name,
-                                    defaultItem: DropdownItem<Record, string>({
+                                    defaultItem: DropdownOldItem<Record, string>({
                                         text$: (scope) => scope.item.name
                                     })
                                 })
                             }),
                             Field({
                                 label: 'Breed',
-                                control: Dropdown<CatApi.Breed, string, SearchScope>({
+                                control: DropdownOld<CatApi.Breed, string, SearchScope>({
                                     items$: (scope) => scope.breeds,
                                     value$: (scope) => scope.breedId,
                                     text$: (scope) => scope.selected.name,
-                                    defaultItem: DropdownItem<CatApi.Breed, string>({
+                                    defaultItem: DropdownOldItem<CatApi.Breed, string>({
                                         text$: (scope) => scope.item.name
                                     })
                                 })
@@ -240,11 +240,11 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                         fields: [
                             Field({
                                 label: 'Per page',
-                                control: Dropdown<Record, number, SearchScope>({
+                                control: DropdownOld<Record, number, SearchScope>({
                                     value$: (scope) => scope.limit,
                                     text$: (scope) => scope.selected.name,
                                     items$: () => LIMITS,
-                                    defaultItem: DropdownItem<Record, number>({
+                                    defaultItem: DropdownOldItem<Record, number>({
                                         text$: (scope) => scope.item.name
                                     })
                                 })

@@ -1,7 +1,7 @@
 import { computable, HtmlBlueprint, iterable, observable, patch } from "@chorda/core";
 import { Field, Fields } from "chorda-bulma";
 import { Coerced, createValueEffect, IteratorScope } from "../../utils";
-import { BgImage, Dropdown, DropdownItem } from "../../helpers";
+import { BgImage, DropdownOld, DropdownOldItem } from "../../helpers";
 import { api, CatApi } from "./api";
 
 
@@ -73,11 +73,11 @@ export const Favourites = () : HtmlBlueprint<FavouritesScope> => {
                 items: [
                     Field({
                         label: 'Order',
-                        control: Dropdown<Record, string, FavouritesScope>({
+                        control: DropdownOld<Record, string, FavouritesScope>({
                             items$: (scope) => ORDERS,
                             value$: (scope) => scope.order,
                             text$: (scope) => scope.selected.name,
-                            defaultItem: DropdownItem<Record, string>({
+                            defaultItem: DropdownOldItem<Record, string>({
                                 text$: (scope) => scope.item.name
                             })
                         })
@@ -113,11 +113,11 @@ export const Favourites = () : HtmlBlueprint<FavouritesScope> => {
                         fields: [
                             Field({
                                 label: 'Per page',
-                                control: Dropdown<Record, number, FavouritesScope>({
+                                control: DropdownOld<Record, number, FavouritesScope>({
                                     value$: (scope) => scope.limit,
                                     text$: (scope) => scope.selected.name,
                                     items$: () => LIMITS,
-                                    defaultItem: DropdownItem<Record, number>({
+                                    defaultItem: DropdownOldItem<Record, number>({
                                         text$: (scope) => scope.item.name
                                     })
                                 })

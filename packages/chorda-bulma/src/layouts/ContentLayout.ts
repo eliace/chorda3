@@ -1,4 +1,4 @@
-import { HtmlBlueprint, mix } from "@chorda/core";
+import { Blueprint, HtmlBlueprint, InferBlueprint, mix } from "@chorda/core";
 
 
 export const ContentLayout = <T>(elements: HtmlBlueprint<T>[]) : HtmlBlueprint<T> => {

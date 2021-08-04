@@ -1,4 +1,4 @@
-import { defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, Keyed, mix, Observable, observable, PublishFunc, Scope, Value } from "@chorda/core"
+import { autoTerminalAware, Blueprint, Callable, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Keyed, Listener, mix, Observable, observable, PublishFunc, Scope, spyGetters, Value } from "@chorda/core"
 import { createPatchEngine } from "@chorda/engine"
 import { createRenderEngine, defaultVNodeFactory, DomEvents } from "@chorda/react"
 import { Route } from "router5"
@@ -61,9 +61,9 @@ export const render = (html: Html, el: () => Element) => {
 
 
 type CustomProps<T, E=unknown> = {
-    as?: HtmlBlueprint<T, E>
-    content?: HtmlBlueprint<T, E>
-} & HtmlBlueprint<T, E>
+    as?: Blueprint<T, E>
+    content?: Blueprint<T, E>
+} & Blueprint<T, E>
 
 export const Coerced = <S, T=unknown, E=unknown>(props: CustomProps<Omit<T, keyof S>&S, E&DomEvents&HtmlEvents>) : HtmlBlueprint<T> => {
     return mix(props.as, props, {
@@ -80,6 +80,20 @@ export const Custom = <T, E=unknown>(props: CustomProps<T, E>) : HtmlBlueprint<T
         }
     })
 }
+
+
+export const withHtml = <T, E>(props: Blueprint<T&HtmlScope, E&HtmlEvents>) : InferBlueprint<T, E> => {
+    return props as any
+}
+
+export const withScope = <S, E=unknown, T=unknown>(props: CustomProps<Omit<T, keyof S>&S, E&DomEvents&HtmlEvents>) : InferBlueprint<T, E> => {
+    return mix(props.as, props)
+}
+
+export const withBlueprint = <T, E=unknown>(props: CustomProps<T, E&DomEvents&HtmlEvents>) : InferBlueprint<T, E> => {
+    return mix(props.as, props)
+}
+
 
 export type DataScope<T> = {
     data: T
@@ -161,6 +175,20 @@ export const createValueEffect = <T, F extends Function>(bus: EventBus<any>&Valu
 
 export const watch = <T>(f: PublishFunc<T>, objects: any[]) => {
     for (let obj of objects) {
+        if (obj == null) {
+            throw Error('Watched object is null')
+        }
         (obj as Observable<unknown>).$subscribe(() => f.apply(this, objects.map(o => o.$value)))
+//        (obj as Observable<unknown>).$subscribe(() => autoTerminalAware(f))
     }
+}
+
+// export const compute = <T>(f: PublishFunc<T>, objects?: any[]) => {
+//     const sub: PublishFunc<T> = () => autoTerminalAware(f)
+    
+//     spyGetters(sub).forEach(o => o.$subscribe(sub))
+// }
+
+export const done = <T, R>(c: any, f: Listener<T, R>) => {
+    (c as EventBus<T>).$on('done', f)
 }

@@ -1,8 +1,104 @@
-import { computable, HtmlBlueprint, HtmlScope, mix, observable, patch } from "@chorda/core";
-import { ColumnLayout, RowLayout } from "chorda-bulma";
-import { Custom } from "../../utils";
+import { callable, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, Injector, Listener, mix, observable, patch } from "@chorda/core";
+import { Column, ColumnLayout, RowLayout } from "chorda-bulma";
+import { Custom, watch, withBlueprint, withScope } from "../../utils";
 import { COUNTRIES, Country } from "../../data";
-import { Paragraph, Text, Dropdown, DropdownEvents, DropdownItem, DropdownScope, DropdownTrigger } from "../../helpers";
+import { Paragraph, Text, Dropdown, DropdownTrigger, withMix, TextInput } from "../../helpers";
+import { DomEvents } from "@chorda/react";
+
+type CountryRecord = Country & {id: any}
+
+const countries: CountryRecord[] = observable(COUNTRIES.map(country => ({...country, id: country.alpha2Code})))
+const value = observable('ZW')
+const stats = observable({
+    filter: '',
+    value: null,
+    selected: null,
+})
+
+type FilterScope<I> = {
+    filter: string
+    filteredItems: I[]
+}
+
+const filterFunc = (v: CountryRecord) => {
+    return v?.name
+}
+
+
+export default <T>() : InferBlueprint<T> => {
+    return ColumnLayout([
+        Column({
+            css: 'is-one-quarter',
+            content: RowLayout([
+                withScope<FilterScope<CountryRecord>>(Dropdown<CountryRecord, FilterScope<CountryRecord>>({
+                    trigger: withMix(false, DropdownTrigger({
+                        content: TextInput({
+                            value$: ({filter}) => filter
+                        })
+                    })),
+                    value$: () => value,
+                    as: {
+                        injections: {
+                            filter: () => observable(''),
+                            filteredItems: ({filter}) => computable(() => {
+                                return !filter ? countries : countries.filter(country => country.name.indexOf(filter) != -1)
+                            }),
+                            items: ({filteredItems}) => filteredItems
+                        },
+                        joints: {
+                            initFilter: ({items, filter, value, active}) => {
+    
+                                watch(() => {
+                                    active.$value = items.length > 1
+                                }, [items])
+        
+                                watch(() => {
+                                    filter.$value = filterFunc(items.find(itm => itm.id == value))
+                                }, [value])
+    
+                            },
+                            updateStats: ({filter, value, selected}) => {
+    
+                                watch(() => stats.filter = filter, [filter])
+                                watch(() => stats.value = value, [value])
+                                watch(() => stats.selected = selected, [selected])
+    
+                            }
+                        }
+                    },
+                }))
+    
+            ])
+        }),
+        Column({
+            css: 'is-three-quarters is-word-wrap',
+            content: RowLayout([
+                Text({
+                    as: Paragraph,
+                    text$: () => computable(() => `filter: ${stats.filter}`)
+                }),
+                Text({
+                    as: Paragraph,
+                    text$: () => computable(() => `value: ${stats.value}`)
+                }),
+                Text({
+                    as: Paragraph({
+                        css: 'is-size-7'
+                    }),
+                    text$: () => computable(() => JSON.stringify(stats.selected))
+                }),
+            ])
+        }),
+    ])
+}
+
+
+
+
+
+
+
+/*
 
 const countryUid = (v: Country) => {
     return v.alpha2Code
@@ -30,7 +126,7 @@ type FilterScope<I, V=I> = {
 
 type FilterEvents<I> = {
     itemsFilter: () => string
-} & DropdownEvents<I>
+} & DropdownOldEvents<I>
 
 type InputScope<V> = {
     value: V
@@ -63,16 +159,16 @@ export default () : HtmlBlueprint => {
                 styles: {
                     marginBottom: 140
                 },
-                as: Dropdown<Country, string, FilterScope<Country, string>>({
+                as: DropdownOld<Country, string, FilterScope<Country, string>>({
                     value$: () => observable('ZW'),
                     items$: (scope) => scope.filteredItems,
                     itemToKey: (item) => item?.alpha2Code,
                     valueToKey: (value) => value,
                     itemToValue: (item) => item?.alpha2Code,
-                        defaultItem: DropdownItem<Country, string, DropdownScope<Country, string>&FilterScope<Country, string>>({
+                        defaultItem: DropdownOldItem<Country, string, DropdownOldScope<Country, string>&FilterScope<Country, string>>({
                         text$: (scope) => scope.item.name,
                     }),
-                    trigger: mix<FilterScope<Country, string>&InputScope<string>, FilterEvents<Country>>(false, DropdownTrigger({
+                    trigger: mix<FilterScope<Country, string>&InputScope<string>, FilterEvents<Country>>(false, DropdownOldTrigger({
                         content: {
                             tag: 'input',
                             css: 'input',
@@ -178,3 +274,5 @@ export default () : HtmlBlueprint => {
         ])
     ])
 }
+
+*/

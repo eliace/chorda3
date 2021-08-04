@@ -7,7 +7,7 @@ import { Example } from "../../helpers"
 export const DropdownExample = () : HtmlBlueprint => {
     return RowLayout([
         Example({
-            title: 'Dropdown',
+            title: 'Dropdown + template',
             content: require('./dropdown').default,
             files: [{
                 name: 'index.ts',
@@ -15,7 +15,7 @@ export const DropdownExample = () : HtmlBlueprint => {
             }]
         }),
         Example({
-            title: 'Dropdown + component',
+            title: 'Dropdown + value',
             content: require('./dropdown-component').default,
             files: [{
                 name: 'index.ts',
@@ -26,6 +26,22 @@ export const DropdownExample = () : HtmlBlueprint => {
             }, {
                 name: 'events.ts',
                 code: require('!raw-loader!../../helpers/events').default
+            }]
+        }),
+        Example({
+            title: 'Dropdown + multi',
+            content: require('./dropdown-multi').default,
+            files: [{
+                name: 'index.ts',
+                code: require('!raw-loader!./dropdown-multi').default
+            }]
+        }),
+        Example({
+            title: 'Dropdown + detached',
+            content: require('./dropdown-detach').default,
+            files: [{
+                name: 'index.ts',
+                code: require('!raw-loader!./dropdown-detach').default
             }]
         }),
         Example({
@@ -44,13 +60,13 @@ export const DropdownExample = () : HtmlBlueprint => {
                 code: require('!raw-loader!./dropdown-input').default
             }]
         }),
-        Example({
-            title: 'Dropdown + async',
-            content: require('./dropdown-async').default,
-            files: [{
-                name: 'index.ts',
-                code: require('!raw-loader!./dropdown-async').default
-            }]
-        }),
+        // Example({
+        //     title: 'Dropdown + async',
+        //     content: require('./dropdown-async').default,
+        //     files: [{
+        //         name: 'index.ts',
+        //         code: require('!raw-loader!./dropdown-async').default
+        //     }]
+        // }),
     ])
 }

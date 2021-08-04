@@ -1,5 +1,5 @@
 import { isMixed, lastEffectiveValue, mixin, Mixed, MixRules } from './mix'
-import { Hub, HubEvents, HubOptions, HubScope, Indexed, Keyed, State } from './Hub'
+import { Hub, HubEvents, HubOptions, HubScope, Indexed, Keyed, NoInfer, State } from './Hub'
 import { DefaultRules } from './rules'
 import { isIterable, isValueIterator, IterableValue, Value, ValueIterator } from './value'
 import { ItemOp, KVItem, reconcile } from './reconcile'
@@ -14,7 +14,7 @@ export const defaultGearFactory = <D, E>(opts: GearOptions<D, E>, context: GearS
 // GEAR
 //------------------------------------
 
-export type Blueprint<D=unknown, E=unknown> = GearOptions<D, E>|string|boolean|Function|Mixed<Blueprint<D, E>>
+export type GearBlueprint<D=unknown, E=unknown> = GearOptions<D, E>|string|boolean|Function|Mixed<any>//<Blueprint<D, E>>
 
 
 export const defaultInitRules = {
@@ -51,7 +51,7 @@ type KeyedAndIndexed = {
 
 
 
-export interface GearOptions<D, E, B extends Blueprint<D, E>=Blueprint<D, E>> extends HubOptions<D, E> {
+export interface GearOptions<D, E, B extends GearBlueprint<D, E>=GearBlueprint<D, E>> extends HubOptions<D, E> {
     
     weight?: number
     name?: string
@@ -94,7 +94,7 @@ export const isGear = (obj: any) : obj is Gear => {
 
 
 
-export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends GearOptions<D, E>=GearOptions<D, E>, B extends Blueprint<D, E>=Blueprint<D, E>> extends Hub<D, E, S, O> {
+export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends GearOptions<D, E>=GearOptions<D, E>, B extends GearBlueprint<D, E>=GearBlueprint<D, E>> extends Hub<D, E, S, O> {
 
 //    containers: {[k: string]: ComponentCollection<B>|ItemCollection<B>}
     index: number

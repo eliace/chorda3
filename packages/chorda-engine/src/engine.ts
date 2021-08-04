@@ -23,6 +23,7 @@ export class SimpleEngine implements Engine<Stateable> {
         this.subscriptions = []
         this.pipeTasks = []
     }
+    processing: boolean;
 
     pipeTask (fn: Function, arg?: any, target?: Stateable) {
         this.pipeTasks.push({fn, arg, target})

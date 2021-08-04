@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, Listener, mix, patch } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, Listener, mix, patch } from "@chorda/core"
 import { DomEvents } from "@chorda/react"
 
 
@@ -10,7 +10,7 @@ type TextScope = {
 }
 
 type TextProps<T> = {
-    as?: HtmlBlueprint<T>
+    as?: Blueprint<T>
     text?: string
     css?: string
     text$?: Injector<T>
@@ -18,7 +18,7 @@ type TextProps<T> = {
 }
 
 
-export const Text = <T>(props: TextProps<T&TextScope>) : HtmlBlueprint<T> => {
+export const Text = <T>(props: TextProps<T&TextScope>) : InferBlueprint<T> => {
     return mix<TextScope, DomEvents>(props.as || {tag: 'span'}, {
 //        tag: 'span',
         reactions: {
