@@ -23,9 +23,6 @@ export const DropdownExample = () : HtmlBlueprint => {
             }, {
                 name: 'dropdown.ts',
                 code: require('!raw-loader!../../helpers/dropdown').default
-            }, {
-                name: 'events.ts',
-                code: require('!raw-loader!../../helpers/events').default
             }]
         }),
         Example({
@@ -34,6 +31,9 @@ export const DropdownExample = () : HtmlBlueprint => {
             files: [{
                 name: 'index.ts',
                 code: require('!raw-loader!./dropdown-multi').default
+            }, {
+                name: 'with-multiselect.ts',
+                code: require('!raw-loader!./common/with-multiselect').default
             }]
         }),
         Example({

@@ -1,4 +1,4 @@
-import { autoTerminalAware, Blueprint, Callable, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Keyed, Listener, mix, Observable, observable, PublishFunc, Scope, spyGetters, Value } from "@chorda/core"
+import { autoTerminalAware, Blueprint, callable, Callable, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, patch, PublishFunc, Scope, spyGetters, Value } from "@chorda/core"
 import { createPatchEngine } from "@chorda/engine"
 import { createRenderEngine, defaultVNodeFactory, DomEvents } from "@chorda/react"
 import { Route } from "router5"
@@ -191,4 +191,205 @@ export const watch = <T>(f: PublishFunc<T>, objects: any[]) => {
 
 export const done = <T, R>(c: any, f: Listener<T, R>) => {
     (c as EventBus<T>).$on('done', f)
+}
+
+
+
+
+
+
+type ItemOf<T> = T extends Array<infer Item> ? Item : never;
+
+export type DynamicItemScope<I> = {
+    item: I
+}
+
+export type DynamicListScope<I> = {
+    items: I
+    list: I
+}
+
+type DynamicListProps<I, T, E> = {
+    items$?: Injector<T>
+    defaultItem?: HtmlBlueprint<T&DynamicItemScope<I>, E>
+    as?: HtmlBlueprint<T, E>
+//    with?: HtmlBlueprint<T, E>[]
+}
+
+export const DynamicList = <A extends any[], S=unknown, T=unknown, E=unknown, I=ItemOf<A>>(props: DynamicListProps<I, T&S&DynamicListScope<A>, E>) : HtmlBlueprint<T, E> => {
+    return mix<DynamicListScope<A>&IteratorScope<A>>({
+        reactions: {
+            __it: (v) => patch({items: v}),
+        },
+        injections: {
+            __it: (scope) => {
+//                console.log('__it', scope.items)
+                return iterable(scope.items, '__item')
+            }
+        },
+        defaultItem: Coerced<DynamicItemScope<I>&ItemScope<I>>({
+            injections: {
+                item: (scope) => {
+//                    console.log('item', scope.$context.__it)
+                    return scope.__item
+                }
+            }
+        })
+    }, 
+    props?.as,
+//    ...props?.with,
+    props && {
+        injections: {
+            items: props.items$
+        },
+        defaultItem: props.defaultItem
+    })
+}
+
+
+type diProps<T, I> = Omit<HtmlOptions<T, unknown, any>, 'defaultItem'> & {
+    defaultItem?: HtmlBlueprint<T&I>,
+    as?: HtmlBlueprint<T>
+}
+
+export const withIterableItems = <A extends any[], T=unknown, I=ItemOf<A>>(props: diProps<T&DynamicListScope<A>, DynamicItemScope<I>>) : HtmlBlueprint<T> => {
+    return mix<DynamicListScope<any[]>&IteratorScope<any[]>>({
+        reactions: {
+            __it: (v) => patch({items: v}),
+        },
+        injections: {
+            __it: (scope) => {
+                return iterable(scope.items, '__item')
+            }
+        },
+        defaultItem: mix<DynamicItemScope<any>&ItemScope<any>>({
+            injections: {
+                item: (scope) => scope.__item
+            }
+        })
+    }, props?.as, props)
+}
+
+
+export const withItem = <I, T=unknown>(props: HtmlBlueprint<T&DynamicListScope<I[]>&DynamicItemScope<I>>) : HtmlBlueprint<T> => {
+    return mix(props)
+}
+
+
+
+export type OuterClickScope = {
+    onOuterClick: () => void
+}
+
+export type OuterClickEvents = Pick<OuterClickScope, 'onOuterClick'>
+
+export type OuterClickEvent = {
+    outerClick?: () => void
+}
+
+
+export const onOuterClick: Joint<HtmlScope> = ({$dom}) => {
+
+    $dom.$event('outerClick')
+
+    const listener = () => {
+        $dom.$emit('outerClick')
+    }
+    document.addEventListener('mousedown', listener)
+    return () => {
+        document.removeEventListener('mousedown', listener)
+    }
+}
+
+
+
+
+export const withOuterClick = <T, E>(props: Blueprint<T&OuterClickScope, E&OuterClickEvents>) : InferBlueprint<T, E> => {
+    return mix<OuterClickScope>({
+        initials: {
+            onOuterClick: () => callable(null)
+        },
+        joints: {
+            initOuterClick: ({onOuterClick}) => {
+                // const listener = () => {
+                //     onOuterClick()
+                // }
+                document.addEventListener('mousedown', onOuterClick)
+                return () => {
+                    document.removeEventListener('mousedown', onOuterClick)
+                }            
+            }
+        }
+    }, props)
+}
+
+
+export const withStopMouseDown = <T, E>(props: Blueprint<T, E>, preventDefault?: boolean) : InferBlueprint<T, E> => {
+    return mix<HtmlScope>({
+        joints: {
+            initStopMouseDown: ({$dom}) => {
+                $dom.$subscribe((el) => {
+                    el?.addEventListener('mousedown', (e: MouseEvent) => {
+                        e.stopPropagation()
+                        preventDefault && e.preventDefault() // если поставить, то будет слетать фокус на input
+                        return false
+                    })
+                })                            
+            }
+        }
+    }, props)
+}
+
+export const withPreventDefaultMouseDown = <T, E>(props: Blueprint<T, E>) : InferBlueprint<T, E> => {
+    return withStopMouseDown(props, true)
+}
+
+
+export const stopMouseDown: Joint<HtmlScope> = ({$dom}) => {
+    $dom.$subscribe((el) => {
+        el?.addEventListener('mousedown', (e: MouseEvent) => {
+            e.stopPropagation()
+            //e.preventDefault()
+            return false
+        })
+    })
+}
+
+export const autoFocus: Joint<HtmlScope&{autoFocus: boolean}> = ({$dom, $renderer}) => {
+    $dom.$subscribe(el => {
+        if (el) {
+            $renderer.scheduleTask(() => {
+                el.focus()
+            })
+        }
+    })
+}
+
+
+export type BoundsScope = {
+    bounds: DOMRect
+}
+
+export const withBounds = <T, E>(props: Blueprint<T&BoundsScope, E>) : InferBlueprint<T, E> => {
+    return mix<BoundsScope&HtmlScope>({
+        initials: {
+            bounds: () => observable(null),
+        },
+        joints: {
+            updateBounds: ({$dom, bounds}) => {
+                watch(() => {
+                    if ($dom.$value) {
+                        bounds.$value = $dom.$value.getBoundingClientRect()
+                    }
+                }, [$dom])
+            }
+        }
+    }, props)
+}
+
+
+
+
+export const withMix = <T, E>(...args: Blueprint<T, E>[]) : InferBlueprint<T, E> => {
+    return mix.apply(this, args)
 }

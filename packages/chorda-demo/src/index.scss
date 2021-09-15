@@ -1,6 +1,6 @@
 @import "~bulma";
 
-$fa-font-path : "~@fortawesome/fontawesome-free/webfonts";
+$fa-font-path : "~@fortawesome/fontawesome-free/webfonts/";
 @import '~@fortawesome/fontawesome-free/scss/fontawesome.scss';
 @import '~@fortawesome/fontawesome-free/scss/solid.scss';
 @import '~@fortawesome/fontawesome-free/scss/brands.scss';
@@ -309,4 +309,13 @@ main {
 
 .is-word-wrap {
   word-wrap: break-word;
+}
+
+
+.mb-120px {
+  margin-bottom: 120px;
+}
+
+.mb-140px {
+  margin-bottom: 140px;
 }

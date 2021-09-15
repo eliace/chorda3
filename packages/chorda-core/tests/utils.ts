@@ -4,6 +4,7 @@ import { Dom, Renderable, Renderer, VNodeFactory } from "../src/render"
 
 
 class TestEngine implements Engine<Stateable> {
+    processing: boolean
     pipeTask: (fn: Function, arg?: any, target?: Stateable) => void
 
     tasks: any[] = []
@@ -98,6 +99,7 @@ export class TestRenderer implements Renderer, Engine<any> {
         this.scheduled = false
         this.tasks = []
     }
+    processing: boolean
     pipeTask: (fn: Function, arg?: any, target?: any) => void
     events: Keyed<any>
 

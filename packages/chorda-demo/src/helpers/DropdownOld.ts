@@ -3,10 +3,8 @@ import { DomEvents } from "@chorda/react";
 import { faAngleDown, faAngleUp, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "chorda-bulma";
 import { SvgIcon } from "./SvgIcon";
-import { onOuterClick, OuterClickEvent, stopMouseDown, autoFocus } from './events'
 import { FaIcon } from "./FaIcon";
-import { watch } from "../utils";
-import { dom } from "@fortawesome/fontawesome-svg-core";
+import { OuterClickEvent, stopMouseDown, watch, onOuterClick } from "../utils";
 
 
 // type MenuItem = {

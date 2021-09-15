@@ -1,9 +1,6 @@
 import { HtmlBlueprint } from "@chorda/core"
 import { Box, Image } from "chorda-bulma"
-
-
-const IMAGE_1 = require('../../data/Yosemite.jpg').default
-
+import { IMAGE_1 } from "../../data"
 
 export default () : HtmlBlueprint => {
     return Box({

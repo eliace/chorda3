@@ -6,7 +6,7 @@ module.exports = {
     mode: 'development',
     devtool: 'source-map',
     devServer: {
-        contentBase: './',
+        static: './',
         hot: true,
         port: 1234
     },    
@@ -25,10 +25,11 @@ module.exports = {
                 loader: 'ts-loader'
             }
         }, {
-            test: /\.(png|svg|jpg|gif)$/,
-            use: [
-                'file-loader'
-            ]
+            test: /\.(png|svg|jpg|gif)$/i,
+            type: 'asset/resource'
+            // use: [
+            //     'file-loader'
+            // ]
         }, {
             test: /\.s[ac]ss$/i,
             use: [
@@ -44,9 +45,17 @@ module.exports = {
             ]
         }, {
             test: /\.(woff|woff2|eot|ttf|otf)$/,
-            use: [
-                'file-loader'
-            ]
+            type: 'asset/resource'
+            // use: [{
+            //     loader: 'file-loader',
+            //     // options: {
+            //     //     name: '[name].[ext]',
+            //     //     outputPath: 'fonts/'
+            //     // }
+            //     // options: {
+            //     //     name: './[name].[ext]',
+            //     // }
+            // }],
         }/*, {
             test: /\.txt$/,
             use: [

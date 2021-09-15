@@ -1,9 +1,10 @@
 import { Blueprint, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, mix, observable, patch, Scope } from "@chorda/core"
 import { ColumnLayout, MenuItem, RowLayout } from "chorda-bulma"
-import { Dropdown, DropdownOld, DropdownOldItem, DropdownOldScope, DropdownScope, withBounds } from "../../helpers"
+import { Dropdown } from "../../helpers"
 import { COUNTRIES, Country } from "../../data"
-import { Coerced, watch, withHtml, withScope } from "../../utils"
-import { DomEvents } from "@chorda/react"
+import { Coerced, watch, withHtml, withBounds } from "../../utils"
+import { withPortal } from "./common/with-portal"
+import { withParentScrollTop } from "./common/with-parent-scroll-top"
 
 type CountryRecord = Country & {id: any}
 
@@ -263,82 +264,7 @@ export default <T>() : InferBlueprint<T> => {
 
 
 
-type PortalScope = {
-    portal: any
-}
 
 
-const withPortal = <T, E>(props: Blueprint<T&PortalScope, E>) : InferBlueprint<T, E> => {
-    return mix<PortalScope>({
-        injections: {
-            portal: () => observable(null)
-        },
-        templates: {
-            portal: {
-                css: 'portal-host',
-                reactions: {
-                    portal: (v) => patch({components: {content: v}})
-                }
-            },
-            content: props
-        }
-    })
-}
-
-
-type ParentScrollScope = {
-    parentScrollTop: number
-}
-
-const withParentScrollTop = <T>(props: Blueprint<T&ParentScrollScope>) : InferBlueprint<T> => {
-    return mix<ParentScrollScope&HtmlScope>({
-        initials: {
-            parentScrollTop: () => observable(null)
-        },
-        joints: {
-            initParentScrollTop: ({$dom, parentScrollTop}) => {
-
-                let scrollListeners: {target: Element, scroll: number}[] = []
-
-                const listener = (e?: Event) => {
-                    if (e) {
-                        scrollListeners.forEach(l => {
-                            if (l.target == e.target) {
-                                l.scroll = (e.target as Element).scrollTop
-                            }
-                        })    
-                    }
-                    parentScrollTop.$value = scrollListeners.reduce((scroll, l) => scroll + l.scroll, 0)
-                }
-
-
-                watch(() => {
-                    if ($dom.$value) {
-                        parents($dom.$value).forEach(el => {
-                            el.addEventListener('scroll', listener)
-                            scrollListeners.push({target: el, scroll: el.scrollTop})
-                        })
-                        listener()
-                    }
-                    else {
-                        scrollListeners.forEach(l => {
-                            l.target.removeEventListener('scroll', listener)
-                        })
-                    }
-                }, [$dom])
-            }
-        }
-    }, props)
-}
-
-const parents = (el: Element) : Element[] => {
-    const out: Element[] = []
-    let parent = el.parentElement
-    while (parent != null) {
-        out.push(parent)
-        parent = parent.parentElement
-    }
-    return out
-}
 
 

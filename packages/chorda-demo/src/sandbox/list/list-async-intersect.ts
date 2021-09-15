@@ -1,10 +1,9 @@
 import { callable, computable, HtmlBlueprint, HtmlScope, MethodsOf, mix, observable, Scoped } from "@chorda/core"
 import { Field, Fields, RowLayout } from "chorda-bulma"
-import { Coerced, Custom, ItemScope, watch } from "../../utils"
+import { Coerced, Custom, DynamicList, ItemScope, watch } from "../../utils"
 import { Tmdb } from "../../api"
 import { TextInput } from "../../helpers"
 import { MovieListItem } from "./common/items"
-import { DynamicItemScope, DynamicList } from "./common/utils"
 import { InfiniteScrollScope, withInfiniteScroll } from "./common/scroll"
 
 

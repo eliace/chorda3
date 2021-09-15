@@ -1,9 +1,8 @@
 import { computable, HtmlBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core";
 import { MediaLayout, Image, Tags, ContentLayout, LevelLayout } from "chorda-bulma";
 import { Tmdb } from "../../../api";
-import { Coerced, IteratorScope } from "../../../utils";
+import { Coerced, DynamicList, IteratorScope } from "../../../utils";
 import { Paragraph, Text } from "../../../helpers";
-import { DynamicList } from "./utils";
 import * as dayjs from 'dayjs'
 
 

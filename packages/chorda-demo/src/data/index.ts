@@ -7,6 +7,7 @@ export const USERS: User[] = require('./users.json').results
 
 export const FRUITS: string[] = require('!raw-loader!./fruits.txt').default.split(',').map((s: string) => s.trim())
 
+export const IMAGE_1 = require('./Yosemite.jpg')
 
 export type Country = {
     name: string

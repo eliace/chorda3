@@ -1,9 +1,8 @@
 import { callable, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, Injector, Listener, mix, observable, patch } from "@chorda/core";
 import { Column, ColumnLayout, RowLayout } from "chorda-bulma";
-import { Custom, watch, withBlueprint, withScope } from "../../utils";
+import { Custom, watch, withBlueprint, withMix, withScope } from "../../utils";
 import { COUNTRIES, Country } from "../../data";
-import { Paragraph, Text, Dropdown, DropdownTrigger, withMix, TextInput } from "../../helpers";
-import { DomEvents } from "@chorda/react";
+import { Paragraph, Text, Dropdown, DropdownTrigger, TextInput, DropdownProps, DropdownScope } from "../../helpers";
 
 type CountryRecord = Country & {id: any}
 
@@ -24,26 +23,29 @@ const filterFunc = (v: CountryRecord) => {
     return v?.name
 }
 
+type CountryDropdownType = <T, E, I=CountryRecord>(props: DropdownProps<T&DropdownScope<I>, I, I, E>) => InferBlueprint<T, E>
+
+const CountryDropdown : CountryDropdownType = Dropdown
 
 export default <T>() : InferBlueprint<T> => {
     return ColumnLayout([
         Column({
             css: 'is-one-quarter',
             content: RowLayout([
-                withScope<FilterScope<CountryRecord>>(Dropdown<CountryRecord, FilterScope<CountryRecord>>({
+                withScope<FilterScope<CountryRecord>>(CountryDropdown({
                     trigger: withMix(false, DropdownTrigger({
                         content: TextInput({
                             value$: ({filter}) => filter
                         })
                     })),
                     value$: () => value,
+                    items$: ({filteredItems}) => filteredItems,
                     as: {
                         injections: {
                             filter: () => observable(''),
                             filteredItems: ({filter}) => computable(() => {
                                 return !filter ? countries : countries.filter(country => country.name.indexOf(filter) != -1)
                             }),
-                            items: ({filteredItems}) => filteredItems
                         },
                         joints: {
                             initFilter: ({items, filter, value, active}) => {

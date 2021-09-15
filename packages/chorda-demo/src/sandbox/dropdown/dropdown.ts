@@ -2,10 +2,7 @@ import { HtmlBlueprint } from "@chorda/core"
 
 export default () : HtmlBlueprint => {
     return {
-        css: 'dropdown is-active',
-        styles: {
-            marginBottom: 120
-        },
+        css: 'dropdown is-active mb-120px',
         templates: {
             trigger: {
                 css: 'dropdown-trigger',

@@ -6,6 +6,7 @@
   "types": "lib/index.d.ts",
   "scripts": {
     "test": "mocha -r ts-node/register tests/**/*.test.ts",
+    "test:pipe": "mocha -r ts-node/register tests/Pipe.test.ts",
     "test:watch": "mocha -r ts-node/register -r source-map-support/register --watch-files src/**/*.ts,tests/**/*.test.ts,tests/**/*.ts --watch tests/**/*.test.ts"
   },
   "author": "",

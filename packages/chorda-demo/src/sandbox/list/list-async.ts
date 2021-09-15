@@ -2,9 +2,8 @@ import { computable, HtmlBlueprint, HtmlScope, iterable, mix, observable, patch 
 import { Field, Fields, Image, List, MediaLayout, RowLayout, Tag, Tags } from "chorda-bulma"
 import { Paragraph, Text, TextInput } from "../../helpers"
 import { Tmdb } from "../../api"
-import { Coerced, Custom, IteratorScope } from "../../utils"
+import { Coerced, Custom, DynamicList, IteratorScope } from "../../utils"
 import { MovieListItem } from "./common/items"
-import { DynamicList } from "./common/utils"
 
 const movies = observable([])
 const genres = observable([] as Tmdb.Genre[])

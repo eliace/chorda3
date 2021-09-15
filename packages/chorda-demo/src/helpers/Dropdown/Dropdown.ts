@@ -5,9 +5,7 @@ import { FaIcon } from "../FaIcon"
 import { DropdownMenu } from "./DropdownMenu"
 import { DropdownTrigger } from "./DropdownTrigger"
 import { MenuItem } from "./utils"
-import { watch, withBlueprint, withScope } from '../../utils'
-import { stopMouseDown, onOuterClick, withOuterClick, withStopMouseDown, withBounds, BoundsScope, withMix, withPreventDefaultMouseDown } from "../events"
-import { withIterableItems } from "../../sandbox/list/common/utils"
+import { watch, withBlueprint, withBounds, withIterableItems, withOuterClick, withPreventDefaultMouseDown, withScope, withStopMouseDown } from '../../utils'
 import { DropdownItem } from "./DropdownItem"
 import { DomEvents } from "@chorda/react"
 
@@ -55,7 +53,8 @@ export type DropdownProps<T, I, V=any, E=unknown> = {
 //export type DropdownEvents<I extends MenuItem> = Pick<DropdownScope<I>, 'selectItem'|'cancelSelect'>
 
 
-export const Dropdown = <I=MenuItem, T extends Scope=unknown, E=unknown>(props: DropdownProps<T&DropdownScope<I>, I, I, E>) : InferBlueprint<T, E> => {
+//export const Dropdown = <I=MenuItem, T extends Scope=unknown, E=unknown>(props: DropdownProps<T&DropdownScope<I>, I, I, E>) : InferBlueprint<T, E> => {
+export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&DropdownScope<I>, I, I, E>) : InferBlueprint<T, E> => {
     
     const value2key: ((v: any) => any) = props.valueToKey || ((v) => v)
     const item2value = props.itemToValue || ((itm) => (itm as any).id)
@@ -147,8 +146,8 @@ export const Dropdown = <I=MenuItem, T extends Scope=unknown, E=unknown>(props: 
     props && withStopMouseDown(withBounds({
         initials: {
             value: () => observable(null),
-            selected: () => reactive(null),
-            items: () => reactive([]),
+            selected: () => observable(null),
+            items: () => observable([]),
             active: () => reactive(props.active),
             current: () => reactive(null),
             loading: () => reactive(false),
