@@ -103,6 +103,6 @@ const avgTimeInterval = (t0: number, t1: number, total: number) => {
 }
 
 
-export const createPatchEngine = () : Engine<Stateable> => {
+export const createSimpleEngine = () : Engine<Stateable> => {
     return new SimpleEngine()
 }
