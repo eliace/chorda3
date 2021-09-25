@@ -72,6 +72,8 @@ const toSequence = (items: KVItem[]) : [Link, {[key: string]: Link}] => {
 
 export const reconcile = (prevItems: KVItem[], nextItems: KVItem[]) : KVItem[] => {
 
+    // TODO должна быть проверка на уникальность ключей
+
 //    console.log('----------------------------------------------')
 
     if (prevItems.length == 0) {

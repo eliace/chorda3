@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { Blueprint, defaultGearFactory, Gear, GearOptions, observable, patch, mixin, mix, iterable } from '../src'
-import { createEngine, immediateTick, nextTick } from './utils'
+import { createPatchScheduler, immediateTick } from './utils'
 import * as _ from 'lodash'
 
 
@@ -17,10 +17,11 @@ type TestEvents = {
 
 
 const createGear = <D>(o: Blueprint<D>) : Gear<D> => {
-    const s = new Gear<D>(o as GearOptions, {$engine: createEngine(), $defaultFactory: defaultGearFactory} as any)
+    const s = new Gear<D>(o as GearOptions<D, unknown>, {$engine: createPatchScheduler(), $defaultFactory: defaultGearFactory} as any)
     immediateTick()
     return s
 }
+
 
 const createGearList = <T>(list: any[]) : Gear<T> => {
     return createGear<any>({
@@ -30,13 +31,14 @@ const createGearList = <T>(list: any[]) : Gear<T> => {
             }
         },
         reactions: {
-            items: (v) => {
+            __it: (v) => {
 //                console.log('new value', iterator(v, ''))
                 return patch({items: v})
             }
         },
         injections: {
-            items: () => iterable(list)
+            items: () => observable(list),
+            __it: ({items}) => iterable(items)
         }
     })
 }
@@ -113,14 +115,14 @@ describe ('Gear', () => {
 
         it ('Should redefine nested scope entry with the same name', () => {
 
-            const g = createGear({
+            const g = createGear<{data: any}>({
                 injections: {
                     data: () => observable({x: 7})
                 },
                 components: {
                     a: {
                         injections: {
-                            data: (scope) => (scope.data as any).x
+                            data: (scope) => scope.data.x
                         }
                     }
                 }
@@ -280,7 +282,8 @@ describe ('Gear', () => {
                 items: [{}, {}]
             })
 
-            g.scope.$engine.immediate()
+            immediateTick()
+//            g.scope.$engine.immediate()
 
             expect(g.items.length).to.eq(2)
         })
@@ -359,7 +362,8 @@ describe ('Gear', () => {
 
             v.$value = {a: 'test'}
 
-            g.scope.$engine.immediate()
+            immediateTick()
+//            g.scope.$engine.immediate()
 
             expect(_.size(g.components)).to.eq(1)
         
@@ -382,7 +386,8 @@ describe ('Gear', () => {
 
             v.$value = {a: 5, b: 7}
 
-            g.scope.$engine.immediate()
+            immediateTick()
+//            g.scope.$engine.immediate()
 
             expect(_.size(g.components)).to.eq(2)
         
@@ -405,7 +410,8 @@ describe ('Gear', () => {
 
             v.$value = {a: 5} as any
 
-            g.scope.$engine.immediate()
+            immediateTick()
+//            g.scope.$engine.immediate()
 
             expect(_.size(g.components)).to.eq(1)
         
@@ -427,7 +433,8 @@ describe ('Gear', () => {
             const gear = createGearList([1,2,3,4,5])
             gear.scope.items.$value = []
 
-            gear.scope.$engine.immediate()
+            immediateTick()
+//            gear.scope.$engine.immediate()
 
             expect(gear.items.length).to.be.eq(0)
         })
@@ -437,7 +444,8 @@ describe ('Gear', () => {
             const gear = createGearList([1,2,3,4,5])
             gear.scope.items.$value = [5,4,3,2,1]
 
-            gear.scope.$engine.immediate()
+            immediateTick()
+//            gear.scope.$engine.immediate()
 
             expect(gear.items.length).to.be.eq(5)
             expect(gear.items.map(toNames)).to.be.deep.eq([5,4,3,2,1])
@@ -448,7 +456,8 @@ describe ('Gear', () => {
             const gear = createGearList([1,2,3])
             gear.scope.items.$value = [1,2,3,4,5]
 
-            gear.scope.$engine.immediate()
+            immediateTick()
+//            gear.scope.$engine.immediate()
 
             expect(gear.items.length).to.be.eq(5)
             expect(gear.items.map(toNames)).to.be.deep.eq([1,2,3,4,5])
@@ -459,7 +468,8 @@ describe ('Gear', () => {
             const gear = createGearList([1,2,3,4,5])
             gear.scope.items.$value = [3,4,5]
 
-            gear.scope.$engine.immediate()
+            immediateTick()
+//            gear.scope.$engine.immediate()
 
             expect(gear.items.length).to.be.eq(3)
             expect(gear.items.map(toNames)).to.be.deep.eq([3,4,5])

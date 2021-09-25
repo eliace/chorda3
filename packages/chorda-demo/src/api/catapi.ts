@@ -99,6 +99,25 @@ export namespace CatApi {
         page?: number
     }
 
+
+    export const api = {
+        getBreeds: () => {
+            return rest.get('/breeds').then(response => response.data)
+        },
+        getCategories: () => {
+            return rest.get('/categories').then(response => response.data)
+        },
+        searchImages (filter: CatApi.SearchImageFilter) {
+            return rest.get('/images/search', {params: filter}).then((response) => response.data)    
+        },
+        searchFavourites (filter: CatApi.SearchFavouriteFilter) {
+            return rest.get('/favourites', {params: filter}).then(response => response.data)
+        },
+        saveAsFavourite (image_id: string) {
+            return rest.post('/favourites', {image_id: image_id})
+        }
+    }
+    
 }
 
 
@@ -110,23 +129,6 @@ const rest = axios.create({
 
 
 
-export const api = {
-    getBreeds: () => {
-        return rest.get('/breeds').then(response => response.data)
-    },
-    getCategories: () => {
-        return rest.get('/categories').then(response => response.data)
-    },
-    searchImages (filter: CatApi.SearchImageFilter) {
-        return rest.get('/images/search', {params: filter}).then((response) => response.data)    
-    },
-    searchFavourites (filter: CatApi.SearchFavouriteFilter) {
-        return rest.get('/favourites', {params: filter}).then(response => response.data)
-    },
-    saveAsFavourite (image_id: string) {
-        return rest.post('/favourites', {image_id: image_id})
-    }
-}
 
 
 

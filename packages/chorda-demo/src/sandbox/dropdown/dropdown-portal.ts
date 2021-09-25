@@ -105,15 +105,15 @@ export default <T>() : InferBlueprint<T> => {
                     templates: {
                         menu: withBounds({
                             joints: {
-                                updateBounds: ({$dom, bounds, active, $engine}) => {
+                                updateBounds: ({$dom, bounds, active, $engine, $renderer}) => {
                                     watch(() => {
                                         if ($dom.$value /*&& active.$value*/) {
-                                            $engine.pipeTask(() => {
+                                            $engine.publish($renderer.task(() => {
                                                 const prevDisplay = $dom.$value.style.display
                                                 $dom.$value.style.display = 'block'
                                                 bounds.$value = $dom.$value.getBoundingClientRect()
                                                 $dom.$value.style.display = prevDisplay
-                                            })
+                                            }))
                                         }
                                     }, [$dom/*, active*/])
                                 }                    

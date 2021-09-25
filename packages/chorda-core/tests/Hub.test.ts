@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { Hub, Engine, State, HubOptions, observable, EventBus, computable, ObservableValueIterator } from '../src'
-import { createEngine, immediateTick } from './utils'
+import { createPatchScheduler, immediateTick } from './utils'
 
 
 
@@ -11,7 +11,7 @@ type Data = {
 
 
 const createHub = <D, E=unknown>(o: HubOptions<D, E>) : Hub<D, E> => {
-    const s = new Hub<D, E>(o, {$engine: createEngine()})
+    const s = new Hub<D, E>(o, {$engine: createPatchScheduler(), $pipe: null})
     immediateTick()
     return s
 }
@@ -36,7 +36,7 @@ describe ('Hub', () => {
                 result.push(k)
             }
 
-            expect(result.sort()).to.deep.eq(['$engine', 'a', 'b'])
+            expect(result.sort()).to.deep.eq(['$engine', '$pipe', 'a', 'b'])
 
         })
 

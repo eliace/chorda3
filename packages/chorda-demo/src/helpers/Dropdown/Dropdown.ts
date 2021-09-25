@@ -5,7 +5,7 @@ import { FaIcon } from "../FaIcon"
 import { DropdownMenu } from "./DropdownMenu"
 import { DropdownTrigger } from "./DropdownTrigger"
 import { MenuItem } from "./utils"
-import { watch, withBlueprint, withBounds, withIterableItems, withOuterClick, withPreventDefaultMouseDown, withScope, withStopMouseDown } from '../../utils'
+import { watch, withBlueprint, withBounds, withIterableItems, withOuterClick, withPreventDefaultMouseDown, withStopMouseDown } from '../../utils'
 import { DropdownItem } from "./DropdownItem"
 import { DomEvents } from "@chorda/react"
 
@@ -49,6 +49,8 @@ export type DropdownProps<T, I, V=any, E=unknown> = {
     itemToValue?: (item: I) => V
     up?: boolean
 }
+
+export type DropdownPropsType<I, T=unknown> = DropdownProps<T&DropdownScope<I>, I>
 
 //export type DropdownEvents<I extends MenuItem> = Pick<DropdownScope<I>, 'selectItem'|'cancelSelect'>
 
@@ -110,13 +112,13 @@ export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&
                                     watch(() => {
                                         if ($dom.$value && isCurrent.$value) {
                                             //  FIXME костыль для обработки в ближайшем rAF
-                                            if ($renderer.processing) {
+                                            if ($renderer.isProcessing) {
                                                 $dom.$value.scrollIntoView({block: 'nearest'})
                                             }
                                             else {
-                                                $engine.pipeTask(() => {
+                                                $engine.publish($renderer.task(() => {
                                                     $dom.$value.scrollIntoView({block: 'nearest'})
-                                                })
+                                                }))
                                             }
                                         }
                                     }, [$dom, isCurrent])

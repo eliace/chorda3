@@ -7,6 +7,10 @@
   "scripts": {
     "test": "mocha -r ts-node/register tests/**/*.test.ts",
     "test:pipe": "mocha -r ts-node/register tests/Pipe.test.ts",
+    "test:value": "mocha -r ts-node/register tests/Value/*.test.ts",
+    "test:hub": "mocha -r ts-node/register tests/Hub.test.ts",
+    "test:gear": "mocha -r ts-node/register tests/Gear.test.ts",
+    "test:html": "mocha -r ts-node/register tests/Html.test.ts",
     "test:watch": "mocha -r ts-node/register -r source-map-support/register --watch-files src/**/*.ts,tests/**/*.test.ts,tests/**/*.ts --watch tests/**/*.test.ts"
   },
   "author": "",

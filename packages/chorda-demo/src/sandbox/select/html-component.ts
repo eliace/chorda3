@@ -1,6 +1,6 @@
 import { HtmlBlueprint, iterable, mix, observable, patch } from "@chorda/core"
 import { RowLayout } from "chorda-bulma"
-import { Coerced, DataScope, withItem, withIterableItems, withScope } from "../../utils"
+import { Coerced, DataScope, withItem, withIterableItems } from "../../utils"
 import { COUNTRIES, Country } from "../../data"
 import { Option, Select } from "./common/select"
 

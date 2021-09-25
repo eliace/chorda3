@@ -1,8 +1,8 @@
-import { callable, computable, EventBus, HtmlBlueprint, observable, Value } from "@chorda/core"
+import { Blueprint, callable, computable, EventBus, HtmlBlueprint, InferBlueprint, mix, observable, Scope, Value } from "@chorda/core"
 import { Card, Field, Title } from "chorda-bulma"
-import { Coerced, createValueEffect, Custom } from "../../utils"
-import { Carousel, DropdownOld, DropdownOldItem, Paragraph, Text } from "../../helpers"
-import { CatApi , api} from "./api"
+import { Coerced, Custom, Content, watch } from "../../utils"
+import { Carousel, Dropdown, DropdownItem, DropdownOld, DropdownOldItem, DropdownProps, DropdownPropsType, DropdownScope, Paragraph, Text } from "../../helpers"
+import { CatApi } from "../../api"
 
 
 type BreedsScope = {
@@ -25,6 +25,92 @@ type BreedsEvents = Pick<BreedsScope, 'onLoadBreeds'> & {
 
 
 
+const BreedSelect = () : InferBlueprint<BreedsScope, BreedsEvents> => {
+    return {
+        styles: {
+            display: 'flex',
+            justifyContent: 'center',
+            marginBottom: '1.5rem'
+        },
+        templates: {
+            content: Field({
+                label: 'breeds',
+                control: Dropdown(<DropdownPropsType<CatApi.Breed, BreedsScope>>{
+                    as: {
+                        css: 'catapi-breed-dropdown'
+                    },
+                    defaultItem: DropdownItem<CatApi.Breed>({
+                        text$: (scope) => scope.item.name
+                    }),
+                    items$: ({breeds}) => breeds,
+                    value$: ({$context}) => $context.selected,
+                    loading$: ({loadingBreeds}) => loadingBreeds,
+                    valueToKey: (v) => v != null && v.id,
+                    itemToValue: (itm) => itm
+                })
+            })
+    
+        }
+    }
+}
+
+const BreedGallery = () : InferBlueprint<BreedsScope, BreedsEvents> => {
+    return Content({
+        content: Card({
+            content: Carousel({
+                images$: (scope) => scope.imageUrls
+            })
+        })
+    })
+}
+
+const BreedDescription = () : InferBlueprint<BreedsScope, BreedsEvents> => {
+    return Content({
+        content: Card({
+            header: false,
+            content: <Blueprint<BreedsScope&{data: CatApi.Breed}>>{
+                injections: {
+                    data: (scope) => scope.selected
+                },
+                css: 'has-text-centered',
+                styles: {
+                    fontSize: '14px'
+                },
+                items: [
+                    Title({
+                        size: 'is-3',
+                        text$: ({data}) => data.name
+                    }),
+                    Title({
+                        size: 'is-4',
+                        text$: ({data}) => computable(() => `id: ${data.id}`)
+                    }),
+                    Text({
+                        as: Paragraph,
+                        text$: ({data}) => data.description
+                    }),
+                    Text({
+                        as: Paragraph,
+                        text$: ({data}) => data.temperament
+                    }),
+                    Text({
+                        as: Paragraph,
+                        text$: ({data}) => data.country_code
+                    }),
+                    Text({
+                        as: Paragraph,
+                        text$: ({data}) => computable(() => `${data.weight?.metric} kgs`)
+                    }),
+                    Text({
+                        as: Paragraph,
+                        text$: ({data}) => computable(() => `${data.life_span} average life span`)
+                    }),
+                ]
+            }
+        })
+    })
+}
+
 
 
 export const Breeds = () : HtmlBlueprint<BreedsScope, BreedsEvents> => {
@@ -45,28 +131,32 @@ export const Breeds = () : HtmlBlueprint<BreedsScope, BreedsEvents> => {
 
                 const loadBreeds = () => {
                     loadingBreeds.$value = true
-                    api.getBreeds().then(data => {
-                        loadingBreeds.$value = false
-                        breeds.$value = data
-                        onLoadBreeds()
-                    })
+                    CatApi.api
+                        .getBreeds()
+                        .then(data => {
+                            loadingBreeds.$value = false
+                            breeds.$value = data
+                        })
+                        .then(onLoadBreeds)
                 }
 
                 const loadImages = (filter: CatApi.SearchImageFilter) => {
                     loadingImages.$value = true
                     images.$value = []
-                    api.searchImages(filter).then(data => {
-                        loadingImages.$value = false
-                        images.$value = data
-                    })
+                    CatApi.api
+                        .searchImages(filter)
+                        .then(data => {
+                            loadingImages.$value = false
+                            images.$value = data
+                        })
                 }
 
                 // при изменении выбранной породы загружаем список изображений
-                selected.$subscribe((next) => {
-                    if (next) {
-                        loadImages({breed_id: next.id, limit: 8})    
+                watch(() => {
+                    if (selected.$value) {
+                        loadImages({breed_id: selected.id.$value, limit: 8})    
                     }
-                })
+                }, [selected])
 
                 // FIXME хак из-за того, что события выбрасываются в том же потоке
                 setTimeout(() => {
@@ -80,83 +170,9 @@ export const Breeds = () : HtmlBlueprint<BreedsScope, BreedsEvents> => {
             },
         },
         templates: {
-            breedSelect: {
-                styles: {
-                    display: 'flex',
-                    justifyContent: 'center',
-                    marginBottom: '1.5rem'
-                },
-                templates: {
-                    content: Field({
-                        label: 'Breeds',
-                        control: DropdownOld<CatApi.Breed, CatApi.Breed, BreedsScope>({
-                            as: {
-                                css: 'catapi-breed-dropdown'
-                            },
-                            defaultItem: DropdownOldItem<CatApi.Breed>({
-                                text$: (scope) => scope.__it.name
-                            }),
-                            items$: (scope) => scope.breeds,
-                            text$: (scope) => scope.selected.name,
-                            value$: (scope) => scope.$context.selected,
-                            loading$: (scope) => scope.loadingBreeds,
-                            itemToValue: (itm) => itm,
-                            valueToKey: (v) => v.id
-                        })
-                    })
-                }
-            },
-            breedGallery: Custom({
-                content: Card({
-                    content: Carousel({
-                        images$: (scope) => scope.imageUrls
-                    })
-                })
-            }),
-            breedDescription: Custom({
-                content: Card({
-                    header: false,
-                    content: Coerced<{data: CatApi.Breed}, BreedsScope>({
-                        injections: {
-                            data: (scope) => scope.selected
-                        },
-                        css: 'has-text-centered',
-                        styles: {
-                            fontSize: '14px'
-                        },
-                        items: [
-                            Title({
-                                size: 'is-3',
-                                text$: ({data}) => data.name
-                            }),
-                            Title({
-                                size: 'is-4',
-                                text$: ({data}) => computable(() => `id: ${data.id}`)
-                            }),
-                            Text({
-                                as: Paragraph,
-                                text$: ({data}) => data.description
-                            }),
-                            Text({
-                                as: Paragraph,
-                                text$: ({data}) => data.temperament
-                            }),
-                            Text({
-                                as: Paragraph,
-                                text$: ({data}) => data.country_code
-                            }),
-                            Text({
-                                as: Paragraph,
-                                text$: ({data}) => computable(() => `${data.weight?.metric} kgs`)
-                            }),
-                            Text({
-                                as: Paragraph,
-                                text$: ({data}) => computable(() => `${data.life_span} average life span`)
-                            }),
-                        ]
-                    })
-                })
-            })
+            BreedSelect,
+            BreedGallery,
+            BreedDescription
         }
     }
 }

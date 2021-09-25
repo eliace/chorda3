@@ -100,7 +100,7 @@ export const withInfiniteScroll = <T, E>(props: HtmlBlueprint<T&InfiniteScrollSc
 
         },
         components: {
-            infiniteTail: Custom<InfiniteScrollScope<any>&HtmlScope>({
+            infiniteTail: Custom<InfiniteScrollScope<any>&HtmlScope, unknown>({
                 weight: 10,
                 joints: {
                     subscribeObserver: ({$dom, infiniteScroll: {intersectionObserver}}) => {

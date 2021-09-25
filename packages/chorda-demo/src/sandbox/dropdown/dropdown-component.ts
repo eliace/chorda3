@@ -1,6 +1,6 @@
 import { Blueprint, computable, HtmlBlueprint, InferBlueprint, Observable, observable, patch } from "@chorda/core";
 import { ColumnLayout, RowLayout } from "chorda-bulma";
-import { Custom, withBlueprint, withScope } from "../../utils";
+import { Custom, withBlueprint } from "../../utils";
 import { COUNTRIES, Country, FRUITS } from "../../data";
 import { Paragraph, Text, Dropdown } from "../../helpers";
 

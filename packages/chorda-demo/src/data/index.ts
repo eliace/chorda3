@@ -9,6 +9,10 @@ export const FRUITS: string[] = require('!raw-loader!./fruits.txt').default.spli
 
 export const IMAGE_1 = require('./Yosemite.jpg')
 
+export const IMAGE_BASE64 = require('./Yosemite_sq.jpg?base64')
+
+export const IMAGE_PLACEHOLDER = require('./Yosemite_3_sq.jpg')
+
 export type Country = {
     name: string
     capital: string

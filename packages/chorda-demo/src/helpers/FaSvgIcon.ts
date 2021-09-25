@@ -7,20 +7,20 @@ import { IconDefinition } from "@fortawesome/free-solid-svg-icons"
 //
 
 
-type SvgIconScope = {
+type FaSvgIconScope = {
     data: IconDefinition
     tooltip: string
 }
 
-interface SvgIconProps<T> {
+interface FaSvgIconProps<T> {
     icon?: IconDefinition
     tooltip?: string
     tooltip$?: Injector<T>
     data$?: Injector<T>
 }
 
-export const SvgIcon = <T>(props: SvgIconProps<T&SvgIconScope>) : HtmlBlueprint<T> => {
-    return mix<SvgIconScope>({
+export const FaSvgIcon = <T>(props: FaSvgIconProps<T&FaSvgIconScope>) : HtmlBlueprint<T> => {
+    return mix<FaSvgIconScope>({
         tag: 'i',
         css: 'icon',
         templates: {

@@ -1,3 +1,4 @@
+import { Scheduler } from '.'
 import { Engine } from './engine'
 import { defaultInitRules, defaultPatchRules, Gear, GearEvents, GearOptions, GearScope } from './Gear'
 import { Keyed, NoInfer } from './Hub'
@@ -11,7 +12,7 @@ import { Observable } from './value'
 //------------------------------------
 
 export type HtmlScope = {
-    $renderer: Renderer&Engine<any>
+    $renderer: Renderer&Scheduler
     $defaultLayout: Function
     $dom?: HTMLElement
     $vnodeFactory: VNodeFactory
@@ -131,6 +132,10 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
         let html = this
         while (html && !html.dirty) {
             html.dirty = true
+            if (!html.parent) {
+                // планируем задачу отрисовки корня
+                this.scope.$engine.publish(this.scope.$renderer.task(null))
+            }
             html = html.parent
         }
         // this.visit((h) => {

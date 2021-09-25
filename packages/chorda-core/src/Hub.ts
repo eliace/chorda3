@@ -1,6 +1,7 @@
 import { Value, EventBus, Subscription, ObservableValue, Handler, spySubscriptions, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable, Thenable, isCallable } from './value'
 import { Engine } from './engine'
 import { MixRules, mixin } from './mix'
+import { ownTask, Pipe, Scheduler } from './pipe'
 
 
 export type Scope = {
@@ -143,7 +144,8 @@ export interface HubOptions<D, E> {
 
 
 export type HubScope = {
-    $engine: Engine<Stateable>
+    $engine: Scheduler
+    $pipe: Pipe
 //    afterDestroy?: () => void
 }
 
@@ -176,7 +178,7 @@ export type Keyed<T=unknown> = {
 let _PatchingHub : Hub<unknown, any> = undefined
 
 export const patch = (o: any) => {
-    _PatchingHub.scope.$engine.scheduleTask(_PatchingHub.patch, o, _PatchingHub)
+    _PatchingHub.scope.$engine.publish(ownTask(_PatchingHub.patch, o, _PatchingHub))
 }
 
 let _ScopeKey: string|symbol
@@ -386,7 +388,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         this.state = State.Initializing
 
         // добавляем патч в очередь задач
-        this.scope.$engine.scheduleTask(this.patch, options, this)
+        this.scope.$engine.publish(ownTask(this.patch, options, this))
     }
 
     patch (optPatch: O) : void {
@@ -557,7 +559,12 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         // освежаем реакции
 //        noAutoTerminal(() => {
             for (let sub of newSubscriptions) {
-                sub.observable.$touch(sub.subscriber)
+                if (sub == null) {
+                    console.error('Undefined subscription')
+                }
+                else {
+                    sub.observable.$touch(sub.subscriber)
+                }
             }
 //        })
 
@@ -608,7 +615,12 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
         // удаляем подписки на изменения
         for (let sub of this.subscriptions) {
-            sub.observable.$unsubscribe(sub)
+            if (sub == null) {
+                console.error('Undefined subscription')
+            }
+            else {
+                sub.observable.$unsubscribe(sub)
+            }
         }
 
         // удаляем подписки на события

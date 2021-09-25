@@ -28,13 +28,13 @@ export const withDetectListBounds = <T>(props?: HtmlBlueprint<T&BoundsScope>) : 
             bounds: () => observable(null),
         },
         joints: {
-            detectBounds: ({$dom, bounds, __it, $engine}) => {
+            detectBounds: ({$dom, bounds, __it, $engine, $renderer}) => {
 
                 const detect = () => {
                     if ($dom.$value /*&& __it.$value.length > 0*/) {
-                        $engine.pipeTask(() => {
+                        $engine.publish($renderer.task(() => {
                             bounds.$value = $dom.$value.getBoundingClientRect()
-                        })
+                        }))
                     }
                 }
             

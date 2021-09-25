@@ -1,8 +1,7 @@
-import { Blueprint, computable, InferBlueprint, mix, observable, patch, reactive } from "@chorda/core"
+import { Blueprint, computable, InferBlueprint, mix, observable, patch, reactive, Scope } from "@chorda/core"
 import { ColumnLayout, RowLayout } from "chorda-bulma"
-import { Dropdown, DropdownScope } from "../../helpers"
+import { Dropdown, DropdownProps, DropdownScope } from "../../helpers"
 import { COUNTRIES, Country } from "../../data"
-import { withScope } from "../../utils"
 
 
 
@@ -16,7 +15,7 @@ type LazyComponentsScope = {
 }
 
 
-export default <T>() : InferBlueprint<T> => {
+export default () : InferBlueprint<Scope> => {
     return ColumnLayout([
         RowLayout([
             Dropdown({
@@ -42,25 +41,26 @@ export default <T>() : InferBlueprint<T> => {
             Dropdown({
                 value$: () => observable('BE'),
                 items$: () => computable(() => countries),
-                as: withScope<LazyComponentsScope>({
+                as: <Blueprint<LazyComponentsScope>>{
                     components: {
                         trigger: true,
                         menu: false
                     },
                     initials: {
-                        lazyComponents: () => reactive({}),
+                        lazyComponents: () => observable({} as any),
                     },
                     reactions: {
                         lazyComponents: (v) => patch({components: v})
                     },
                     joints: {
                         lazyMenu: ({lazyComponents}) => {
+                            // на 2 секунды отложим создание меню
                             setTimeout(() => {
                                 lazyComponents.menu.$value = true
                             }, 2000)
                         }
                     }
-                })
+                }
             }),
         ]),
     ])

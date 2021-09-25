@@ -1,5 +1,7 @@
-import { Observable, Value, Subscriber, EventBus, Subscription, PublishFunc, defaultUidFunc} from './utils'
+import { Observable, Value, Subscriber, EventBus, Subscription, PublishFunc, defaultUidFunc, EMPTY} from './utils'
 import { EventNode } from './bus'
+import { closeTransaction, commitEngine, currentTransaction, openTransaction } from './engine'
+import { LifecycleProvider, SubscriptionProvider } from '.'
 
 export type UidFunc<I=any> = (value: I) => string
 
@@ -50,25 +52,7 @@ interface ValueNode<T> extends Value<T> {
     $get () : T
 }
 
-export const EMPTY = Object.seal({})
 
-
-type NodeUpdate = {
-    node: Node<any>
-    prev: any
-    next: any
-}
-
-type UpdateSession = {
-    nodes: Set<ValueNode<any>>
-    head: ValueNode<any>
-    deleted: ValueNode<any>[]
-    updated: NodeUpdate[]
-}
-
-type Transaction = {
-    joined: boolean
-}
 
 
 
@@ -97,37 +81,6 @@ export const spyGetters = (fn: Function) : Observable<any>[] => {
     return result
 }
 
-let _Session: UpdateSession = null
-
-export const openTransaction = () : Transaction => {
-    const t = {joined: true}
-    if (!_Session) {
-        _Session = {
-            nodes: new Set(),
-            head: this,
-            deleted: [],
-            updated: []
-        }
-        t.joined = false
-    }
-    // else {
-    //     debugger
-    // }
-    return t
-}
-
-export const closeTransaction = (t: Transaction) => {
-    if (!t.joined) {
-        if (_Session.updated.length > 0 || _Session.deleted.length > 0) {
-            _update_engine.addSession(_Session)
-        }
-        _Session = null    
-    }
-}
-
-export const transactionUpdates = (t: Transaction) : NodeUpdate[] => {
-    return _Session.updated
-}
 
 // const transactionAware = (fn: Function) => {
 //     if (_Session) {
@@ -149,87 +102,10 @@ export const transactionUpdates = (t: Transaction) : NodeUpdate[] => {
 // }
 
 
-class UpdateEngine {
-
-    _sessions: UpdateSession[]
-    _commiting: boolean
-    _commitedNodes: Set<Node<any>>
-//    _commitedSubscriptions: Set<Subscription>
-
-    constructor () {
-        this._sessions = []
-        this._commitedNodes = new Set<Node<unknown>>()
-//        this._commitedSubscriptions = new Set<Subscription>()
-    }
-
-    addSession(session: UpdateSession) {
-        this._sessions.push(session)
-    }
-
-    commit () {
-        if (!this._commiting) {
-//            this._commitedNodes.size == 0 && console.log('Commit start')
-            this._commiting = true
-
-            const sessions = this._sessions
-            this._sessions = []
-
-            sessions.forEach(session => {
-//                console.log('session', session.updated)
-
-                // session.deleted.forEach(del => {
-                //     del.$destroy()
-                // })
-
-//                const lastUpdateMap = new Map<Subscriber<any>, NodeUpdate>()
-                session.updated.forEach(upd => {
-                    if (this._commitedNodes.has(upd.node)) {
-//                        console.warn('Cyclic update detected', upd)
-//                        return
-                    }
-                    upd.node._subscriptions.forEach(sub => {
-                        sub.subscriber.$publish(upd.next, upd.prev, EMPTY)
-                    })
-                    this._commitedNodes.add(upd.node)
-                })
-                // lastUpdateMap.forEach((upd, sub) => {
-                //     sub.$publish(upd.next, upd.prev, EMPTY)
-                // })
-//                 session.updated.forEach(upd => {
-//                     if (this._commitedNodes.has(upd.node)) {
-//                         if (upd.next == 'filter: Albania') {
-//                             debugger
-//                         }
-// //                        console.log('Already commited', upd, upd.node._memoValue)
-//                         return
-//                     }
-//                     upd.node._subscriptions.forEach(sub => {
-//                         sub.subscriber.$publish(upd.next, upd.prev, EMPTY)
-//                     })
-//                 })
-//                this._commitedNodes.add(session.head as Node<any>)
-            })
-
-            this._commiting = false
-
-            if (this._sessions.length > 0) {
-                this.commit()
-            }
-            else {
-                this._commitedNodes.clear()
-//                console.log('Commit end')
-            }
-        }
-    }
-
-
-}
-
-const _update_engine = new UpdateEngine()
 
 
 
-export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T>, Observable<T> {
+export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T>, Observable<T>, SubscriptionProvider, LifecycleProvider {
 
     _memoValue: any
     _source: Node<unknown>
@@ -312,6 +188,7 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
     }
 
     get $value () {
+
         if (_SpyGetters) {
             _SpyGetters.push(this)
         }
@@ -336,6 +213,12 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
     }
 
     set $value (newValue: any) {
+
+        if (this._destroyed) {
+            console.error('Value drop destroyed state', this)
+            this._destroyed = false
+        }
+
         // если новое значение является наблюдаемым, то берем только его значение
         // сейчас эта проверка дублирует аналогичную в publish
         if (newValue && typeof (newValue as ValueSet<any>).$at === 'function') {
@@ -369,7 +252,7 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
 
         // _Session = null
         
-        _update_engine.commit()
+        commitEngine().commit()
         // if (newValue != null) {
 
         //     if ((newValue as ValueNode<any>).$at) {
@@ -396,10 +279,17 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
 
     $publish(next: any, prev?: any, keys?: {[key: string]: any}): void {
 
+ //       console.log('publish')
+
         if (!this._initialized) {
             console.warn('Value is not initialized', this)
             this._initialized = true // FIXME насколько это корректно?
         }
+
+        // if (this._destroyed) {
+        //     console.warn('Value destroyed', this)
+        //     return
+        // }
 
 
         const t = openTransaction()
@@ -514,6 +404,11 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
 
     $update (direction: UpdateDirection, value: any, key?: ValueKey, keyInfo?: {[key: string]: any}) {
 
+        if (this._destroyed) {
+            console.error('Value destroyed and should not be updated', this)
+            return
+        }
+
         // if (this._key == 'filter') {
         //     console.log('update filter', value)
         // }
@@ -557,14 +452,14 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
             }
         }
 
-        if (_Session) {
-            _Session.updated.push({
+        const t = currentTransaction()
+        if (t) {
+            t.updated.push({
                 node: this,
                 next: this._memoValue,
                 prev
             })
         }
-
 
 //        console.log('notify', this._key, this._memoValue)
 
@@ -578,7 +473,7 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
     _updateEntries (newValue: any) {
 
         const nextEntries: {[key: string]: any} = {}
-        const prevMap: {[key: string]: any} = {}
+        const prevMap: {[key: string]: Node<any>} = {}
     
         if (Array.isArray(newValue)) {
 
@@ -631,21 +526,55 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
                     entry._key = k;
                     entry._uid = k
                     delete prevMap[k]
+
+                    // ?
+                    if (entry._destroyed) {
+                        console.log('Entry restored', entry)
+                        entry._destroyed = false
+                    }
                 }
                 else {
 
                 }
             }
         }
+        // else {
+        //     Object.assign(prevMap, this._entries)
+        // }
 
         this._entries = nextEntries
 
         for (let i in prevMap) {
+            // замененные элементы
+            if (i in nextEntries) {
+                console.log('replaced', prevMap[i])
+            }
+            else {
+                const removed = prevMap[i]
+                if (i != removed._key) {
+                    debugger
+                }
+
+                if (removed._subscriptions.length > 0) {
+                    this._entries[String(removed._key)] = removed
+//                    removed._destroyed = true
+                    continue
+                }
+
+                console.log('removed', removed._key, removed._memoValue)
+            }
+
+            const t = currentTransaction()
+            if (t) {
+                t.deleted.push(prevMap[i])
+            }
+
+
 //            if (!(i in nextEntries)) {
                 // этот элемент идет на удаление
 //                console.log('delete', i)
 //                if (!_Sess)
-                _Session.deleted.push(prevMap[i])
+            
 //                prevMap[i]._destroy()
 //            }
         }
@@ -666,17 +595,24 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
 
     $destroy () {
 
+        console.log('destroy', this._key, this._memoValue ,this._subscriptions.length)
+
         this._destroyed = true
-        // this._subscriptions.forEach(sub => {
-        //     sub.subscriber.$publish(undefined, this._memoValue, EMPTY)
-        // })
-        this._subscriptions = null
+
         for (let i in this._entries) {
+            console.log('destroy', i)
             this._entries[i].$destroy()
         }
         this._memoValue = undefined
-//        this._entries = null
-//        this._source = null
+
+        // ?
+        // this._subscriptions.forEach(sub => {
+        //     sub.subscriber.$publish(undefined, this._memoValue, EMPTY)
+        // })
+
+        // this._subscriptions = []
+        // this._entries = null
+        // this._source = null
 
 //        console.log('deleted', this._key)
         // FIXME здесь нужно каскадное обновление
@@ -688,6 +624,9 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
     //     return _update_engine._commited.has(this)
     // }
 
+    get $subscriptions () {
+        return this._subscriptions
+    }
 }
 
 

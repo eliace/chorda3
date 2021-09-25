@@ -2,7 +2,7 @@ import { computable, DomNode, HtmlBlueprint, HtmlScope, Injector, iterable, Join
 import { DomEvents } from "@chorda/react";
 import { faAngleDown, faAngleUp, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "chorda-bulma";
-import { SvgIcon } from "./SvgIcon";
+import { FaSvgIcon } from "./FaSvgIcon";
 import { FaIcon } from "./FaIcon";
 import { OuterClickEvent, stopMouseDown, watch, onOuterClick } from "../utils";
 

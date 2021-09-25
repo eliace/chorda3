@@ -2,7 +2,7 @@ import { HtmlBlueprint } from "@chorda/core"
 import { faGithub, faTwitter } from "@fortawesome/free-brands-svg-icons"
 import { faBold, faCheck, faItalic, faTimes, faUnderline } from "@fortawesome/free-solid-svg-icons"
 import { Button, Buttons } from "chorda-bulma"
-import { FaIcon, SvgIcon } from "../../helpers"
+import { FaIcon, FaSvgIcon } from "../../helpers"
 
 
 
@@ -11,9 +11,9 @@ export default () : HtmlBlueprint => {
         items: [
             Buttons({
                 buttons: [
-                    Button({icon: SvgIcon({icon: faBold})}),
-                    Button({icon: SvgIcon({icon: faItalic})}),
-                    Button({icon: SvgIcon({icon: faUnderline})}),
+                    Button({icon: FaSvgIcon({icon: faBold})}),
+                    Button({icon: FaSvgIcon({icon: faItalic})}),
+                    Button({icon: FaSvgIcon({icon: faUnderline})}),
                 ]
             }),
             Buttons({

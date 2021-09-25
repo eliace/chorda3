@@ -56,6 +56,9 @@ module.exports = {
             //     //     name: './[name].[ext]',
             //     // }
             // }],
+        }, {
+            resourceQuery: /base64/,
+            type: 'asset/inline'
         }/*, {
             test: /\.txt$/,
             use: [

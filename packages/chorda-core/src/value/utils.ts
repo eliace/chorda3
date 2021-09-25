@@ -1,4 +1,8 @@
 
+
+export const EMPTY = Object.seal({})
+
+
 export interface Value<T> {
     $value: T
     readonly $uid: string
@@ -25,6 +29,14 @@ export interface Observable<T> extends Subscriber<T> {
     $unsubscribe (subscription: Subscription|Subscriber<T>|PublishFunc<T>) : void
     $touch (subscriber: Subscriber<T>) : void
     $untouch () : void
+}
+
+export interface SubscriptionProvider {
+    readonly $subscriptions: Subscription[]
+}
+
+export interface LifecycleProvider {
+    $destroy () : void
 }
 
 

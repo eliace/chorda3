@@ -1,6 +1,7 @@
-import { EMPTY, UpdateDirection, ObservableValueSet, spyGetters, ValueSet, UidFunc, openTransaction, closeTransaction, transactionUpdates } from './node'
+import { closeTransaction, openTransaction, transactionUpdates } from './engine'
+import { ObservableValueSet, spyGetters, ValueSet, UidFunc } from './node'
 import { autoTerminalAware, proxify, ObservableNode, isValueSet } from './observable'
-import { Observable, PublishFunc, Subscriber, Subscription } from './utils'
+import { EMPTY, Observable, PublishFunc, Subscriber, Subscription } from './utils'
 
 
 interface Computable {
@@ -18,6 +19,7 @@ class ComputableNode<T> extends ObservableNode<T> implements Computable {
     _touched: boolean
     _publishers: Subscription[]
     _sources: Set<Observable<unknown>>
+    _computing: boolean
 
     constructor (computor: Computor<T>, initValue?: T, entryUidFunc?: UidFunc) {
         super(initValue, undefined, undefined, entryUidFunc)
@@ -31,7 +33,11 @@ class ComputableNode<T> extends ObservableNode<T> implements Computable {
 
     $compute () : T {
 
+        if (this._computing) {
+            return this._memoValue
+        }
 
+        this._computing = true
 
         let next: T = undefined
         // this._publishers.forEach(dep => {
@@ -66,6 +72,9 @@ class ComputableNode<T> extends ObservableNode<T> implements Computable {
         const getters = spyGetters(() => {
             next = autoTerminalAware(this._computor)
         })
+
+
+        this._computing = false
         // getters.forEach(dep => {
         //     if ((dep as any)._destroyed) {
         //         console.warn('Destroyed dependency detected', dep)
@@ -99,6 +108,8 @@ class ComputableNode<T> extends ObservableNode<T> implements Computable {
 
     $publish(next: any, prev?: any, keys?: {[key: string]: any}): void {
 
+//        console.log('publish computable', next)
+
         if (this._destroyed) {
             console.warn('Publishing to destroyed computable')
             return
@@ -117,11 +128,13 @@ class ComputableNode<T> extends ObservableNode<T> implements Computable {
 
 
         const t = openTransaction()
+
         super.$publish(computed, null, EMPTY)
 
         let count = 0
         transactionUpdates(t).forEach(upd => {
-            count += upd.node._subscriptions.length
+            // FIXME
+            count += upd.node.$subscriptions.length
         })
 
         if (count == 0) {

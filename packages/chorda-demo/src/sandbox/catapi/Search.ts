@@ -1,14 +1,16 @@
-import { computable, HtmlBlueprint, iterable, observable, patch } from "@chorda/core"
+import { Blueprint, callable, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, Injector, iterable, Listener, mix, observable, patch, Scope } from "@chorda/core"
 import { Button, Field, Fields } from "chorda-bulma"
-import { Coerced, createAppScope, createValueEffect, IteratorScope } from "../../utils"
-import { BgImage, DropdownOld, DropdownOldItem, FaIcon } from "../../helpers"
-import { api, CatApi } from "./api"
+import { Coerced, createAppScope, IteratorScope, ListBlueprint, watch, withList } from "../../utils"
+import { BgImage, BgImagePropsType, Dropdown, DropdownItem, DropdownOld, DropdownOldItem, DropdownPropsType, FaIcon, SvgImagePlaceholder } from "../../helpers"
+import { faHeart, faRedo, faUserLock } from "@fortawesome/free-solid-svg-icons"
+import { CatApi } from "../../api"
+import { IMAGE_BASE64, IMAGE_PLACEHOLDER } from "../../data"
 import { DomEvents } from "@chorda/react"
-import { faHeart, faRedo } from "@fortawesome/free-solid-svg-icons"
+import { ProgressPlugin } from "webpack"
 
 const favourites = observable(null)
 
-api.searchFavourites({page: 1}).then(result => {
+CatApi.api.searchFavourites({page: 1}).then(result => {
     favourites.$value = result
 })
 
@@ -68,6 +70,82 @@ const LIMITS = observable([
 const RECORD_NONE: Record = {id: null, name: 'None'}
 
 
+const asyncImageLoad = (url: string) : Promise<string> => {
+    return new Promise<string>((resolve, reject) => {
+        const img = new Image()
+        img.src = url
+        img.addEventListener('load', () => {
+            console.log('image loaded')
+            resolve(url)
+        })    
+    })
+}
+
+
+
+type AsyncImageLoadScope = {
+    asyncUrl: string
+    url: string
+    onBeforeLoad: () => {}
+}
+
+type AsyncImageLoadActions = {
+    onBeforeLoad: () => {}
+}
+
+const withAsyncImageLoad = <T, E>(props: Blueprint<T&AsyncImageLoadScope, E&AsyncImageLoadActions>) : InferBlueprint<T, E> => {
+    return mix<AsyncImageLoadScope>({
+        initials: {
+            onBeforeLoad: () => callable(null)
+        },
+        joints: {
+            asyncLoad: ({url, asyncUrl, onBeforeLoad}) => {
+
+                console.log('init bgimage')
+
+                watch(() => {
+                    // console.log('url changed to', IMAGE_PLACEHOLDER)
+                    // console.log('url to load', urlToLoad.$value)
+                    // url.$value = IMAGE_PLACEHOLDER
+                    onBeforeLoad()
+                    if (asyncUrl.$value) {
+                        asyncImageLoad(asyncUrl).then((u) => {
+                            console.log('url changed to', ''+u)
+                            url.$value = u
+                        })                                                        
+                    }
+                }, [asyncUrl])
+
+            }
+        }
+    }, props)
+}
+
+
+
+
+type FavouriteButtonProps<T, E> = {
+    as?: Blueprint<T, E>,
+    onClick?: Listener<T, unknown>
+    isFavourite$?: Injector<T>
+}
+
+const FavouriteButton = <T, E>(props: FavouriteButtonProps<T&FavouriteScope, E>) : InferBlueprint<T, E> => {
+    return mix<FavouriteScope, DomEvents>({
+        injections: {
+            favourite: props.isFavourite$
+        },
+        reactions: {
+            favourite: (v) => patch({classes: {'is-favourited': v}})
+        },
+        events: {
+            $dom: {
+                click: props.onClick
+            }
+        }
+    }, props.as)
+}
+
 
 export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
     return {
@@ -80,7 +158,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
             breeds: () => observable([RECORD_NONE as CatApi.Breed]),
             page: () => observable(0),
             limit: () => observable(9),
-            searchResults: () => observable([{}, {}, {}, {}, {}, {}, {}, {}, {}] as CatApi.SearchResult[]),
+            searchResults: () => observable([{}, {}, {}, {}, {}, {}, {}, {}, {}] as CatApi.SearchResult[], () => undefined),
         },
         injections: {
             filter: (scope) => computable(() => {
@@ -92,29 +170,33 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                     page: scope.page
                 }
             }),
-            search: ({searchResults}) => (filter: CatApi.SearchImageFilter) => {
-                api.searchImages(filter).then(result => {
+            search: ({searchResults, limit}) => (filter: CatApi.SearchImageFilter) => {
+                searchResults.$value = Array(limit.$value).fill(null).map(() => {return {} as CatApi.SearchResult})
+                console.log('start search', filter)
+                CatApi.api.searchImages(filter).then(result => {
+                    console.log('pre stop search')
                     searchResults.$value = result
+                    console.log('stop search')
                 })
             },
             loadNextPage: ({page}) => () => {
                 page.$value = page + 1
             },
             loadBreeds: ({breeds, breedId}) => () => {
-                api.getBreeds().then(data => {
+                CatApi.api.getBreeds().then(data => {
                     breeds.$value = [RECORD_NONE as CatApi.Breed].concat(data)
                     breedId.$value = breeds[0].id
                 })
             },
             loadCategories: ({categories, categoryId}) => () => {
-                api.getCategories().then(data => {
+                CatApi.api.getCategories().then(data => {
                     categories.$value = [RECORD_NONE as CatApi.Category].concat(data)
                     categoryId.$value = categories[0].id
                 })
             },
             markAsFavourite: () => (image) => {
                 image.favourite = true
-                api.saveAsFavourite(String(image.id))
+                CatApi.api.saveAsFavourite(String(image.id))
             }
         },
         joints: {
@@ -142,22 +224,22 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                         fields: [
                             Field({
                                 label: 'Order',
-                                control: DropdownOld<Record, string, SearchScope>({
+                                control: Dropdown(<DropdownPropsType<Record, SearchScope>>{
                                     items$: () => ORDERS,
-                                    value$: (scope) => scope.orderId,
+                                    value$: ($) => $.orderId,
                                     text$: (scope) => scope.selected.name,
-                                    defaultItem: DropdownOldItem<Record, string>({
+                                    defaultItem: DropdownItem<Record>({
                                         text$: (scope) => scope.item.name
                                     })
                                 })
                             }),
                             Field({
                                 label: 'Type',
-                                control: DropdownOld<Record, string, SearchScope>({
+                                control: Dropdown(<DropdownPropsType<Record, SearchScope>>{
                                     items$: () => TYPES,
                                     value$: (scope) => scope.typeId,
                                     text$: (scope) => scope.selected.name,
-                                    defaultItem: DropdownOldItem<Record, string>({
+                                    defaultItem: DropdownItem<Record>({
                                         text$: (scope) => scope.item.name
                                     })
                                 })
@@ -168,22 +250,22 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                         fields: [
                             Field({
                                 label: 'Category',
-                                control: DropdownOld<Record, string, SearchScope>({
+                                control: Dropdown(<DropdownPropsType<Record, SearchScope>>{
                                     items$: (scope) => scope.categories,
                                     value$: (scope) => scope.categoryId,
                                     text$: (scope) => scope.selected.name,
-                                    defaultItem: DropdownOldItem<Record, string>({
+                                    defaultItem: DropdownItem<Record>({
                                         text$: (scope) => scope.item.name
                                     })
                                 })
                             }),
                             Field({
                                 label: 'Breed',
-                                control: DropdownOld<CatApi.Breed, string, SearchScope>({
+                                control: Dropdown(<DropdownPropsType<CatApi.Breed, SearchScope>>{
                                     items$: (scope) => scope.breeds,
                                     value$: (scope) => scope.breedId,
                                     text$: (scope) => scope.selected.name,
-                                    defaultItem: DropdownOldItem<CatApi.Breed, string>({
+                                    defaultItem: DropdownItem<CatApi.Breed>({
                                         text$: (scope) => scope.item.name
                                     })
                                 })
@@ -192,47 +274,41 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                     })
                 ]
             },
-            images: Coerced<IteratorScope<CatApi.SearchResult[]>, SearchScope>({
-                injections: {
-                    __it: (scope) => iterable(scope.searchResults),
-                },
+            images2: {
                 css: 'catapi-search',
                 templates: {
-                    tiles: {
+                    content: withList(<ListBlueprint<CatApi.SearchResult&{favourite: boolean}, SearchScope>>{
+                        injections: {
+                            items: ($) => $.searchResults
+                        },
                         css: 'flex-tiles',
-                        defaultItem: Coerced<IteratorScope<CatApi.SearchResult&{favourite: boolean}>&FavouriteScope, SearchScope>({
+                        defaultItem: {
                             css: 'flex-tile',
                             templates: {
-                                content: BgImage({
-                                    url$: (scope) => scope.__it.url
-                                }),
-                                favicon: FaIcon({
-                                    icon: faHeart,
+                                image: withAsyncImageLoad(BgImage({
                                     as: {
                                         injections: {
-                                            favourite: (scope) => scope.__it.favourite
+                                            asyncUrl: ($) => $.item.url
                                         },
-                                        reactions: {
-                                            favourite: (v) => patch({classes: {'is-favourited': v}})
-                                        },
-                                        events: {    
-                                            $dom: {
-                                                click: (e, {markAsFavourite, __it}) => {
-                                                    markAsFavourite(__it)
-                                                }    
-                                            }                                                                                                            
+                                        events: {
+                                            onBeforeLoad: (e, {url}) => {
+                                                url.$value = IMAGE_PLACEHOLDER
+                                            } 
                                         }
-                                    }
-                                    
+                                    },
+                                })),
+                                favicon: FavouriteButton({
+                                    isFavourite$: $ => $.item.favourite,
+                                    onClick: (e, {markAsFavourite, item}) => markAsFavourite(item),
+                                    as: FaIcon({
+                                        icon: faHeart
+                                    })
                                 })
-                            },
-                        }),
-                        reactions: {
-                            __it: (v) => patch({items: v})
+                            }
                         }
-                    }
+                    })
                 }
-            }),
+            },
             footer: {
                 css: 'mt-5',
                 templates: {
@@ -240,11 +316,11 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                         fields: [
                             Field({
                                 label: 'Per page',
-                                control: DropdownOld<Record, number, SearchScope>({
+                                control: Dropdown(<DropdownPropsType<Record, SearchScope>>{
                                     value$: (scope) => scope.limit,
                                     text$: (scope) => scope.selected.name,
                                     items$: () => LIMITS,
-                                    defaultItem: DropdownOldItem<Record, number>({
+                                    defaultItem: DropdownItem<Record>({
                                         text$: (scope) => scope.item.name
                                     })
                                 })
@@ -254,7 +330,8 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                                     text: 'More',
                                     css: 'is-info is-medium',
                                     rightIcon: FaIcon({icon: faRedo}),
-                                    onClick: (e, {loadNextPage}) => loadNextPage()
+                                    onClick: (e, {loadNextPage}) => loadNextPage(),
+                                    //disabled$: ($) => computable(() => $.)
                                 }),
                             })
                         ]

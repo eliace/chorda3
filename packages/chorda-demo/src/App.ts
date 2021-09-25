@@ -132,8 +132,8 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                         }
                                     })
                                 },
-                                updateNetwork: ({$engine}) => {
-                                    $engine.addPostEffect(() => {
+                                updateNetwork: ({$engine, $renderer}) => {
+                                    $engine.publish($renderer.task(() => {
                                         const data: vis.Data = buildHtmlTree()
                                         if (_network) {
                                             const nextPatch = () => {
@@ -180,7 +180,7 @@ export const App = () : HtmlBlueprint<AppScope> => {
 //                                                 })
 // //                                                _network.redraw()
 //                                             }
-                                    })
+                                    }))
                                 }
                             }
                         })

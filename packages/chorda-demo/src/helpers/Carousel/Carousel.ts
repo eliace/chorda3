@@ -1,4 +1,4 @@
-import { computable, HtmlBlueprint, HtmlScope, Injector, iterable, mix, observable, patch } from "@chorda/core"
+import { computable, HtmlBlueprint, HtmlScope, InferBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core"
 import { DomEvents } from "@chorda/react"
 import { Coerced } from "../../utils"
 
@@ -33,7 +33,7 @@ type CarouselProps<T> = {
 }
 
 
-export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : HtmlBlueprint<T> => {
+export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : InferBlueprint<T> => {
     return mix<CarouselScope, DomEvents>({
         css: 'carousel',
         templates: {
@@ -47,7 +47,7 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : HtmlBluepri
                     templates: {
                         content: Coerced<CarouselSlideScope, CarouselScope>({
                             reactions: {
-                                slide: (v) => {patch({
+                                slide: (v) => {v && patch({
                                     styles: {
                                         backgroundImage: `url(${v.url})`
                                     },
@@ -72,11 +72,11 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : HtmlBluepri
                 defaultItem: Coerced<CarouselSlideScope, CarouselScope&DomEvents>({
                     tag: 'li',
                     reactions: {
-                        slide: (v) => patch({
+                        slide: (v) => {v && patch({
                             classes: {
                                 'active': !v.hidden//.valueOf()
                             }
-                        })
+                        })}
                     },
                     events: {
                         $dom: {

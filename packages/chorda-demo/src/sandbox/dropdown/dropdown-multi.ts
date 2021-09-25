@@ -3,7 +3,7 @@ import { ColumnLayout, RowLayout } from "chorda-bulma";
 import { Dropdown, Paragraph, Text, DropdownItem, DropdownScope, DropdownProps } from "../../helpers";
 import { COUNTRIES, Country } from "../../data";
 import { withMultiselect } from "./common/with-multiselect";
-import { withBlueprint, withScope } from "../../utils";
+import { withBlueprint } from "../../utils";
 
 type CountryRecord = Country & {id: any}
 

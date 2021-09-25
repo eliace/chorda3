@@ -1,4 +1,4 @@
-import { HtmlBlueprint, mix, patch } from "@chorda/core"
+import { HtmlBlueprint, InferBlueprint, mix, patch } from "@chorda/core"
 
 
 
@@ -8,7 +8,7 @@ interface CardImageProps<T> {
 }
 
 
-export const CardImage = <T>(props: CardImageProps<T>) : HtmlBlueprint<T> => {
+export const CardImage = <T>(props: CardImageProps<T>) : InferBlueprint<T> => {
     return {
         templates: {
             content: props.image
@@ -22,7 +22,7 @@ interface CardHeaderProps<T> {
     icon?: HtmlBlueprint<T>
 }
 
-export const CardHeader = <T>(props: CardHeaderProps<T>) : HtmlBlueprint<T> => {
+export const CardHeader = <T>(props: CardHeaderProps<T>) : InferBlueprint<T> => {
     return {
         components: {
             title: {
@@ -53,7 +53,7 @@ interface CardProps<T> {
 }
 
 
-export const Card = <T>(props: CardProps<T&CardScope>) : HtmlBlueprint<T> => {
+export const Card = <T>(props: CardProps<T&CardScope>) : InferBlueprint<T> => {
     return mix<CardScope>({
         css: 'card',
         components: {

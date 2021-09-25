@@ -2,7 +2,7 @@ import { computable, HtmlBlueprint, iterable, observable, patch } from "@chorda/
 import { Field, Fields } from "chorda-bulma";
 import { Coerced, createValueEffect, IteratorScope } from "../../utils";
 import { BgImage, DropdownOld, DropdownOldItem } from "../../helpers";
-import { api, CatApi } from "./api";
+import { CatApi } from "../../api";
 
 
 type FavouritesScope = {
@@ -54,7 +54,7 @@ export const Favourites = () : HtmlBlueprint<FavouritesScope> => {
         joints: {
             autoLoad: ({images, filters}) => {
 
-                const search = createValueEffect(images, 'loadFavourites', api.searchFavourites)
+                const search = createValueEffect(images, 'loadFavourites', CatApi.api.searchFavourites)
 
                 filters.$subscribe(next => {
 //                        debugger

@@ -1,81 +1,81 @@
-import { Engine, HtmlProps, Keyed, Stateable } from "../src"
+import { AsyncEngine, Engine, HtmlProps, Keyed, ownTaskFilter, Scheduler, Stateable, subscriptionTaskFilter, unknownTaskFilter, BufferedEngine } from "../src"
 import { Dom, Renderable, Renderer, VNodeFactory } from "../src/render"
 
 
 
-class TestEngine implements Engine<Stateable> {
-    processing: boolean
-    pipeTask: (fn: Function, arg?: any, target?: Stateable) => void
+// class TestEngine implements Engine<Stateable> {
+//     processing: boolean
+//     pipeTask: (fn: Function, arg?: any, target?: Stateable) => void
 
-    tasks: any[] = []
-    scheduled: boolean
-    post: any[] = []
+//     tasks: any[] = []
+//     scheduled: boolean
+//     post: any[] = []
 
-    scheduleTask (fn: Function, arg: any, target: any) {
-        this.tasks.push({fn, arg, target})
-    }
+//     scheduleTask (fn: Function, arg: any, target: any) {
+//         this.tasks.push({fn, arg, target})
+//     }
 
-    addPostEffect (fn: Function) {
-        this.post.push(fn)
-    }
+//     addPostEffect (fn: Function) {
+//         this.post.push(fn)
+//     }
 
-    immediate () {
-        const tasks = this.tasks
-        this.tasks = []
-        tasks.forEach(task => {
-            task.fn.call(task.target, task.arg)
-        })
-        if (this.tasks.length > 0) {
-            this.immediate()
-        }
-    }
+//     immediate () {
+//         const tasks = this.tasks
+//         this.tasks = []
+//         tasks.forEach(task => {
+//             task.fn.call(task.target, task.arg)
+//         })
+//         if (this.tasks.length > 0) {
+//             this.immediate()
+//         }
+//     }
 
-    schedule () {
-        if (!this.scheduled) {
-            setTimeout(() => {
-                const tasks = this.tasks
-                this.tasks = []
-                this.scheduled = false
+//     schedule () {
+//         if (!this.scheduled) {
+//             setTimeout(() => {
+//                 const tasks = this.tasks
+//                 this.tasks = []
+//                 this.scheduled = false
 
-                tasks.forEach(task => {
-                    task.fn.call(task.target, task.arg)
-                })
+//                 tasks.forEach(task => {
+//                     task.fn.call(task.target, task.arg)
+//                 })
 
-                if (this.tasks.length > 0 && !this.scheduled) {
-                    this.schedule()
-                }
-                else if (this.tasks.length == 0) {
-                    this.post.forEach(fn => fn())
-                }
-            })
-            this.scheduled = true
-        }
+//                 if (this.tasks.length > 0 && !this.scheduled) {
+//                     this.schedule()
+//                 }
+//                 else if (this.tasks.length == 0) {
+//                     this.post.forEach(fn => fn())
+//                 }
+//             })
+//             this.scheduled = true
+//         }
 
-    }
+//     }
     
-    chain (link: Engine<any>) {
-        this.post.push(() => {
-            link.schedule()
-        })
-    }
+//     chain (link: Engine<any>) {
+//         this.post.push(() => {
+//             link.schedule()
+//         })
+//     }
 
-}
-
-
-const _testEngine = new TestEngine()
+// }
 
 
 
-export const createEngine = () : Engine<Stateable> => {
+const _testEngine = new BufferedEngine()
+
+
+export const createPatchScheduler = () : Scheduler => {
     return _testEngine
 }
 
-export const nextTick = () => {
-    _testEngine.schedule()
-}
+// export const nextTick = () => {
+//     _testEngine.schedule()
+// }
 
 export const immediateTick = () => {
-    _testEngine.immediate()
+    _testEngine.flush()
 }
 
 
@@ -87,7 +87,38 @@ type RenderRoot = {
 }
 
 
+class TestRenderer extends BufferedEngine implements Renderer {
 
+    roots: RenderRoot[]
+
+    constructor () {
+        super()
+        this.roots = []
+    }
+    
+    attach(el: Element, node: Renderable): void {
+        const rootsToDetach = this.roots
+        rootsToDetach.forEach(root => this.detach(root.node))
+        this.roots.push({el, node})
+    }
+    detach(node: Renderable): void {
+        this.roots = this.roots.filter(root => root.node != node)
+    }
+
+    events: Keyed<any>
+
+    render () {
+
+        for (let root of this.roots) {
+            root.node.render()
+        }
+
+        this.flush()
+    }
+
+}
+
+/*
 export class TestRenderer implements Renderer, Engine<any> {
 
     roots: RenderRoot[]
@@ -153,13 +184,13 @@ export class TestRenderer implements Renderer, Engine<any> {
     }
     
 }
-
+*/
 
 
 
 const _testRenderer = new TestRenderer()
 
-export const createRenderer = () => {
+export const createRenderScheduler = () => {
     return _testRenderer
 }
 
@@ -167,8 +198,8 @@ export const attachRoot = (r: Renderable) => {
     _testRenderer.attach(null, r)
 }
 
-export const nextFrame = () => {
-    _testRenderer.schedule()
+export const immediateRender = () => {
+    _testRenderer.render()
 }
 
 export const defaultVNodeFactory: VNodeFactory = <P, H extends HtmlProps>(key: string, vnodeProps: P, htmlProps: Dom&H, children?: any[]) : any => {

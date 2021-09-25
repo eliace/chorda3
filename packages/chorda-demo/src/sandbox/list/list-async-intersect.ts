@@ -47,7 +47,7 @@ export default <T>() : HtmlBlueprint<T> => {
             items$: (scope) => scope.infiniteItems,
             as: withInfiniteScroll({
                 styles: {
-                    maxHeight: 400,
+                    maxHeight: 380,
                     overflowY: 'auto'
                 },
                 joints: {

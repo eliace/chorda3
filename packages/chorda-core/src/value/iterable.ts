@@ -1,4 +1,4 @@
-import { ObservableValueSet, UidFunc, Node, EMPTY, ValueSet, ObservableValue } from "./node";
+import { ObservableValueSet, UidFunc, Node, ValueSet, ObservableValue } from "./node";
 import { isObservable, observable, ObservableNode } from "./observable";
 import { Observable, PublishFunc, Subscriber, Subscription } from "./utils";
 
@@ -7,7 +7,7 @@ import { Observable, PublishFunc, Subscriber, Subscription } from "./utils";
 
 export interface IterableValue<T, K extends keyof T=keyof T> {
     readonly $name: string
-    $each (f: (itm: ValueSet<T[K]>) => void) : void
+    $each (f: (itm: ValueSet<T[K]>, i?: string) => void) : void
 }
 
 
@@ -42,13 +42,16 @@ export class IterableNode<T, K extends keyof T=keyof T> extends Node<T> implemen
 
     // }
 
-    $each (f: (itm: ValueSet<T[K]>) => void) {
+    $each (f: (itm: ValueSet<T[K]>, i?: string) => void) {
+//        console.log('each')
         const origin = (this._origin as ValueSet<T>) //|| this//(this as ValueSet<T>)
         const v = origin.$value
 //        console.log('each', v)
         for (let i in v) {
-            f(origin.$at(i) as any) // FIXME
+            f(origin.$at(i) as any, i) // FIXME
         }
+//        console.log('each end')
+
         // if (Array.isArray(v)) {
         //     for (let i = 0; i < v.length; i++) {
         //         f(origin.$at(i))

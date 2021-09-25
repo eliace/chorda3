@@ -1,8 +1,9 @@
-import { HtmlBlueprint, HtmlScope, mix, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, HtmlScope, InferBlueprint, mix, observable, ownTask, patch } from "@chorda/core"
 import { faThumbsDown, faThumbsUp } from "@fortawesome/free-solid-svg-icons"
 import { Button, Buttons, Card } from "chorda-bulma"
-import { BgImage, BgImageScope, FaIcon, SvgIcon } from "../../helpers"
-import { api } from "./api"
+import { IMAGE_BASE64 } from "../../data"
+import { CatApi } from "../../api"
+import { BgImage, BgImageScope, FaIcon, FaSvgIcon, SvgImagePlaceholder } from "../../helpers"
 
 
 type VoteScope = {
@@ -10,28 +11,36 @@ type VoteScope = {
     imageLoading: boolean
 }
 
+const asyncImageLoad = (url: string) : Promise<string> => {
+    return new Promise<string>((resolve, reject) => {
+        const img = new Image()
+        img.src = url
+        img.addEventListener('load', () => {
+            console.log('image loaded')
+            resolve(url)
+        })    
+    })
+}
 
-export const Vote = () : HtmlBlueprint => {
-    return mix<VoteScope&HtmlScope>({
+
+export const Vote = () : InferBlueprint<VoteScope&HtmlScope> => {
+    return {
         injections: {
             imageUrl: () => observable(null),
-            imageLoading: () => observable(false)
+            imageLoading: () => observable(false),
         },
         joints: {
             autoLoad: ({imageUrl, imageLoading}) => {
 
                 imageLoading.$value = true
 
-                api.searchImages({breed_id: 'norw'}).then(breeds => {
-
-                    const img = new Image()
-                    img.src = breeds[0].url
-                    img.addEventListener('load', () => {
+                CatApi.api
+                    .searchImages({breed_id: 'norw'})
+                    .then(breeds => asyncImageLoad(breeds[0].url))
+                    .then((url) => {
                         imageLoading.$value = false
-                        imageUrl.$value = breeds[0].url
-                        console.log('image loaded')
+                        imageUrl.$value = url                       
                     })
-                })
 
 
             }
@@ -77,7 +86,7 @@ export const Vote = () : HtmlBlueprint => {
                                                     if ($dom.$value && url.$value) {
                                                         const el = $dom.$value
                                                         el.classList.add(name+'-enter')
-                                                        $renderer.scheduleTask(() => {
+                                                        $renderer.publish(ownTask(() => {
                                                             el.classList.add(name+'-enter-active'/*, name+'-enter'*/)
                                                             
                                                             el.classList.remove(name+'-enter')
@@ -86,7 +95,7 @@ export const Vote = () : HtmlBlueprint => {
                                                                 el.classList.remove(name+'-enter-active')
                                                             }
                                                             el.addEventListener('transitionend', f)    
-                                                        })
+                                                        }))
                                                     }
                                                     else {
                                                         // hidden
@@ -114,7 +123,7 @@ export const Vote = () : HtmlBlueprint => {
                         // }),
                     })
                 }
-            }
+            },
         }
-    })
+    }
 }

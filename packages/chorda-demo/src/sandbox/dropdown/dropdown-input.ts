@@ -1,8 +1,8 @@
-import { callable, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, Injector, Listener, mix, observable, patch } from "@chorda/core";
+import { callable, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, Injector, Listener, mix, observable, patch, Scope } from "@chorda/core";
 import { Column, ColumnLayout, RowLayout } from "chorda-bulma";
-import { Custom, watch, withBlueprint, withMix, withScope } from "../../utils";
+import { Custom, watch, withMix } from "../../utils";
 import { COUNTRIES, Country } from "../../data";
-import { Paragraph, Text, Dropdown, DropdownTrigger, TextInput, DropdownProps, DropdownScope } from "../../helpers";
+import { Paragraph, Text, Dropdown, DropdownTrigger, TextInput, DropdownProps, DropdownScope, DropdownPropsType } from "../../helpers";
 
 type CountryRecord = Country & {id: any}
 
@@ -23,16 +23,13 @@ const filterFunc = (v: CountryRecord) => {
     return v?.name
 }
 
-type CountryDropdownType = <T, E, I=CountryRecord>(props: DropdownProps<T&DropdownScope<I>, I, I, E>) => InferBlueprint<T, E>
 
-const CountryDropdown : CountryDropdownType = Dropdown
-
-export default <T>() : InferBlueprint<T> => {
+export default () : InferBlueprint<Scope> => {
     return ColumnLayout([
         Column({
             css: 'is-one-quarter',
             content: RowLayout([
-                withScope<FilterScope<CountryRecord>>(CountryDropdown({
+                Dropdown(<DropdownPropsType<CountryRecord, FilterScope<CountryRecord>>>{
                     trigger: withMix(false, DropdownTrigger({
                         content: TextInput({
                             value$: ({filter}) => filter
@@ -68,7 +65,7 @@ export default <T>() : InferBlueprint<T> => {
                             }
                         }
                     },
-                }))
+                })
     
             ])
         }),

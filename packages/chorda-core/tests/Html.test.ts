@@ -1,25 +1,26 @@
 import { expect } from "chai"
 import { defaultHtmlFactory, defaultLayout, EventBus, Gear, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, observable, patch, Value } from "../src"
-import { attachRoot, createEngine, createRenderer, defaultVNodeFactory, nextFrame, nextTick } from "./utils"
+import { attachRoot, createPatchScheduler, createRenderScheduler, defaultVNodeFactory, immediateRender, immediateTick } from "./utils"
 
 
 
 
 const createHtml = <D, E=unknown, H=any>(o: HtmlOptions<D&HtmlScope, E, H>) : Html<D, E> => {
     const s = new Html<D, E>(o, {
-        $engine: createEngine(), 
-        $renderer: createRenderer(), 
+        $engine: createPatchScheduler(), 
+        $renderer: createRenderScheduler(),
+        $pipe: null,
         $defaultFactory: defaultHtmlFactory,
         $defaultLayout: defaultLayout,
         $vnodeFactory: defaultVNodeFactory
     })
-    s.scope.$engine.chain(s.scope.$renderer)
+    // s.scope.$engine.chain(s.scope.$renderer)
 
-    s.scope.$engine.addPostEffect(() => {
-        s.scope.$renderer.schedule()
-    })
+    // s.scope.$engine.addPostEffect(() => {
+    //     s.scope.$renderer.schedule()
+    // })
 
-    nextTick()
+    immediateTick()
     attachRoot(s)
 
     return s
@@ -43,7 +44,7 @@ describe ('Html', () => {
         }, 20)
     })
 
-    it ('Should render child nodes', (done) => {
+    it ('Should render child nodes', () => {
 
         const html = createHtml({
             components: {
@@ -52,13 +53,17 @@ describe ('Html', () => {
             }
         })
 
-        setTimeout(() => {
-            expect(html.vnode).to.deep.eq({children: [{key: 'a'}, {key: 'b'}]})
-            done()
-        }, 20)
+        immediateRender()
+
+        expect(html.vnode).to.deep.eq({children: [{key: 'a'}, {key: 'b'}]})
+
+        // setTimeout(() => {
+        //     expect(html.vnode).to.deep.eq({children: [{key: 'a'}, {key: 'b'}]})
+        //     done()
+        // }, 20)
     })
 
-    it ('Should render dom props', (done) => {
+    it ('Should render dom props', () => {
 
         const html = createHtml({
             components: {
@@ -70,13 +75,17 @@ describe ('Html', () => {
             }
         })
 
-        setTimeout(() => {
-            expect(html.vnode).to.deep.eq({children: [{key: 'a', tag: 'hello'}]})
-            done()
-        }, 20)
+        immediateRender()
+
+        expect(html.vnode).to.deep.eq({children: [{key: 'a', tag: 'hello'}]})
+
+        // setTimeout(() => {
+        //     expect(html.vnode).to.deep.eq({children: [{key: 'a', tag: 'hello'}]})
+        //     done()
+        // }, 20)
     })
 
-    it ('Should render ext props', (done) => {
+    it ('Should render ext props', () => {
 
         const html = createHtml({
             components: {
@@ -86,13 +95,17 @@ describe ('Html', () => {
             }
         })
 
-        setTimeout(() => {
-            expect(html.vnode).to.deep.eq({children: [{key: 'a', className: 'my-class'}]})
-            done()
-        }, 10)
+        immediateRender()
+
+        expect(html.vnode).to.deep.eq({children: [{key: 'a', className: 'my-class'}]})
+
+        // setTimeout(() => {
+        //     expect(html.vnode).to.deep.eq({children: [{key: 'a', className: 'my-class'}]})
+        //     done()
+        // }, 10)
     })
 
-    it ('Should render text child nodes', (done) => {
+    it ('Should render text child nodes', () => {
 
         const html = createHtml({
             components: {
@@ -102,14 +115,18 @@ describe ('Html', () => {
             }
         })
 
-        setTimeout(() => {
-            expect(html.vnode).to.deep.eq({children: [{key: 'a', children: ['foo']}]})
-            done()
-        }, 20)
+        immediateRender()
+
+        expect(html.vnode).to.deep.eq({children: [{key: 'a', children: ['foo']}]})
+
+        // setTimeout(() => {
+        //     expect(html.vnode).to.deep.eq({children: [{key: 'a', children: ['foo']}]})
+        //     done()
+        // }, 20)
     })
 
 
-    it ('Should render shared components', (done) => {
+    it ('Should render shared components', () => {
 
         const portal = observable([])
 
@@ -142,46 +159,84 @@ describe ('Html', () => {
             }
         });
 
+        immediateRender()
 
-        setTimeout(() => {
-            expect(html.vnode).to.deep.eq({
-                children: [{
-                    key: 'a',
-                    children: [{key: 'c'}]
-                }, {
-                    key: 'b'
-                }]
-            })
-            onUpdate(true)
-            nextTick()
-            setTimeout(() => {
-                expect(html.vnode).to.deep.eq({
-                    children: [{
-                        key: 'a',
-                        children: [{key: 'c'}]
-                    }, {
-                        key: 'b',
-                        children: [{key: 0, children: ['Hello']}, {key: 1}]
-                    }]
-                })
-                onUpdate(false)
-                nextTick()
-                setTimeout(() => {
-                    expect(html.vnode).to.deep.eq({
-                        children: [{
-                            key: 'a',
-                            children: [{key: 'c'}]
-                        }, {
-                            key: 'b',
-                        }]
-                    })
-                    done()
-                }, 20)
-            }, 20)
-        }, 20)
+        expect(html.vnode).to.deep.eq({
+            children: [{
+                key: 'a',
+                children: [{key: 'c'}]
+            }, {
+                key: 'b'
+            }]
+        })
+        onUpdate(true)
+
+        immediateTick()
+        immediateRender()
+
+        expect(html.vnode).to.deep.eq({
+            children: [{
+                key: 'a',
+                children: [{key: 'c'}]
+            }, {
+                key: 'b',
+                children: [{key: 0, children: ['Hello']}, {key: 1}]
+            }]
+        })
+        onUpdate(false)
+
+        immediateTick()
+        immediateRender()
+
+        expect(html.vnode).to.deep.eq({
+            children: [{
+                key: 'a',
+                children: [{key: 'c'}]
+            }, {
+                key: 'b',
+            }]
+        })
+
+
+        // setTimeout(() => {
+        //     expect(html.vnode).to.deep.eq({
+        //         children: [{
+        //             key: 'a',
+        //             children: [{key: 'c'}]
+        //         }, {
+        //             key: 'b'
+        //         }]
+        //     })
+        //     onUpdate(true)
+        //     immediateTick()
+        //     setTimeout(() => {
+        //         expect(html.vnode).to.deep.eq({
+        //             children: [{
+        //                 key: 'a',
+        //                 children: [{key: 'c'}]
+        //             }, {
+        //                 key: 'b',
+        //                 children: [{key: 0, children: ['Hello']}, {key: 1}]
+        //             }]
+        //         })
+        //         onUpdate(false)
+        //         immediateTick()
+        //         setTimeout(() => {
+        //             expect(html.vnode).to.deep.eq({
+        //                 children: [{
+        //                     key: 'a',
+        //                     children: [{key: 'c'}]
+        //                 }, {
+        //                     key: 'b',
+        //                 }]
+        //             })
+        //             done()
+        //         }, 20)
+        //     }, 20)
+        // }, 20)
     })
 
-    it ('Should render shared components', (done) => {
+    it ('Should render shared components', () => {
 
         const portal = observable([])
 
@@ -207,10 +262,14 @@ describe ('Html', () => {
             }
         });
 
-        setTimeout(() => {
-            console.log(html.vnode)
-            done()
-        }, 20)
+        immediateRender()
+
+        console.log(html.vnode)
+
+        // setTimeout(() => {
+        //     console.log(html.vnode)
+        //     done()
+        // }, 20)
 
     })
 

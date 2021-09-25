@@ -1,5 +1,5 @@
 import { Blueprint, defaultGearFactory, Gear, GearOptions, Injector, iterable, observable, patch, Scoped } from "../src"
-import { createEngine, immediateTick, nextTick } from "./utils"
+import { createPatchScheduler, immediateTick } from "./utils"
 
 
 type TestScope = {
@@ -8,7 +8,7 @@ type TestScope = {
 }
 
 const createAndRun = <D, E=unknown>(o: Blueprint<D, E>) : Gear<D, E> => {
-    const s = new Gear<D, E>(o as GearOptions<D, E>, {$engine: createEngine(), $defaultFactory: defaultGearFactory} as any)
+    const s = new Gear<D, E>(o as GearOptions<D, E>, {$engine: createPatchScheduler(), $defaultFactory: defaultGearFactory} as any)
     immediateTick()
     return s
 }

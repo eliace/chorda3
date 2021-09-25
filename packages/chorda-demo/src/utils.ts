@@ -1,6 +1,7 @@
-import { autoTerminalAware, Blueprint, callable, Callable, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, patch, PublishFunc, Scope, spyGetters, Value } from "@chorda/core"
-import { createPatchEngine } from "@chorda/engine"
-import { createRenderEngine, defaultVNodeFactory, DomEvents } from "@chorda/react"
+import { autoTerminalAware, Blueprint, callable, Callable, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, ownTask, patch, pipe, PublishFunc, Scope, spyGetters, Value } from "@chorda/core"
+import { createPatchScheduler } from "@chorda/engine"
+import { createRenderScheduler, defaultVNodeFactory, DomEvents } from "@chorda/react"
+import { Transaction } from "chorda-core/src/value/engine"
 import { Route } from "router5"
 import * as vis from "vis-network"
 import { App } from "./App"
@@ -22,14 +23,16 @@ const routes: Route[] = [
 
 export const createAppScope = () : HtmlScope => {
 
-    const engine = createPatchEngine()
-    const renderer = createRenderEngine()
+    const engine = createPatchScheduler()
+    const renderer = createRenderScheduler()
 
-    engine.chain(renderer)
+    engine.subscribe(renderer)
+    //engine.chain(renderer)
 
     const scope : HtmlScope&AppScope = {
         $renderer: renderer,
         $engine: engine,
+        $pipe: pipe(engine, renderer),
         $defaultFactory: defaultHtmlFactory,
         $defaultLayout: defaultLayout,
         $vnodeFactory: defaultVNodeFactory,
@@ -60,12 +63,12 @@ export const render = (html: Html, el: () => Element) => {
 
 
 
-type CustomProps<T, E=unknown> = {
+type CustomProps<T, E> = {
     as?: Blueprint<T, E>
     content?: Blueprint<T, E>
 } & Blueprint<T, E>
 
-export const Coerced = <S, T=unknown, E=unknown>(props: CustomProps<Omit<T, keyof S>&S, E&DomEvents&HtmlEvents>) : HtmlBlueprint<T> => {
+export const Coerced = <S, T=unknown, E=unknown>(props: CustomProps<Omit<T, keyof S>&S, E&DomEvents&HtmlEvents>) : InferBlueprint<T> => {
     return mix(props.as, props, {
         templates: {
             content: props.content
@@ -73,22 +76,24 @@ export const Coerced = <S, T=unknown, E=unknown>(props: CustomProps<Omit<T, keyo
     })
 }
 
-export const Custom = <T, E=unknown>(props: CustomProps<T, E>) : HtmlBlueprint<T, E> => {
+export const Custom = <T, E>(props: CustomProps<T, E>) : InferBlueprint<T, E> => {
     return mix(props.as, props, {
         templates: {
             content: props.content
         }
     })
 }
+
+export const Content = Custom
 
 
 export const withHtml = <T, E>(props: Blueprint<T&HtmlScope, E&HtmlEvents>) : InferBlueprint<T, E> => {
     return props as any
 }
 
-export const withScope = <S, E=unknown, T=unknown>(props: CustomProps<Omit<T, keyof S>&S, E&DomEvents&HtmlEvents>) : InferBlueprint<T, E> => {
-    return mix(props.as, props)
-}
+// export const withScope = <S, E=unknown, T=unknown>(props: CustomProps<Omit<T, keyof S>&S, E&DomEvents&HtmlEvents>) : InferBlueprint<T, E> => {
+//     return mix(props.as, props)
+// }
 
 export const withBlueprint = <T, E=unknown>(props: CustomProps<T, E&DomEvents&HtmlEvents>) : InferBlueprint<T, E> => {
     return mix(props.as, props)
@@ -277,6 +282,51 @@ export const withItem = <I, T=unknown>(props: HtmlBlueprint<T&DynamicListScope<I
 
 
 
+
+export type ListBlueprint<I, T=unknown, E=unknown, H=any> = Omit<HtmlOptions<T&{items: unknown[]}, E, H>, 'defaultItem'> & {
+    defaultItem?: Blueprint<T&{item: I}>
+}
+
+
+export const withList = <T extends Scope, E> (props: ListBlueprint<unknown, T, E>) : InferBlueprint<T, E> => {
+    return mix<{$items: unknown[], items: unknown[], $item: unknown, item: unknown}>(props, {
+        injections: {
+            $items: ($) => iterable($.items, '$item')
+        },
+        reactions: {
+            $items: (v) => patch({items: v})
+        },
+        defaultItem: {
+            injections: {
+                item: ($) => $.$item
+            }
+        }
+    })
+}
+
+
+// const TestItem = <T, E>(props: {text$: Injector<T, E>}) : InferBlueprint<T, E> => {
+//     return {
+
+//     }
+// }
+
+
+// const b : InferBlueprint<{text: string}, any> = withList(<ListBlueprint<string>>{
+//     injections: {
+//         items: () => observable([{}])
+//     },
+//     defaultItem: TestItem({
+//         text$: ($) => $.item
+//     })
+// })
+
+
+
+
+
+
+
 export type OuterClickScope = {
     onOuterClick: () => void
 }
@@ -358,9 +408,9 @@ export const stopMouseDown: Joint<HtmlScope> = ({$dom}) => {
 export const autoFocus: Joint<HtmlScope&{autoFocus: boolean}> = ({$dom, $renderer}) => {
     $dom.$subscribe(el => {
         if (el) {
-            $renderer.scheduleTask(() => {
+            $renderer.publish(ownTask(() => {
                 el.focus()
-            })
+            }))
         }
     })
 }

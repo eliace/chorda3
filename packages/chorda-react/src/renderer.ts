@@ -96,7 +96,7 @@ export class ReactRenderer implements Renderer, Engine<any> {
 
 }
 
-const EVENT_MAP : Keyed<string> = {
+export const EVENT_MAP : Keyed<string> = {
     click: 'onClick',
     change: 'onChange',
     input: 'onInput',

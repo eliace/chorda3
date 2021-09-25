@@ -60,14 +60,14 @@ export default <T>() : HtmlBlueprint<T> => {
                 //     __it: (v) => patch({items: v})
                 // },
                 joints: {
-                    detectBounds: ({$dom, bounds, items, $engine}) => {
+                    detectBounds: ({$dom, bounds, items, $engine, $renderer}) => {
 
                         const detect = () => {
     //                        console.log('detect bounds')
                             if ($dom.$value) {
-                                $engine.pipeTask(() => {
+                                $engine.publish($renderer.task(() => {
                                     bounds.$value = $dom.$value.getBoundingClientRect()
-                                })
+                                }))
                             }
                         }
 
@@ -97,14 +97,14 @@ export default <T>() : HtmlBlueprint<T> => {
                         //     t = t2
                         // })
                     },
-                    watchScrollHeight: ({$dom, $engine, items, scrollHeight, scrollHeightLock, scrollTop, bounds}) => {
+                    watchScrollHeight: ({$dom, $engine, $renderer, items, scrollHeight, scrollHeightLock, scrollTop, bounds}) => {
 
                         const detectScrollHeight = () => {
     //                        console.log('detect scroll height')
                             const el = $dom.$value
     //                        console.log('detect scroll height')
                             if (el) {
-                                $engine.pipeTask(() => {
+                                $engine.publish($renderer.task(() => {
                                     // if (scrollTop + bounds.height > scrollHeight) {
                                     //     el.scrollTop = scrollHeight - bounds.height - 1
                                     // }
@@ -117,7 +117,7 @@ export default <T>() : HtmlBlueprint<T> => {
                                     else {
                                         el.scrollTo(0, scrollHeight - bounds.height)
                                     }
-                                })
+                                }))
                             }
                         }
 
@@ -154,7 +154,7 @@ export default <T>() : HtmlBlueprint<T> => {
                         //lastPage.$subscribe(update)
                             
                     },
-                    loadNextPage: ({lastPage, loading, totalPages, bus, scrollHeightLock, $engine, $dom}) => {
+                    loadNextPage: ({lastPage, loading, totalPages, bus, scrollHeightLock, $engine, $renderer, $dom}) => {
 
                         const loadNextPage = (p: number, q: string) => {
                             return Tmdb.api.searchMovie({page: p, query: q, language: 'ru'}).then(response => {
@@ -165,9 +165,9 @@ export default <T>() : HtmlBlueprint<T> => {
                         }
 
                         const resetScroll = () => {
-                            $engine.pipeTask(() => {
+                            $engine.publish($renderer.task(() => {
                                 $dom.$value.scrollTo(0, 0)
-                            })
+                            }))
                         }
 
 
