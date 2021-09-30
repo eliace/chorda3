@@ -19,14 +19,19 @@ export interface Renderer<P=any, H=any> {
     attach (root: Element, node: Renderable) : void
     detach (node: Renderable) : void
     readonly events: Keyed<any>
+    isAttached (node: Renderable) : boolean
 //    createVNode () : VNode//tuple: [string|number, {}, {}, VNode[]]) : VNode
 }
 
 export interface Renderable {
-    render() : VNode
+    render(asRoot?: boolean) : VNode
+    readonly isRoot : boolean
 }
 
-export type VNodeFactory = <P, O>(key: string, vnodeProps: P, htmlProps: O&Dom, children?: any[]) => VNode
+export interface VNodeFactory {
+    createVNode <P, O>(key: string, vnodeProps: P, htmlProps: O&Dom, children?: any[]) : VNode
+}
+//export type VNodeFactory = <P, O>(key: string, vnodeProps: P, htmlProps: O&Dom, children?: any[]) => VNode
 
 
 

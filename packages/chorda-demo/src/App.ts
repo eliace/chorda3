@@ -6,6 +6,8 @@ import { Elements } from "./elements";
 import { Extended } from "./extended";
 import { Sandbox } from "./sandbox";
 import { AppScope, buildHtmlTree, Coerced } from "./utils";
+import { Components } from "./components";
+import { Form } from "./form";
 
 let _network: vis.Network = null
 const _nodes = new visds.DataSet<vis.Node>([])
@@ -86,6 +88,8 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                 elements: Elements,
                                 sandbox: Sandbox,
                                 extended: Extended,
+                                components: Components,
+                                form: Form
                             }
                         })
                     },

@@ -35,7 +35,7 @@ export const createAppScope = () : HtmlScope => {
         $pipe: pipe(engine, renderer),
         $defaultFactory: defaultHtmlFactory,
         $defaultLayout: defaultLayout,
-        $vnodeFactory: defaultVNodeFactory,
+//        $vnodeFactory: defaultVNodeFactory,
         router: null
     }
 
@@ -87,7 +87,7 @@ export const Custom = <T, E>(props: CustomProps<T, E>) : InferBlueprint<T, E> =>
 export const Content = Custom
 
 
-export const withHtml = <T, E>(props: Blueprint<T&HtmlScope, E&HtmlEvents>) : InferBlueprint<T, E> => {
+export const withHtml = <T, E>(props: Blueprint<T&HtmlScope, E&HtmlEvents&DomEvents>) : InferBlueprint<T, E> => {
     return props as any
 }
 
@@ -95,7 +95,7 @@ export const withHtml = <T, E>(props: Blueprint<T&HtmlScope, E&HtmlEvents>) : In
 //     return mix(props.as, props)
 // }
 
-export const withBlueprint = <T, E=unknown>(props: CustomProps<T, E&DomEvents&HtmlEvents>) : InferBlueprint<T, E> => {
+export const withBlueprint = <T, E=unknown>(props: CustomProps<T, E>) : InferBlueprint<T, E> => {
     return mix(props.as, props)
 }
 

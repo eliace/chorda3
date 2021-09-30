@@ -103,9 +103,9 @@ class UpdateEngine {
 //                const lastUpdateMap = new Map<Subscriber<any>, NodeUpdate>()
                 session.updated.forEach(upd => {
                     if (this._commitedNodes.has(upd.node)) {
-                        console.warn('Cyclic update detected', upd)
-                        if (upd.next == this._commitedNodes.get(upd.node)) {
-                            console.warn('Cyclic update break')
+                        //console.warn('Cyclic update detected', upd.prev, upd.next)
+                        if (upd.next === this._commitedNodes.get(upd.node)) {
+                            console.warn('Possible cyclic update', upd)
                             return
                         }
 //                        return

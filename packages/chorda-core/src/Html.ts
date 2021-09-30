@@ -1,7 +1,7 @@
 import { Scheduler } from '.'
 import { Engine } from './engine'
 import { defaultInitRules, defaultPatchRules, Gear, GearEvents, GearOptions, GearScope } from './Gear'
-import { Keyed, NoInfer } from './Hub'
+import { Keyed, NoInfer, Stateable } from './Hub'
 import { Mixed, mixin, MixRules } from './mix'
 import { buildClassName, Dom, DomNode, Renderable, Renderer, VNodeFactory } from './render'
 import { DefaultRules } from './rules'
@@ -12,10 +12,10 @@ import { Observable } from './value'
 //------------------------------------
 
 export type HtmlScope = {
-    $renderer: Renderer&Scheduler
+    $renderer: Renderer&Scheduler&VNodeFactory
     $defaultLayout: Function
     $dom?: HTMLElement
-    $vnodeFactory: VNodeFactory
+    //$vnodeFactory: VNodeFactory
 //    afterRender?: any
 } & GearScope
 
@@ -43,6 +43,7 @@ export interface HtmlOptions<D, E, H, B=HtmlBlueprint<NoInfer<D>, NoInfer<E>, H>
 
 export type HtmlEvents = GearEvents & {
     afterRender?: () => any
+    afterInit?: () => Stateable&Renderable
 }
 
 export type HtmlProps = {
@@ -78,7 +79,7 @@ export const passthruLayout = (factory: VNodeFactory, key: string, props: any, d
 }
 
 export const defaultLayout = (factory: VNodeFactory, key: string, props: any, dom: Dom, children?: Renderable[]) : any => {
-    return factory(key, props, dom, children && children.map(defaultRender))
+    return factory.createVNode(key, props, dom, children && children.map(defaultRender))
 }
 
 
@@ -132,9 +133,12 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
         let html = this
         while (html && !html.dirty) {
             html.dirty = true
-            if (!html.parent) {
-                // планируем задачу отрисовки корня
-                this.scope.$engine.publish(this.scope.$renderer.task(null))
+//            if (!html.parent) {
+            if (html.isRoot) {
+//                debugger
+                    // планируем задачу отрисовки корня
+                html.scope.$pipe.push(html.scope.$renderer.task(null))
+//                break
             }
             html = html.parent
         }
@@ -162,9 +166,17 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
         this.attached = false
     }
 
+    get isRoot () : boolean {
+        return this.parent ? (this.parent.scope.$renderer != this.scope.$renderer) : true
+    }
 
 
-    render () : any {
+
+    render (asRoot?: boolean) : any {
+
+        if (!asRoot && this.isRoot) {
+            return null
+        }
 
         if (!this.dirty) {
             return this.vnode
@@ -174,7 +186,7 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
 
         const layout = o.layout || this.scope.$defaultLayout
 //        const renderer: Renderer = this.scope.$renderer
-        const factory = this.scope.$vnodeFactory
+        const factory = this.scope.$renderer//.$vnodeFactory
         const dom = this.scope.$dom
         const text = o.text
         const children = this.children

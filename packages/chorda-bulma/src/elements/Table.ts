@@ -1,9 +1,10 @@
-import { HtmlBlueprint, Injector, mix, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core"
 
 
 
-type TableScope = {
+export type TableScope = {
     data: any[]
+    rows: any[]
 }
 
 type TableProps<T> = {
@@ -56,10 +57,13 @@ export const Table = <T>(props: TableProps<T&TableScope>) : HtmlBlueprint<T> => 
                     }
                 },
                 reactions: {
-                    data: (next) => {
+                    rows: (next) => {
 //                        debugger
                         patch({items: next})
                     }
+                },
+                injections: {
+                    rows: $ => iterable($.data, 'data')
                 }
             }
         }
@@ -113,9 +117,9 @@ type RowScope<D=any> = {
     data: D[]
 }
 
-type RowProps<T> = {
-    defaultCell?: HtmlBlueprint<T>
-    cells?: HtmlBlueprint<T>[]
+export type RowProps<I, T> = {
+    defaultCell?: HtmlBlueprint<T&CellScope<I>>
+    cells?: HtmlBlueprint<T&CellScope<I>>[]
     data$?: Injector<T>
     data?: T
 //    dataId?: string
@@ -123,7 +127,7 @@ type RowProps<T> = {
 
 
 
-export const Row = <T>(props: RowProps<T>) : HtmlBlueprint<T> => {
+export const Row = <T>(props: RowProps<any, T&RowScope>) : HtmlBlueprint<T> => {
     return mix<RowScope>({
     }, {
         defaultItem: props.defaultCell,
@@ -142,7 +146,11 @@ export const Row = <T>(props: RowProps<T>) : HtmlBlueprint<T> => {
 // Cell
 //
 
-type CellProps<T> = {
+type CellScope<I> = {
+    data: I
+}
+
+export type CellProps<T> = {
     text?: string
     data?: T,
     data$?: Injector<T>
@@ -152,7 +160,7 @@ type CellProps<T> = {
 export const Cell = <T>(props: CellProps<T>) : HtmlBlueprint<T> => {
     return mix<any>(/*{
 //        tag: 'td'
-    }, */{
+    }, */props && {
 //        text: props.text,
         reactions: {
             data: (v) => patch({text: (props.format || String)(v)})

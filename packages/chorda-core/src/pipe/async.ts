@@ -13,12 +13,14 @@ export class AsyncEngine<T extends Task = Task> implements Scheduler<T> {
     subscriptions: Scheduler[]
     scheduled: boolean
     processing: boolean
+    name: string
 
-    constructor () {
+    constructor (name?: string) {
         this.tasks = []
         this.subscriptions = []
         this.deferred = []
         this.scheduled = false
+        this.name = name || 'default'
     } 
 
     publish(task: T): void {
@@ -56,7 +58,7 @@ export class AsyncEngine<T extends Task = Task> implements Scheduler<T> {
 
         this.scheduled = true
         setTimeout(() => {
-            console.log('tick start', this.tasks.length)
+//            console.log(`[${this.name}] tick start`, this.tasks.length)
             const t0 = performance.now()
 
             this.scheduled = false
@@ -81,7 +83,7 @@ export class AsyncEngine<T extends Task = Task> implements Scheduler<T> {
             this.processing = false
 
             const t1 = performance.now()
-            console.log('tick', tasks.length, Math.round(t1 - t0), avgTimeInterval(t0, t1, tasks.length)/*, deleted ? '-'+deleted : ''*/)
+            console.log(`[${this.name}] patched`, tasks.length, Math.round(t1 - t0), avgTimeInterval(t0, t1, tasks.length)/*, deleted ? '-'+deleted : ''*/)
         })
     }
 

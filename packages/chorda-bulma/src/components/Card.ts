@@ -74,7 +74,7 @@ export const Card = <T>(props: CardProps<T&CardScope>) : InferBlueprint<T> => {
                     }
                 },
                 reactions: {
-                    model: (v) => patch({
+                    model: (v) => v && patch({
                         components: {title: v.title, icon: v.titleIcon}
                     })
                 }

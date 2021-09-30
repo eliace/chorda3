@@ -3,6 +3,7 @@ import { ExamplePanel } from "../helpers"
 import { CatApi } from "./catapi"
 import Countries from './countries'
 import { DropdownExample } from "./dropdown"
+import { InfernoExample } from "./inferno"
 import { ListExample } from "./list"
 import { SelectExample } from "./select"
 
@@ -36,6 +37,11 @@ export const Sandbox = () : HtmlBlueprint => {
             name: 'list',
             link: '/#/sandbox/list',
             example: ListExample
+        }, {
+            title: 'Inferno',
+            name: 'inferno',
+            link: '/#/sandbox/inferno',
+            example: InfernoExample
         }]
     })
 }

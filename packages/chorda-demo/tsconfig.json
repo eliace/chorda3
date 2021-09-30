@@ -12,6 +12,8 @@
         "@chorda/react": ["chorda-react/src"],
         "@chorda/engine": ["chorda-engine/src"],
         "@chorda/core": ["chorda-core/src"],
+        "@chorda/inferno": ["chorda-inferno/src"],
+        "demo": ["chorda-demo/src"]
       }
     }
 }

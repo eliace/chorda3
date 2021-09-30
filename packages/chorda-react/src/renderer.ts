@@ -94,6 +94,10 @@ export class ReactRenderer implements Renderer, Engine<any> {
         return EVENT_MAP
     }
 
+    isAttached (node: Renderable) : boolean {
+        return this.roots.find((root) => root.node == node) != null
+    }
+
 }
 
 export const EVENT_MAP : Keyed<string> = {

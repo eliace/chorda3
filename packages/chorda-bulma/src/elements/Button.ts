@@ -1,16 +1,11 @@
 import { HtmlBlueprint, Injector, Listener, mix, observable, patch } from "@chorda/core"
+import { RendererEvents } from "../utils"
 
 
 //
 // Button
 //
 
-
-type RendererEvents = {
-    $dom: {
-        click: () => void
-    }
-}
 
 type ButtonScope = {
     color: string

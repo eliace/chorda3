@@ -449,12 +449,12 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
             //     result = it.next()
             // }
 
-            console.log('next items', nextItems, prevItems)
+//            console.log('next items', nextItems, prevItems)
 //            console.log('reconcile')
 
             const mergedItems: KVItem[] = reconcile(prevItems, nextItems)
 
-            console.log('reconcile end')
+//            console.log('reconcile end')
 
 //            console.log('merged items', this.key, mergedItems)
 

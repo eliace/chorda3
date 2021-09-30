@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, Listener, mix, patch, Scope } from "@chorda/core"
+import { HtmlBlueprint, Injector, Listener, mix, observable, patch, Scope } from "@chorda/core"
 import { Link, List, ListScope } from "../simple"
 
 
@@ -86,7 +86,10 @@ export const Tabs = <T extends Scope>(props: TabsProps<T&TabsScope>) : HtmlBluep
             'is-centered': props.centered
         },
         injections: {
-            tabs: props.tabs$ || null
+            tabs: props.tabs$
+        },
+        initials: {
+            tabs: () => null
         },
         templates: {
             content: List<TabsScope>({

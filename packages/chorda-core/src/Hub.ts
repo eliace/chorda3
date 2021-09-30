@@ -150,6 +150,7 @@ export type HubScope = {
 }
 
 export type HubEvents = {
+    afterInit: () => Stateable
     afterDestroy: () => void
 }
 
@@ -179,6 +180,7 @@ let _PatchingHub : Hub<unknown, any> = undefined
 
 export const patch = (o: any) => {
     _PatchingHub.scope.$engine.publish(ownTask(_PatchingHub.patch, o, _PatchingHub))
+    //_PatchingHub.scope.$pipe.push(ownTask(_PatchingHub.patch, o, _PatchingHub))
 }
 
 let _ScopeKey: string|symbol
@@ -261,18 +263,32 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
                     return context
                 }
 
+
 //                console.log('get', p)
 
                 let isInjected = false
 
-                const prop = _InjectProps[String(p)] || PropState.None
+                let prop = _InjectProps[String(p)] || PropState.None
+                const prevPropState = _InjectProps[String(p)]
+                const prevProp = target[p]
 
 //                if () {
 
-                    if (p in target) {
+                    if (/*!isInjected && this.state != State.Initializing &&*/ (p in target)) {
                         isInjected = true
 //                        return (target[p] && isAutoTerminal() && target[p].$isTerminal) ? target[p].$value : target[p]
                     }
+
+                    // if (this.state == State.Initializing) {
+                    //     isInjected = false
+                    //     prop = PropState.None
+                    //     target[p] = undefined
+                    // }
+
+                    // if (this.options.injections && (this.options.injections as any)['$engine']) {
+                    //     console.log('$engine', p, isInjected, prop)
+                    // }
+
 
                     if (!isInjected && prop < PropState.Injector && this.options.injections) {
                         const injector: Injector<any, any> = (this.options.injections as any)[p]
@@ -335,6 +351,18 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
                         target[p] = (context as any)[p]
                     })
                     isInjected = true
+                    // if (this.state == State.Initializing) {
+                    //     isInjected = false
+                    //     //_InjectProps[String(p)] = PropState.None
+                    // }
+                }
+
+                if (this.state == State.Initializing && (p == '$engine' || p == '$renderer' || p == '$pipe' )) {
+                    const out = (target[p] && isAutoTerminal() && target[p].$isTerminal) ? target[p].$value : target[p]
+                    delete target[p]
+                    _InjectProps[String(p)] = PropState.None
+                    isInjected = false
+                    return out
                 }
 
 //                return target[p]
@@ -575,6 +603,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
         if (this.state == State.Initializing) {
             this.state = State.Initialized
+            this.events.afterInit?.(this, this.scope)
         }
 
         // if (this.events['patch']) {
@@ -723,6 +752,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
         if (nextOpts != null) {
             console.warn('component update not yet ready', nextOpts, this)
+            this.patch(nextOpts)
             return
         }
 

@@ -8,6 +8,7 @@ export const USERS: User[] = require('./users.json').results
 export const FRUITS: string[] = require('!raw-loader!./fruits.txt').default.split(',').map((s: string) => s.trim())
 
 export const IMAGE_1 = require('./Yosemite.jpg')
+export const IMAGE_2 = require('./Yosemite 3.jpg')
 
 export const IMAGE_BASE64 = require('./Yosemite_sq.jpg?base64')
 

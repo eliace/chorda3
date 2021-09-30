@@ -1,7 +1,7 @@
 import { computable, HtmlBlueprint, Injector, mix, observable, patch } from "@chorda/core"
 import { Card, LevelLayout, Tab, Tabs, Title } from "chorda-bulma"
 import { Selected } from "../App"
-import { Coerced, Custom } from "../utils"
+import { Coerced, Custom, withHtml } from "../utils"
 import { Action } from "./Action"
 import { CodeBox } from "./CodeBox"
 
@@ -33,7 +33,7 @@ type ExampleFile = {
 export const Example = <T>(props: ExampleBoxProps<T&ExampleBoxScope>) : HtmlBlueprint<T> => {
     
     const files : ExampleFile[] = props.files || [{name: 'index.ts', code: props.code}]
-    
+
     return mix<ExampleBoxScope>(Card, {
         css: 'example-box',
         components: {
@@ -101,7 +101,7 @@ export const Example = <T>(props: ExampleBoxProps<T&ExampleBoxScope>) : HtmlBlue
                                     return acc
                                 }, {} as any)
                             }) 
-                        }
+                        },
                     }),
                     tabs: Custom({
                         css: 'code-tabs',
@@ -115,9 +115,8 @@ export const Example = <T>(props: ExampleBoxProps<T&ExampleBoxScope>) : HtmlBlue
                                 onClick: (e, scope) => {
                                     scope.activeFile = scope.name
                                 }
-                            })    
-                        })
-
+                            })
+                        }),
                     })
                 }
             }        

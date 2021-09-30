@@ -8,10 +8,12 @@ type TextInputScope = {
 }
 
 type TextInputProps<T> = {
+    value?: string
     value$?: Injector<T>
     onInput?: Listener<T, string>
     onFocus?: Listener<T, void>
     onEsc?: Listener<T, void>
+    placeholder?: string
 }
 
 export const TextInput = <T>(props: TextInputProps<T&TextInputScope>) : HtmlBlueprint<T> => {
@@ -37,7 +39,7 @@ export const TextInput = <T>(props: TextInputProps<T&TextInputScope>) : HtmlBlue
             }
         },
         initials: {
-            value: () => observable(''),
+            value: () => observable(props.value || ''),
         },
         injections: {
             value: props.value$
@@ -71,7 +73,9 @@ export const TextInput = <T>(props: TextInputProps<T&TextInputScope>) : HtmlBlue
                 // $dom.$subscribe(changeValue)
 
             },
+        },
+        dom: {
+            placeholder: props.placeholder
         }
-
     })
 }

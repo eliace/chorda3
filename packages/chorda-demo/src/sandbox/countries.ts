@@ -39,6 +39,6 @@ export default () : HtmlBlueprint => {
                 ]
             })
         }),
-        data$: () => iterable(countries, 'data')
+        data$: () => countries
     })
 }

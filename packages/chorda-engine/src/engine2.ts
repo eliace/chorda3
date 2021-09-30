@@ -19,9 +19,18 @@ const avgTimeInterval = (t0: number, t1: number, total: number) => {
 export class PatchEngine extends AsyncEngine<Task<Stateable>> {
 
     process (tasks: Task<Stateable>[]) : Task<Stateable>[] {
-        return tasks
-            .filter(destroyedTaskFilter)
-            .filter(ownTaskFilter(this))
+        return tasks.filter(task => {
+            if (task.target && (task.target.state == State.Destroying || task.target.state == State.Destroyed)) {
+                //        deleted++
+                //      console.warn('Ignoring target in destroying or destroyed state', task.target)
+                return false
+            }
+
+            return ownTaskFilter(this)(task)
+        })
+        // return tasks
+        //     .filter(destroyedTaskFilter)
+        //     .filter(ownTaskFilter(this))
     }
 
     // schedule () {
@@ -59,6 +68,6 @@ export class PatchEngine extends AsyncEngine<Task<Stateable>> {
 
 
 
-export const createPatchScheduler = () : Scheduler<Task<Stateable>> => {
-    return new PatchEngine()
+export const createPatchScheduler = (name?: string) : Scheduler<Task<Stateable>> => {
+    return new PatchEngine(name)
 }

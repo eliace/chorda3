@@ -1,4 +1,4 @@
-import { HtmlBlueprint, HtmlScope, Injector, mix, patch } from "@chorda/core";
+import { HtmlBlueprint, HtmlScope, Injector, mix, observable, patch } from "@chorda/core";
 
 
 export type ListScope = {
@@ -28,7 +28,7 @@ export const List = <T>(props: ListProps<T&ListScope>) : HtmlBlueprint<T> => {
         defaultItem: props.defaultItem,
         injections: {
             items: props.items$
-        }
+        },
     })
 }
 

@@ -552,7 +552,8 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
             else {
                 const removed = prevMap[i]
                 if (i != removed._key) {
-                    debugger
+                    console.warn('removed and changed key', i, removed._key, removed)
+                    console.log(prevMap)
                 }
 
                 if (removed._subscriptions.length > 0) {
@@ -600,7 +601,7 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
         this._destroyed = true
 
         for (let i in this._entries) {
-            console.log('destroy', i)
+//            console.log('destroy', i)
             this._entries[i].$destroy()
         }
         this._memoValue = undefined

@@ -15,6 +15,7 @@ export const Tag = <T>(props: TagProps<T>) : HtmlBlueprint<T> => {
     }, 
     props?.as,
     props && {
+        text: props.text
     })
 }
 

@@ -62,7 +62,7 @@ export const ExamplePanel = <T>(props: ExamplePanelProps<T&ExampleScope>) : Html
                     })
                 }, {
                     tabs: Tabs({
-                        tabs$: (scope) => iterable(scope.tabs),
+                        tabs$: (scope) => iterable(scope.$context.tabs),
                         defaultTab: Coerced<{tab: ExampleTab, __it: ExampleTab}, ExampleScope&TabsScope>({
                             as: Tab({
                                 text$: (scope) => scope.tab.title,
