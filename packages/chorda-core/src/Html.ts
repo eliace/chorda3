@@ -136,7 +136,7 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
 //            if (!html.parent) {
             if (html.isRoot) {
 //                debugger
-                    // планируем задачу отрисовки корня
+                    // планируем перерисовку в свой такт (после всех патчей)
                 html.scope.$pipe.push(html.scope.$renderer.task(null))
 //                break
             }
@@ -215,6 +215,22 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
 
             if (this.attached) {
                 this.detach()
+            }
+            else {
+
+                // помечаем путь до корня "грязным"
+                let html = this
+                while (html && !html.dirty) {
+                    html.dirty = true
+        //            if (!html.parent) {
+                    if (html.isRoot) {
+        //                debugger
+                        // планируем перерисовку в ближайший кадр, чтобы удаленный элемент как можно скорее пропал из VDOM
+                        html.scope.$renderer.publish(html.scope.$renderer.task(null))
+        //                break
+                    }
+                    html = html.parent
+                }
             }
 
             defer && defer()

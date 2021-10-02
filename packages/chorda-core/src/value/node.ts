@@ -2,6 +2,7 @@ import { Observable, Value, Subscriber, EventBus, Subscription, PublishFunc, def
 import { EventNode } from './bus'
 import { closeTransaction, commitEngine, currentTransaction, openTransaction } from './engine'
 import { LifecycleProvider, SubscriptionProvider } from '.'
+import { PubSub } from './pubsub'
 
 export type UidFunc<I=any> = (value: I) => string
 
@@ -61,16 +62,16 @@ interface ValueNode<T> extends Value<T> {
 
 let _SpyGetters : Observable<any>[] = null
 
-let _SpySubscriptions : Subscription[] = null
+// let _SpySubscriptions : Subscription[] = null
 
-export const spySubscriptions = (fn: Function) : Subscription[] => {
-    const prevSub = _SpySubscriptions
-    _SpySubscriptions = []
-    fn()
-    const result = _SpySubscriptions
-    _SpySubscriptions = prevSub
-    return result
-}
+// export const spySubscriptions = (fn: Function) : Subscription[] => {
+//     const prevSub = _SpySubscriptions
+//     _SpySubscriptions = []
+//     fn()
+//     const result = _SpySubscriptions
+//     _SpySubscriptions = prevSub
+//     return result
+// }
 
 export const spyGetters = (fn: Function) : Observable<any>[] => {
     const prevGetters = _SpyGetters
@@ -105,7 +106,7 @@ export const spyGetters = (fn: Function) : Observable<any>[] => {
 
 
 
-export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T>, Observable<T>, SubscriptionProvider, LifecycleProvider {
+export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T>, LifecycleProvider {
 
     _memoValue: any
     _source: Node<unknown>
@@ -343,47 +344,6 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
 //         }
     }
 
-    $subscribe(subscriber: Subscriber<T>|PublishFunc<T>): Subscription {
-
-        if (this._destroyed) {
-            console.error('Cannot subscribe to deleted value')
-            return null
-        }
-        
-        // проверяем, что такая подписка уже есть
-        for (let sub of this._subscriptions) {
-            if (sub.subscriber == subscriber || sub.subscriber.$publish == subscriber) {
-                return sub
-            }
-        }    
-
-        if (typeof subscriber === 'function') {
-            subscriber = {
-                $publish: subscriber
-            }
-        }
-
-        const sub: Subscription = {
-            subscriber,
-            observable: this
-        }
-
-        this._subscriptions.push(sub)
-
-        if (_SpySubscriptions) {
-            _SpySubscriptions.push(sub)
-        }
-
-        return sub
-    }
-
-    $unsubscribe(subscription: Subscription|Subscriber<T>|PublishFunc<T>): void {
-        // if (this._destroyed) {
-        //     console.error('Cannot unsubscribe from deleted value')
-        //     return 
-        // }
-        this._subscriptions = this._subscriptions.filter(sub => sub != subscription && sub.subscriber != subscription && sub.subscriber.$publish != subscription)
-    }
 
     $touch(subscriber: Subscriber<T>): void {
         //this._started = true
@@ -479,16 +439,31 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
 
 //            const uidFunc = this._uidFunc || defaultUidFunc
 
-            for (let k in this._entries) {
-                let uid = this._entries[k].$uid// (this._entries[k] as Axle<any>)._uid// uidFunc(this._entries[k].$value) //(this._entries[k] as Value<any>).$uid
-                if (uid === undefined) {
-                    uid = this._uidFunc(this._entries[k].$value)
+            // prevMap составляем только на основе индексированных значений, чтобы значения свойтв (length)
+            // не перекрывали ключи
+            newValue.forEach((v, k) => {
+                if (k in this._entries) {
+                    let uid = this._entries[k].$uid// (this._entries[k] as Axle<any>)._uid// uidFunc(this._entries[k].$value) //(this._entries[k] as Value<any>).$uid
                     if (uid === undefined) {
-                        uid = k
+                        uid = this._uidFunc(this._entries[k].$value)
+                        if (uid === undefined) {
+                            uid = String(k)
+                        }
                     }
+                    prevMap[uid] = this._entries[k]    
                 }
-                prevMap[uid] = this._entries[k]
-            }
+            })
+
+            // for (let k in this._entries) {
+            //     let uid = this._entries[k].$uid// (this._entries[k] as Axle<any>)._uid// uidFunc(this._entries[k].$value) //(this._entries[k] as Value<any>).$uid
+            //     if (uid === undefined) {
+            //         uid = this._uidFunc(this._entries[k].$value)
+            //         if (uid === undefined) {
+            //             uid = k
+            //         }
+            //     }
+            //     prevMap[uid] = this._entries[k]
+            // }
 
 //            console.log(this._key, prevMap)
     
@@ -530,6 +505,7 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
                     // ?
                     if (entry._destroyed) {
                         console.log('Entry restored', entry)
+                        entry._subscriptions.length > 0 && console.error('Restored entry has subscriptions', entry)
                         entry._destroyed = false
                     }
                 }
@@ -545,22 +521,24 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
         this._entries = nextEntries
 
         for (let i in prevMap) {
+
+            const removed = prevMap[i]
+
             // замененные элементы
             if (i in nextEntries) {
                 console.log('replaced', prevMap[i])
             }
             else {
-                const removed = prevMap[i]
                 if (i != removed._key) {
-                    console.warn('removed and changed key', i, removed._key, removed)
+                    console.warn('removed and changed key', i, removed._key, removed.$uid, removed)
                     console.log(prevMap)
                 }
 
-                if (removed._subscriptions.length > 0) {
-                    this._entries[String(removed._key)] = removed
-//                    removed._destroyed = true
-                    continue
-                }
+//                 if (removed._subscriptions.length > 0) {
+//                     this._entries[String(removed._key)] = removed
+// //                    removed._destroyed = true
+//                     continue
+//                 }
 
                 console.log('removed', removed._key, removed._memoValue)
             }
@@ -625,9 +603,9 @@ export abstract class Node<T, E=any> extends EventNode<E> implements ValueNode<T
     //     return _update_engine._commited.has(this)
     // }
 
-    get $subscriptions () {
-        return this._subscriptions
-    }
+    // get $subscriptions () {
+    //     return this._subscriptions
+    // }
 }
 
 

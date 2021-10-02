@@ -2,6 +2,7 @@ import { Engine } from "../engine";
 import { Keyed } from "../Hub";
 import { EMPTY, EventBus, Handler, Observable, ObservableValue, PublishFunc, Subscriber, Subscription } from "../value";
 import { EventNode } from "../value/bus";
+import { PubSub } from "../value/pubsub";
 import { Dom, Renderer } from "./utils";
 
 
@@ -19,17 +20,17 @@ import { Dom, Renderer } from "./utils";
 // }
 
 
-export class DomNode<T=unknown, E=unknown> extends EventNode<E> implements Observable<T>, Dom {
+export class DomNode<T=unknown, E=unknown> extends PubSub<T, E> implements Dom {
 
     _ref: Function
     _el: T
-    _subscriptions: Subscription[]
+//    _subscriptions: Subscription[]
     _effects: Function[]
 
     constructor (renderer: Renderer) {
         super(renderer.events)
 
-        this._subscriptions = []
+//        this._subscriptions = []
         this._effects = []
     }
 
@@ -66,35 +67,35 @@ export class DomNode<T=unknown, E=unknown> extends EventNode<E> implements Obser
     //     return true
     // }
 
-    $subscribe(subscriber: Subscriber<T>|PublishFunc<T>): Subscription {
+    // $subscribe(subscriber: Subscriber<T>|PublishFunc<T>): Subscription {
         
-        // проверяем, что такая подписка уже есть
-        for (let sub of this._subscriptions) {
-            if (sub.subscriber == subscriber || sub.subscriber.$publish == subscriber) {
-                return sub
-            }
-        }    
+    //     // проверяем, что такая подписка уже есть
+    //     for (let sub of this._subscriptions) {
+    //         if (sub.subscriber == subscriber || sub.subscriber.$publish == subscriber) {
+    //             return sub
+    //         }
+    //     }    
 
-        if (typeof subscriber === 'function') {
-            subscriber = {
-                $publish: subscriber
-            }
-        }
+    //     if (typeof subscriber === 'function') {
+    //         subscriber = {
+    //             $publish: subscriber
+    //         }
+    //     }
 
-        const sub: Subscription = {
-            subscriber,
-            observable: this
-        }
+    //     const sub: Subscription = {
+    //         subscriber,
+    //         observable: this
+    //     }
 
-        this._subscriptions.push(sub)
+    //     this._subscriptions.push(sub)
 
 
-        return sub
-    }
+    //     return sub
+    // }
 
-    $unsubscribe(subscription: Subscription|Subscriber<T>|PublishFunc<T>): void {
-        this._subscriptions = this._subscriptions.filter(sub => sub != subscription && sub.subscriber != subscription && sub.subscriber.$publish != subscription)
-    }
+    // $unsubscribe(subscription: Subscription|Subscriber<T>|PublishFunc<T>): void {
+    //     this._subscriptions = this._subscriptions.filter(sub => sub != subscription && sub.subscriber != subscription && sub.subscriber.$publish != subscription)
+    // }
 
     $publish(next: any, prev?: any, keys?: {[key: string]: any}): void {
         this._el = next
@@ -102,6 +103,12 @@ export class DomNode<T=unknown, E=unknown> extends EventNode<E> implements Obser
     }
 
     $touch(subscriber: Subscriber<T>): void {
+//        console.log('dom value', this._el)
+        subscriber.$publish(this._el, undefined, EMPTY)
+
+        // if (this._el) {
+        //     console.log('dom value already initialized')
+        // }
 //        throw new Error("Method not implemented.");
     }
 

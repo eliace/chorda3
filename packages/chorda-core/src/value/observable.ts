@@ -185,10 +185,24 @@ export const proxify = <T>(obj: T, node: ValueSet<T>) : ValueSet<T>&T => {
 //                 return (target.$value as any)[name]
 //             }
 
+            if (target.$is(IsCheck.ARRAY)) {
+                if (name == 'splice') {
+                    const v = target.$value as any
+                    return (...args: any) => {
+//                        debugger
+                        const out = v[name].apply(v, args)
+                        target.$value = v
+                        return out
+                    }
+                }
+            }
+
+
             if (target.$has(name, HasCheck.METHOD)) {
                 const v = target.$value as any
                 return v[name].bind(v)//proxy)
             }
+
 
 
             // if (!target.$has(name)) {

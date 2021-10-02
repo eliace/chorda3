@@ -1,4 +1,4 @@
-import { Value, EventBus, Subscription, ObservableValue, Handler, spySubscriptions, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable, Thenable, isCallable } from './value'
+import { Value, EventBus, Subscription, ObservableValue, Handler, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable, Thenable, isCallable, spySubscriptions } from './value'
 import { Engine } from './engine'
 import { MixRules, mixin } from './mix'
 import { ownTask, Pipe, Scheduler } from './pipe'
@@ -231,7 +231,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 //    _Injectors: Injectors<any> = null
 
 
-    constructor (options: O, context: S, initScope: any = null) {
+    constructor (options: O, context: S = null, initScope: any = null) {
 
         this.options = {} as O
 
@@ -439,32 +439,32 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         let newSubscriptions: Subscription[] = []
         let newHandlers: Handler<any>[] = []
 
-        // Injectors
-        if (optPatch.injections) {
-            // здесь мы должны обновлять измененные инжекторы
+        // // Injectors
+        // if (optPatch.injections) {
+        //     // здесь мы должны обновлять измененные инжекторы
 
-            // this._Injectors = o.injections
-            // for (let k in o.injections) {
-            //     this.scope[k]
-            //     // const injector: Injector<any> = o.injections[k]
-            //     // if (injector !== undefined) {
-            //     //     let entry = null
-            //     //     if (typeof injector === 'function') {
-            //     //         entry = injector(this.scope)
-            //     //     }
-            //     //     else if (injector != null) {
-            //     //         console.warn('Injector must be a function', k, injector)
-            //     //         continue
-            //     //     }
+        //     // this._Injectors = o.injections
+        //     // for (let k in o.injections) {
+        //     //     this.scope[k]
+        //     //     // const injector: Injector<any> = o.injections[k]
+        //     //     // if (injector !== undefined) {
+        //     //     //     let entry = null
+        //     //     //     if (typeof injector === 'function') {
+        //     //     //         entry = injector(this.scope)
+        //     //     //     }
+        //     //     //     else if (injector != null) {
+        //     //     //         console.warn('Injector must be a function', k, injector)
+        //     //     //         continue
+        //     //     //     }
 
-            //     //     if (this.scope[k] != entry) {
-            //     //         // TODO здесь нужно отписываться от элемента скоупа 
-            //     //         this.scope[k] = entry
-            //     //     }
-            //     // }
-            // }
-            // this._Injectors = null
-        }
+        //     //     //     if (this.scope[k] != entry) {
+        //     //     //         // TODO здесь нужно отписываться от элемента скоупа 
+        //     //     //         this.scope[k] = entry
+        //     //     //     }
+        //     //     // }
+        //     // }
+        //     // this._Injectors = null
+        // }
 
 
         // Joints
@@ -586,6 +586,9 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
         // освежаем реакции
 //        noAutoTerminal(() => {
+        // if (newSubscriptions.length) {
+        //     console.log('new subscriptions', newSubscriptions)
+        // }
             for (let sub of newSubscriptions) {
                 if (sub == null) {
                     console.error('Undefined subscription')
@@ -668,20 +671,24 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
             disjointPromise.then(() => {
                 // завершаем удаление, только если статус на удалении
                 if (this.state == State.Destroying) {
-                    this.scope = null
 
                     deferred && deferred()
-    
-                    this.state = State.Destroyed    
+
+                    this.scope = null
+                    
+                    this.state = State.Destroyed
+
+                    console.log('Delayed destroy done')
                 }
              }, (err) => {
                 console.log('Delayed destroy fail', err)
              })
         }
         else {
-            this.scope = null
 
             deferred && deferred()
+
+            this.scope = null
 
             this.state = State.Destroyed            
         }

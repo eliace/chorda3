@@ -31,7 +31,7 @@ class ReactRenderer2 extends AsyncEngine implements Renderer, VNodeFactory {
     schedule () {
         this.scheduled = true
         requestAnimationFrame(() => {
-            console.log('[react] render start')
+//            console.log('[react] render start')
             this.scheduled = false
 
             this.processing = true
@@ -43,14 +43,14 @@ class ReactRenderer2 extends AsyncEngine implements Renderer, VNodeFactory {
 
             this.roots.forEach((root, i) => {
                 ReactDOM.render(rendered[i], root.el, () => {
-                    console.log('[react] dom ready')
+//                    console.log('[react] dom ready')
 
                     tasks
                         .filter(ownTaskFilter(this))
                         .filter(subscriptionTaskFilter(this.subscriptions))
                         .filter(unknownTaskFilter(this.subscriptions))
 
-                    console.log('[react] render end')                    
+                    console.log('[react] render end', tasks.length)                    
                 })
             })
 

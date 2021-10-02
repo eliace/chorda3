@@ -46,7 +46,8 @@ export class IterableNode<T, K extends keyof T=keyof T> extends Node<T> implemen
 //        console.log('each')
         const origin = (this._origin as ValueSet<T>) //|| this//(this as ValueSet<T>)
         const v = origin.$value
-//        console.log('each', v)
+        // console.log('each', v)
+        // console.log('each', (origin as any)._entries)
         for (let i in v) {
             f(origin.$at(i) as any, i) // FIXME
         }

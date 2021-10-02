@@ -1,6 +1,6 @@
 import { expect } from "chai"
 import { defaultHtmlFactory, defaultLayout, EventBus, Gear, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, observable, patch, Value } from "../src"
-import { attachRoot, createPatchScheduler, createRenderScheduler, defaultVNodeFactory, immediateRender, immediateTick } from "./utils"
+import { attachRoot, createPatchScheduler, createRenderScheduler, immediateRender, immediateTick } from "./utils"
 
 
 
@@ -12,7 +12,7 @@ const createHtml = <D, E=unknown, H=any>(o: HtmlOptions<D&HtmlScope, E, H>) : Ht
         $pipe: null,
         $defaultFactory: defaultHtmlFactory,
         $defaultLayout: defaultLayout,
-        $vnodeFactory: defaultVNodeFactory
+//        $vnodeFactory: defaultVNodeFactory
     })
     // s.scope.$engine.chain(s.scope.$renderer)
 

@@ -344,5 +344,14 @@ describe('observable', () => {
     })
 
 
+    // it ('Should not update not indexed entries', () => {
+
+    //     const arr = observable([1,2,5], (v) => v)
+    //     const l = arr.length
+
+
+
+    // })
+
 
 })

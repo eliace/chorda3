@@ -5,6 +5,8 @@
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
+    "clean": "rm -rf lib-umd lib",
+    "build": "npm run clean && tsc && webpack",
     "test": "mocha -r ts-node/register tests/**/*.test.ts",
     "test:pipe": "mocha -r ts-node/register tests/Pipe.test.ts",
     "test:value": "mocha -r ts-node/register tests/Value/*.test.ts",

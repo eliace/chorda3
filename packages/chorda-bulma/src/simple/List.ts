@@ -1,4 +1,4 @@
-import { HtmlBlueprint, HtmlScope, Injector, mix, observable, patch } from "@chorda/core";
+import { Blueprint, HtmlBlueprint, HtmlScope, InferBlueprint, Injector, mix, observable, patch } from "@chorda/core";
 
 
 export type ListScope = {
@@ -40,16 +40,17 @@ export type ListItemScope = {
 
 type ListItemProps<T> = {
     css?: string
-    text: string
+    text?: string
     text$?: Injector<T>
+    as?: Blueprint<T>
 }
 
-export const ListItem = <T>(props: ListItemProps<T&ListItemScope>) : HtmlBlueprint<T> => {
+export const ListItem = <T>(props: ListItemProps<T&ListItemScope>) : InferBlueprint<T> => {
     return mix<ListItemScope>({
         reactions: {
             text: (v) => patch({text: v})
         }
-    }, props && {
+    }, props.as, props && {
         css: props.css,
         text: props.text,
         injections: {

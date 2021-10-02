@@ -29,6 +29,9 @@ export const Text = <T>(props: TextProps<T&TextScope>) : InferBlueprint<T> => {
         },
     }, {
         css: props.css,
+        initials: {
+            text: () => props.text
+        },
         injections: {
             text: props.text$
         },

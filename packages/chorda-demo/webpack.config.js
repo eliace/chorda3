@@ -74,7 +74,6 @@ module.exports = {
             '@chorda/engine': path.resolve('../chorda-engine/src'),
             '@chorda/core': path.resolve('../chorda-core/src'),
             '@chorda/inferno': path.resolve('../chorda-inferno/src'),
-            'demo': path.resolve('./src'),
         }
     },
     plugins: [

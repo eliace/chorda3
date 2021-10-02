@@ -299,6 +299,8 @@ describe ('Gear', () => {
             g.items[1].destroy()
 
             expect(g.items.length).to.eq(2)
+            expect(g.items[0].index).to.eq(0)
+            expect(g.items[1].index).to.eq(1)
         })
 
         it ('Should create item with defaultOptions', () => {

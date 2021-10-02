@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+      "baseUrl": "../",
+      "paths": {
+        "@chorda/react": ["chorda-react/src"],
+        "@chorda/engine": ["chorda-engine/src"],
+        "@chorda/core": ["chorda-core/src"]
+        }
+    }
+}

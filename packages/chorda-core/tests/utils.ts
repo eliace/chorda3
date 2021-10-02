@@ -87,13 +87,16 @@ type RenderRoot = {
 }
 
 
-class TestRenderer extends BufferedEngine implements Renderer {
+class TestRenderer extends BufferedEngine implements Renderer, VNodeFactory {
 
     roots: RenderRoot[]
 
     constructor () {
         super()
         this.roots = []
+    }
+    isAttached(node: Renderable): boolean {
+        throw new Error("Method not implemented.")
     }
     
     attach(el: Element, node: Renderable): void {
@@ -114,6 +117,23 @@ class TestRenderer extends BufferedEngine implements Renderer {
         }
 
         this.flush()
+    }
+
+    createVNode <P, H extends HtmlProps>(key: string, vnodeProps: P, htmlProps: Dom&H, children?: any[]) : any {
+        const props: any = {...vnodeProps}
+        if (key != null) {
+            props.key = key
+        }
+        Object.keys(htmlProps).filter(k => k[0] != '_').forEach(k => {
+            props[k] = (htmlProps as any)[k]
+        })
+        // if (elRef != null) {
+        //     props.elRef = elRef
+        // }
+        if (children != null) {
+            props.children = children
+        }
+        return props
     }
 
 }
@@ -202,19 +222,3 @@ export const immediateRender = () => {
     _testRenderer.render()
 }
 
-export const defaultVNodeFactory: VNodeFactory = <P, H extends HtmlProps>(key: string, vnodeProps: P, htmlProps: Dom&H, children?: any[]) : any => {
-    const props: any = {...vnodeProps}
-    if (key != null) {
-        props.key = key
-    }
-    Object.keys(htmlProps).filter(k => k[0] != '_').forEach(k => {
-        props[k] = (htmlProps as any)[k]
-    })
-    // if (elRef != null) {
-    //     props.elRef = elRef
-    // }
-    if (children != null) {
-        props.children = children
-    }
-    return props
-}

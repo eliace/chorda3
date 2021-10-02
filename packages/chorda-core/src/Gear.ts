@@ -97,18 +97,19 @@ export const isGear = (obj: any) : obj is Gear => {
 export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends GearOptions<D, E>=GearOptions<D, E>, B extends GearBlueprint<D, E>=GearBlueprint<D, E>> extends Hub<D, E, S, O> {
 
 //    containers: {[k: string]: ComponentCollection<B>|ItemCollection<B>}
-    index: number
-    key: string
-    parent: this
+    index?: number
+    key?: string
+    parent?: this
     components: {[k: string]: Gear<D>}
     items: Gear<D>[]
-    uid: string | number | symbol
+    uid?: string | number | symbol
 
     constructor (options: O, context?: S, scope?: any) {
         super(options, context, scope)
 
         this.components = {}
         this.items = []
+        
     }
 
     patch (optPatch: O) {
@@ -413,6 +414,11 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
 
     removeIndexed (idx: number) {
         this.items.splice(idx, 1)
+        this.items.forEach(itm => {
+            if (itm.index > idx) {
+                itm.index--
+            }
+        })
     }
 
     syncIndexed (next: Mixed<B>[] | IterableValue<any>) {
@@ -478,6 +484,9 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
                         i--
                         item = null
                     }
+                    // else {
+                    //     debugger
+                    // }
 //                        console.log('del', i, itm.key)
                 }
                 else {
@@ -525,6 +534,8 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
 
         super.destroy(() => {
 
+            deferred && deferred()
+
             if (this.parent) {
                 if (this.key) {
                     this.parent.removeKeyed(this.key)
@@ -547,8 +558,6 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
             delete this.index
             this.items = []
             this.components = {}
-
-            deferred && deferred()
         })
 
     }
