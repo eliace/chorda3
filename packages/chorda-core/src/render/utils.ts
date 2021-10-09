@@ -11,7 +11,7 @@ export interface Dom {
 //    readonly $ref: Function
     readonly $eventHandlers: Keyed<Function>
     readonly $isSubscribed: boolean
-    $nextFrame (el: HTMLElement) : void
+//    $nextFrame (el: HTMLElement) : void
 }
 
 

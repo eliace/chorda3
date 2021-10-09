@@ -107,7 +107,8 @@ export const EVENT_MAP : Keyed<string> = {
     focus: 'onFocus',
     blur: 'onBlur',
     keyUp: 'onKeyUp',
-    keyDown: 'onKeyDown'
+    keyDown: 'onKeyDown',
+    submit: 'onSubmit',
 }
 
 export type DomEvents = {
@@ -119,6 +120,7 @@ export type DomEvents = {
         blur: () => React.FocusEvent
         keyUp: () => React.KeyboardEvent
         keyDown: () => React.KeyboardEvent
+        submit: () => React.FormEvent
     }
 }
 

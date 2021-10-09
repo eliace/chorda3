@@ -115,7 +115,13 @@ class ComputableNode<T> extends ObservableNode<T> implements Computable {
             return
         }
 
-        let computed: any = this.$compute()
+        let computed: any = undefined
+        try {
+            computed = this.$compute()
+        }
+        catch (err) {
+            console.error('Compute error', err)
+        }
 
         if (computed && typeof (computed as ValueSet<any>).$at === 'function') {
             computed = computed.$value

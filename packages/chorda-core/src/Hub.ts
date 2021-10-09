@@ -1,5 +1,4 @@
-import { Value, EventBus, Subscription, ObservableValue, Handler, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable, Thenable, isCallable, spySubscriptions } from './value'
-import { Engine } from './engine'
+import { Value, EventBus, Subscription, ObservableValue, Handler, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable, Thenable, isCallable, spySubscriptions, isValueSet } from './value'
 import { MixRules, mixin } from './mix'
 import { ownTask, Pipe, Scheduler } from './pipe'
 
@@ -56,7 +55,7 @@ type MethodsAndObjectsOf<D> = {
 }
 
 export type MethodsOf<D> = {
-    [P in keyof D as D[P] extends ((...args: any[]) => any) ? P : never]?: D[P]// extends (...args: any[]) => any ? D[P] : never
+    [P in keyof D as D[P] extends ((...args: any) => any) ? P : never]?: D[P]// extends (...args: any[]) => any ? D[P] : never
 }
 
 
@@ -102,7 +101,12 @@ for (let k in l2) {
 }
 */
 
-export type Listener<D, R> = (event: R, scope: EventScoped<D>) => boolean | unknown
+type AsyncListeners<D, R> = {
+    done?: Listener<D, R>
+    fail?: Listener<D, any>
+}
+
+export type Listener<D, R> = (event: R, scope: EventScoped<D>) => boolean | unknown //) | AsyncListeners<D, R>
 
 // Scope bindings
 
@@ -193,6 +197,35 @@ const scopeKeyAware = (key: string|symbol, fn: Function) => {
 }
 
 
+interface MonitoredThenable extends Thenable {
+    isPending: boolean
+    isDone: boolean
+    isFailed: boolean
+}
+
+const createMonitoredThenable = (thenable: Thenable) : Thenable => {
+    const monitored = thenable.then((v: unknown) => {
+        mt.isDone = true
+        mt.isPending = false
+        return v
+    }, (v: unknown) => {
+        mt.isFailed = true
+        mt.isPending = false
+        return v
+    })
+    const mt : MonitoredThenable = {
+        isPending: true,
+        isFailed: false,
+        isDone: false,
+        then: (resolve: Function, reject?: Function) => monitored.then(resolve, reject)
+    }
+    return mt
+}
+
+const isMonitoredThenable = (v: any) : v is MonitoredThenable => {
+    return (v as MonitoredThenable).then != null
+}
+
 // export const _iterator = <T extends []|{}>(source: T) : ValueIterator<T> => {
 //     if (_ScopeKey == null) {
 //         console.warn('Scope key not detected')
@@ -217,7 +250,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
     subscriptions: Subscription[]
     handlers: Handler<any>[]
-    joints: any[]
+    joints: (MonitoredThenable|Function)[]
 
     // TODO по сути здесь флаги
     bindings: {[key: string]: Function}
@@ -317,10 +350,20 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 //                }
 
 
-                if (!isInjected && prop < PropState.Initial && initScope && initScope[p] != null) {
-                    _InjectProps[String(p)] = PropState.Initial
-                    target[p] = initScope[p]
-                    isInjected = true
+                if (!isInjected && prop < PropState.Initial && initScope) {
+//                    console.log('--- check initial ---', p)
+                    let hasProp = false
+                    if (isValueSet(initScope)) {
+                        hasProp = initScope.$has(p) && initScope.$at(p).$value != null
+                    }
+                    else if (initScope[p] != null) {
+                        hasProp = true
+                    }
+                    if (hasProp) {
+                        _InjectProps[String(p)] = PropState.Initial
+                        target[p] = initScope[p]
+                        isInjected = true
+                    }
                 }
 
 
@@ -473,7 +516,10 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
             const subscriptions = spySubscriptions(() => {
                 noAutoTerminal(() => {
                     for (let k in o.joints) {
-                        const joint = o.joints[k].call(this, this.scope)
+                        let joint = o.joints[k].call(this, this.scope)
+                        if (joint && (joint as Thenable).then) {
+                            joint = createMonitoredThenable(joint)
+                        }
                         this.joints.push(joint)
                         // for (let i in o.joints[k]) {
                         //     if (o.joints[k][i]) {
@@ -624,14 +670,14 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         // обрабатываем хуки отключения скоупа
         let disjointPromise = null
         if (this.joints.length > 0) {
-            const promises = []
+            const promises: Thenable[] = []
             for (let disjoint of this.joints) {
                 if (disjoint) {
-                    if ((disjoint as Thenable).then) {
+                    if (isMonitoredThenable(disjoint)) {
                         debugger
-                        promises.push(disjoint)
+                        disjoint.isPending && promises.push(disjoint)
                     }
-                    else {
+                    else if (typeof disjoint === 'function') {
                         const eff = disjoint()
                         if (eff && (eff as Thenable).then) {
                             promises.push(eff)

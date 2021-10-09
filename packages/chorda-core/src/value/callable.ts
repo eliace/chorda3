@@ -8,6 +8,12 @@ export interface Callable {
     $call (thisArg: any, args: any[]) : any
 }
 
+export type CallableEvents<R> = {
+    done: () => R
+    fail: () => any
+    wait: () => void
+}
+
 
 class _Node<T, E> extends Node<T, E> {
 
@@ -44,15 +50,22 @@ class CallableNode<T extends Function, E=any> extends Function implements Value<
     }
 
     $call(thisArg: any, args: any[]) {
-        let result = this._memoValue ? this._memoValue.apply(thisArg, args) : args[0]
+        if (this._memoValue == null) {
+            console.warn('Possible uninitialized callable', args)
+        }
+        let result = this._memoValue != null ? this._memoValue.apply(thisArg, args) : args[0]
         if (isValueSet(result)) {
             result = result.$value
         }
         if (result && (result as Thenable).then) {
+            this.$emit('wait')
             result = result.then((response: any) => {
                 this.$emit('done', response)
 //                this.$publish(response)
                 return response
+            }, (fail: any) => {
+                this.$emit('fail', fail)
+                return fail
             })
         }
         else {

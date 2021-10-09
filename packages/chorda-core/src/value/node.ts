@@ -1,7 +1,6 @@
 import { Observable, Value, Subscriber, EventBus, Subscription, PublishFunc, defaultUidFunc, EMPTY} from './utils'
-import { EventNode } from './bus'
 import { closeTransaction, commitEngine, currentTransaction, openTransaction } from './engine'
-import { LifecycleProvider, SubscriptionProvider } from '.'
+import { LifecycleProvider, SubscriptionProvider } from './utils'
 import { PubSub } from './pubsub'
 
 export type UidFunc<I=any> = (value: I) => string

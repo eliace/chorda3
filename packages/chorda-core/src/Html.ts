@@ -1,5 +1,4 @@
-import { Scheduler } from '.'
-import { Engine } from './engine'
+import { Scheduler, State } from '.'
 import { defaultInitRules, defaultPatchRules, Gear, GearEvents, GearOptions, GearScope } from './Gear'
 import { Keyed, NoInfer, Stateable } from './Hub'
 import { Mixed, mixin, MixRules } from './mix'
@@ -125,7 +124,7 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
         if (optPatch.html) {
             dom.html = o.html
         }
-        if (optPatch.tag) {
+        if (optPatch.tag != null) {
             dom.tag = o.tag
         }
 
@@ -174,6 +173,10 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
 
     render (asRoot?: boolean) : any {
 
+        if (this.state == State.Destroyed) {
+            return null
+        }
+
         if (!asRoot && this.isRoot) {
             return null
         }
@@ -197,13 +200,24 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
         // }
 
         if (text || children.length > 0) {
-            this.vnode = layout(factory, key, this.options.dom, dom, text ? [text, ...children] : children)
+            let childrenAndText = children
+            if (text) {
+                childrenAndText = [...children]
+                const i = children.findIndex(c => c.options.weight && c.options.weight > 0)
+                if (i == -1) {
+                    childrenAndText.push(text as any)
+                }
+                else {
+                    childrenAndText.splice(i, 0, text as any)
+                }
+            }
+            this.vnode = layout(factory, key, this.options.dom, dom, childrenAndText)
         }
         else {
             this.vnode = layout(factory, key, this.options.dom, dom)
         }
 
-        (dom as any).$applyEffects(this.scope.$renderer)
+//        (dom as any).$applyEffects(this.scope.$renderer)
 
         this.dirty = false
 
@@ -224,9 +238,15 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
                     html.dirty = true
         //            if (!html.parent) {
                     if (html.isRoot) {
+                        if (this.state == State.Destroying) {
+                            // отложенное удаление планируем в ближайший кадр, чтобы удаленный элемент как можно скорее пропал из VDOM
+                            html.scope.$renderer.publish(html.scope.$renderer.task(null))
+                        }
+                        else {
+                            // немедленное удаление синхронизируем с патчами, чтобы избежать "моргания"
+                            html.scope.$engine.publish(html.scope.$renderer.task(null))
+                        }
         //                debugger
-                        // планируем перерисовку в ближайший кадр, чтобы удаленный элемент как можно скорее пропал из VDOM
-                        html.scope.$renderer.publish(html.scope.$renderer.task(null))
         //                break
                     }
                     html = html.parent

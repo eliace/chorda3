@@ -220,6 +220,7 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
         const compOpts = mixin(defaultComponent, template, blueprint).build(this.initRules())
 
         if (compOpts) {
+//            console.log('addKeyed', key, compOpts)
 //            console.log(scope)
             const comp = (componentFactory || this.scope.$defaultFactory)(compOpts, this.scope, scope)
             comp.key = key
@@ -471,7 +472,7 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
                 let item: Gear<D> = null
                 if (itm.op == ItemOp.ADD) {
                     const v = itm.value
-                    item = this.addIndexed({} as B, i, {[key]: v})
+                    item = this.addIndexed({} as B, i, key ? {[key]: v} : v)
                     item.uid = itm.key// v.$uid
 //                        console.log('add', i, itm.key)//v.$uid)
                 }

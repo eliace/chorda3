@@ -194,9 +194,9 @@ export const watch = <T>(f: PublishFunc<T>, objects: any[]) => {
 //     spyGetters(sub).forEach(o => o.$subscribe(sub))
 // }
 
-export const done = <T, R>(c: any, f: Listener<T, R>) => {
-    (c as EventBus<T>).$on('done', f)
-}
+// export const done = <T, R>(c: any, f: Listener<T, R>) => {
+//     (c as EventBus<T>).$on('done', f)
+// }
 
 
 

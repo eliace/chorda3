@@ -1,7 +1,5 @@
-import { Engine } from "../engine";
 import { Keyed } from "../Hub";
 import { EMPTY, EventBus, Handler, Observable, ObservableValue, PublishFunc, Subscriber, Subscription } from "../value";
-import { EventNode } from "../value/bus";
 import { PubSub } from "../value/pubsub";
 import { Dom, Renderer } from "./utils";
 
@@ -116,21 +114,21 @@ export class DomNode<T=unknown, E=unknown> extends PubSub<T, E> implements Dom {
 
     }
 
-    $nextFrame (el: HTMLElement) {
+    // $nextFrame (el: HTMLElement) {
 
-    }
+    // }
 
-    get $effects () {
-        return this._effects
-    }
+    // get $effects () {
+    //     return this._effects
+    // }
 
-    $addEffect (fn: Function) {
-        this._effects.push(fn)
-    }
+    // $addEffect (fn: Function) {
+    //     this._effects.push(fn)
+    // }
 
-    $applyEffects (engine: Engine<unknown>) {
-        this._effects.forEach(eff => engine.scheduleTask(eff))
-        this._effects = []
-    }
+    // $applyEffects (engine: Engine<unknown>) {
+    //     this._effects.forEach(eff => engine.scheduleTask(eff))
+    //     this._effects = []
+    // }
 
 }

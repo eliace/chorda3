@@ -83,7 +83,7 @@ export class AsyncEngine<T extends Task = Task> implements Scheduler<T> {
             this.processing = false
 
             const t1 = performance.now()
-            console.log(`[${this.name}] patched`, tasks.length, Math.round(t1 - t0), avgTimeInterval(t0, t1, tasks.length)/*, deleted ? '-'+deleted : ''*/)
+            console.log(`[${this.name}] patch end`, tasks.length, Math.round(t1 - t0), avgTimeInterval(t0, t1, tasks.length)/*, deleted ? '-'+deleted : ''*/)
         })
     }
 

@@ -8,17 +8,25 @@ let _AutoTerminal = false
 export const autoTerminalAware = (fn: Function) : any => {
     const prevAutoTermial = _AutoTerminal
     _AutoTerminal = true
-    const result = fn()
-    _AutoTerminal = prevAutoTermial
-    return result
+    try {
+        const result = fn()
+        return result    
+    }
+    finally {
+        _AutoTerminal = prevAutoTermial
+    }
 }
 
 export const noAutoTerminal = (fn: Function) : any => {
     const prevAutoTermial = _AutoTerminal
     _AutoTerminal = false
-    const result = fn()
-    _AutoTerminal = prevAutoTermial
-    return result
+    try {
+        const result = fn()
+        return result
+    }
+    finally {
+        _AutoTerminal = prevAutoTermial
+    }
 }
 
 export const isAutoTerminal = () => _AutoTerminal
