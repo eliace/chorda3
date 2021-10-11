@@ -2,3 +2,6 @@ node_modules
 .cache
 dist
 .vscode
+.DS_Store
+lib
+lib-umd
