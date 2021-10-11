@@ -18,6 +18,7 @@ export type FieldProps<T> = {
     addons?: Keyed<Blueprint<T>>
     expanded?: boolean
     color?: Color
+    as?: Blueprint<T>
 }
 
 
@@ -41,7 +42,9 @@ export const Field = <T>(props: FieldProps<T&FieldScope>): HtmlBlueprint<T> => {
                 css: 'control'
             }
         }
-    }, props && {
+    }, 
+    props?.as, 
+    props && {
         classes: {
             'has-addons': isAddons
         },

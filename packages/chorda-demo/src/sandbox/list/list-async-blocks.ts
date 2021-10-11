@@ -1,4 +1,4 @@
-import { computable, Html, HtmlBlueprint, HtmlScope, mix, mix2, observable, passthruLayout, Value } from "@chorda/core"
+import { computable, Html, HtmlBlueprint, HtmlScope, observable, passthruLayout, Value } from "@chorda/core"
 import { Field, Fields, RowLayout } from "chorda-bulma"
 import { TextInput } from "../../helpers"
 import { Tmdb } from "../../api"

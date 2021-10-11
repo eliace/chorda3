@@ -1,11 +1,11 @@
 {
-  "name": "chorda-core",
+  "name": "@chorda/core",
   "version": "3.0.0",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "scripts": {
-    "clean": "rm -rf lib-umd lib",
+    "clean": "rm -rf dist lib-umd lib",
     "build": "npm run clean && tsc && webpack",
     "test": "mocha -r ts-node/register tests/**/*.test.ts",
     "test:pipe": "mocha -r ts-node/register tests/Pipe.test.ts",

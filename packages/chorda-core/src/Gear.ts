@@ -431,6 +431,8 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
             const it = next
             const key = it.$name
 
+//            console.log('iterable', key, it)
+
             const prevItems: KVItem[] = []
             this.items.forEach(item => {
                 prevItems.push({

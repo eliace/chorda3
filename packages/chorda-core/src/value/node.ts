@@ -432,26 +432,39 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
     _updateEntries (newValue: any) {
 
         const nextEntries: {[key: string]: any} = {}
-        const prevMap: {[key: string]: Node<any>} = {}
+        const reuseMap: {[key: string]: Node<any>} = {}
     
         if (Array.isArray(newValue)) {
+
+            for (let k in this._entries) {
+                let uid = this._entries[k].$uid
+                if (uid == undefined) {
+                    uid = this._uidFunc(this._entries[k].$value)
+                    if (uid === undefined) {
+                        uid = String(k)
+                    }
+                }
+                reuseMap[uid] = this._entries[k]
+            }
+
+//            Object.assign(reuseMap, this._entries)
 
 //            const uidFunc = this._uidFunc || defaultUidFunc
 
             // prevMap составляем только на основе индексированных значений, чтобы значения свойтв (length)
             // не перекрывали ключи
-            newValue.forEach((v, k) => {
-                if (k in this._entries) {
-                    let uid = this._entries[k].$uid// (this._entries[k] as Axle<any>)._uid// uidFunc(this._entries[k].$value) //(this._entries[k] as Value<any>).$uid
-                    if (uid === undefined) {
-                        uid = this._uidFunc(this._entries[k].$value)
-                        if (uid === undefined) {
-                            uid = String(k)
-                        }
-                    }
-                    prevMap[uid] = this._entries[k]    
-                }
-            })
+            // newValue.forEach((v, k) => {
+            //     if (k in this._entries) {
+            //         let uid = this._entries[k].$uid// (this._entries[k] as Axle<any>)._uid// uidFunc(this._entries[k].$value) //(this._entries[k] as Value<any>).$uid
+            //         if (uid === undefined) {
+            //             uid = this._uidFunc(this._entries[k].$value)
+            //             if (uid === undefined) {
+            //                 uid = String(k)
+            //             }
+            //         }
+            //         reuseMap[uid] = this._entries[k]
+            //     }
+            // })
 
             // for (let k in this._entries) {
             //     let uid = this._entries[k].$uid// (this._entries[k] as Axle<any>)._uid// uidFunc(this._entries[k].$value) //(this._entries[k] as Value<any>).$uid
@@ -464,7 +477,7 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
             //     prevMap[uid] = this._entries[k]
             // }
 
-//            console.log(this._key, prevMap)
+//            console.log(this._key, Object.keys(reuseMap))
     
     //            const nextMap: {[key: string]: any} = {}
             newValue.forEach((v, i) => {
@@ -472,25 +485,27 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
                 if (uid === undefined) {
                     uid = String(i)
                 }
-                let entry = prevMap[uid] as Node<any>
+                let entry = reuseMap[uid] as Node<any>
                 if (entry) {
+//                    console.log('reuse entry', [entry._key, entry._uid], [i, uid])
                     nextEntries[i] = entry;
-                    entry._key = i;
+                    entry._key = String(i);
                     entry._uid = uid;
                     entry._memoValue = v;
-                    delete prevMap[uid]
+                    delete reuseMap[uid]
                 }
                 else {
-
                 }
 //                nextMap[uid] = v
             })
+
+//            console.log('rest reuse map', this._key, reuseMap)
 
 //            console.log(this._key, nextEntries)
 
         }
         else if (newValue && newValue.constructor === Object) {
-            Object.assign(prevMap, this._entries)
+            Object.assign(reuseMap, this._entries)
             for (let k in newValue) {
                 // const v = newValue[k]
                 // const uid = k//uidFunc(v)
@@ -499,7 +514,7 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
                     nextEntries[k] = entry;
                     entry._key = k;
                     entry._uid = k
-                    delete prevMap[k]
+                    delete reuseMap[k]
 
                     // ?
                     if (entry._destroyed) {
@@ -519,32 +534,37 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
 
         this._entries = nextEntries
 
-        for (let i in prevMap) {
+        for (let i in reuseMap) {
 
-            const removed = prevMap[i]
+            const removed = reuseMap[i]
 
             // замененные элементы
             if (i in nextEntries) {
-                console.log('replaced', prevMap[i])
+                console.log('replaced', reuseMap[i])
             }
             else {
                 if (i != removed._key) {
-                    console.warn('removed and changed key', i, removed._key, removed.$uid, removed)
-                    console.log(prevMap)
+                    console.warn('removed and changed key', i, removed._key, removed.$uid)//, removed)
+                    //console.log(prevMap)
                 }
 
-//                 if (removed._subscriptions.length > 0) {
-//                     this._entries[String(removed._key)] = removed
-// //                    removed._destroyed = true
-//                     continue
-//                 }
+                if (removed._subscriptions.length > 0) {
+                    if (this._entries[String(removed._key)]) {
+                        debugger
+                    }
+                    else {
+                        this._entries[String(removed._key)] = removed
+                    }
+//                    removed._destroyed = true
+                    continue
+                }
 
                 console.log('removed', removed._key, removed._memoValue)
             }
 
             const t = currentTransaction()
             if (t) {
-                t.deleted.push(prevMap[i])
+                t.deleted.push(reuseMap[i])
             }
 
 

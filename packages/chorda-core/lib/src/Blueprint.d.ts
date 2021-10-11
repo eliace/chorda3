@@ -1,0 +1,11 @@
+import { Html } from ".";
+import { HtmlBlueprint, HtmlOptions, HtmlScope } from "./Html";
+import { NoInfer } from "./Hub";
+import { Scheduler } from "./pipe";
+import { Renderer, VNodeFactory } from "./render";
+export declare type InferBlueprint<T, E = unknown, H = any> = HtmlBlueprint<T, E, H>;
+export declare type Blueprint<T, E = unknown, H = any> = InferBlueprint<NoInfer<T>, NoInfer<E>, H>;
+export declare const mix: <T, E = unknown>(...args: Blueprint<T, E, any>[]) => InferBlueprint<unknown>;
+export declare const createHtmlOptions: <T>(blueprint: InferBlueprint<T, unknown, any>) => HtmlOptions<any, any, any>;
+export declare const createHtmlContext: (patcher: Scheduler, renderer: Scheduler & Renderer & VNodeFactory) => HtmlScope;
+export declare const attach: (html: Html, el: () => Element) => void;

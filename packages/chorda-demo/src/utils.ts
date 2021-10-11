@@ -1,6 +1,6 @@
-import { autoTerminalAware, Blueprint, callable, Callable, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, ownTask, patch, pipe, PublishFunc, Scope, spyGetters, Value } from "@chorda/core"
-import { createPatchScheduler } from "@chorda/engine"
-import { createRenderScheduler, defaultVNodeFactory, DomEvents } from "@chorda/react"
+import { autoTerminalAware, Blueprint, callable, Callable, createHtmlContext, createHtmlOptions, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, ownTask, patch, pipe, PublishFunc, Scope, spyGetters, Value } from "@chorda/core"
+import { createAsyncPatcher } from "@chorda/engine"
+import { createReactRenderer, defaultVNodeFactory, DomEvents } from "@chorda/react"
 import { Transaction } from "chorda-core/src/value/engine"
 import { Route } from "router5"
 import * as vis from "vis-network"
@@ -23,32 +23,37 @@ const routes: Route[] = [
 
 export const createAppScope = () : HtmlScope => {
 
-    const engine = createPatchScheduler()
-    const renderer = createRenderScheduler()
+//     const engine = createAsyncPatcher()
+//     const renderer = createReactRenderer()
 
-    engine.subscribe(renderer)
-    //engine.chain(renderer)
+//     engine.subscribe(renderer)
+//     //engine.chain(renderer)
 
-    const scope : HtmlScope&AppScope = {
-        $renderer: renderer,
-        $engine: engine,
-        $pipe: pipe(engine, renderer),
-        $defaultFactory: defaultHtmlFactory,
-        $defaultLayout: defaultLayout,
-//        $vnodeFactory: defaultVNodeFactory,
-        router: null
-    }
+//     const scope : HtmlScope&AppScope = {
+//         $renderer: renderer,
+//         $engine: engine,
+//         $pipe: pipe(engine, renderer),
+//         $defaultFactory: defaultHtmlFactory,
+//         $defaultLayout: defaultLayout,
+// //        $vnodeFactory: defaultVNodeFactory,
+//         router: null
+//     }
 
-    useRouter(scope, (router) => {
+    const context: HtmlScope&RouterScope = {router: null, ...createHtmlContext(
+        createAsyncPatcher(),
+        createReactRenderer()
+    )}
+
+    useRouter(context, (router) => {
         router.setOption('defaultRoute', 'home')
         router.add(routes)
     })
 
-    return scope
+    return context
 }
 
 export const createAppOptions = () : HtmlOptions<unknown, unknown, any> => {
-    return App() as HtmlOptions<unknown, unknown, any>
+    return createHtmlOptions(App())
 }
 
 

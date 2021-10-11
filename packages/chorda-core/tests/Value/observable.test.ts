@@ -322,6 +322,8 @@ describe('observable', () => {
 
         v.$value = {} as any
 
+        console.log((v as any)._entries)
+
         expect((v as any)._entries['a']).is.undefined
         expect((v as any)._entries['b']).is.not.undefined
     })
@@ -340,6 +342,31 @@ describe('observable', () => {
         v.$value = null
 
         expect(size((v as any)._entries)).is.eq(0)
+
+    })
+
+
+
+    it ('Should remove array entries', () => {
+
+        const arr = observable([1, 2, 3, 4, 5], (v) => v)
+
+        arr.$at(0).$subscribe(() => {})
+        arr.$at(1).$subscribe(() => {})
+        arr.$at(2).$subscribe(() => {})
+        arr.$at(3).$subscribe(() => {})
+        arr.$at(4).$subscribe(() => {})
+
+
+        arr.$value = [3, 4, 5]
+
+        expect(arr.$value.length).to.be.eq(3)
+        expect((arr[0] as any)._key).to.be.eq('0')
+        expect((arr[1] as any)._key).to.be.eq('1')
+        expect((arr[2] as any)._key).to.be.eq('2')
+        expect((arr[0] as any)._memoValue).to.be.eq(3)
+        expect((arr[1] as any)._memoValue).to.be.eq(4)
+        expect((arr[2] as any)._memoValue).to.be.eq(5)
 
     })
 

@@ -8,11 +8,16 @@ module.exports = {
         app: './src/index.ts'
     },
     output: {
-        path: path.resolve(__dirname, 'lib-umd'),
-        library: 'Chorda',
-        libraryTarget: 'umd',
+        library: {
+            type: "umd",
+            name: "Chorda"
+        },
         filename: 'index.js',
-        umdNamedDefine: true
+        path: path.resolve(__dirname, 'lib-umd'),
+        // library: 'Chorda',
+        // libraryTarget: 'umd',
+        // filename: 'index.js',
+        // umdNamedDefine: true
     },
     module: {
         rules: [{

@@ -52,11 +52,11 @@ const routes: Route<Record<string, any>>[] = [
 export default () : InferBlueprint<AppScope, AppEvents> => {
     return withAuth(withRouter({
         joints: {
-            init: ({isAuth: isAuthenticated, navigate, login, register, pages, user, logout}) => {
+            init: ({isAuth, navigate, login, register, pages, user, logout}) => {
 
-                watch([isAuthenticated], () => {
+                watch([isAuth], () => {
                     // при потере аутентификации переходим на страницу логина
-                    if (!isAuthenticated.$value) {
+                    if (!isAuth.$value) {
                         const p = pages.$value
                         if (!(p.home || p.signIn || p.signUp || p.article)) {
                             navigate(Pages.SignIn)
@@ -73,6 +73,7 @@ export default () : InferBlueprint<AppScope, AppEvents> => {
                 }
 
                 logout.$value = () => {
+                    api.logout()
                     user.$value = {} as User
                 }
 
@@ -83,9 +84,6 @@ export default () : InferBlueprint<AppScope, AppEvents> => {
                 done: (u, {user}) => {
                     user.$value = u
                 },
-                fail: (e) => {
-//                    debugger
-                }
             },
             register: {
                 done: (u, {user}) => {

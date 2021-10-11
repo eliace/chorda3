@@ -105,7 +105,7 @@ const withAsyncImageLoad = <T, E>(props: Blueprint<T&AsyncImageLoadScope, E&Asyn
 
                 watch(() => {
                     // console.log('url changed to', IMAGE_PLACEHOLDER)
-                    // console.log('url to load', urlToLoad.$value)
+                    console.log('url to load', asyncUrl.$value)
                     // url.$value = IMAGE_PLACEHOLDER
                     onBeforeLoad()
                     if (asyncUrl.$value) {
@@ -274,7 +274,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                     })
                 ]
             },
-            images2: {
+            images: {
                 css: 'catapi-search',
                 templates: {
                     content: withList(<ListBlueprint<CatApi.SearchResult&{favourite: boolean}, SearchScope>>{
@@ -304,7 +304,14 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                                         icon: faHeart
                                     })
                                 })
-                            }
+                            },
+                            // joints: {
+                            //     debugItem: ({item}) => {
+                            //         watch(() => {
+                            //             console.log('update item', item.url)
+                            //         }, [item.url])
+                            //     }
+                            // }
                         }
                     })
                 }

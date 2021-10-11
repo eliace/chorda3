@@ -2,14 +2,14 @@ import { Blueprint, InferBlueprint, mix, patch } from "@chorda/core";
 import { IconDefinition } from "@fortawesome/fontawesome-common-types";
 
 
-type ControlIconsScope = {
+type FieldIconsScope = {
     leftIcon?: Blueprint<unknown>
     rightIcon?: Blueprint<unknown>
 }
 
 
-export const withControlIcons = <T, E>(props: Blueprint<T&ControlIconsScope, E>) : InferBlueprint<T, E> => {
-    return mix<ControlIconsScope>({
+export const withFieldIcons = <T, E>(props: Blueprint<T&FieldIconsScope, E>) : InferBlueprint<T, E> => {
+    return mix<FieldIconsScope>({
         templates: {
             control: {
                 css: 'control',

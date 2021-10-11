@@ -10,10 +10,11 @@ module.exports = {
     },
     output: {
         path: path.resolve(__dirname, 'lib-umd'),
-        library: 'ChordaEngine',
-        libraryTarget: 'umd',
+        library: {
+            type: 'umd',
+            name: 'ChordaEngine'
+        },
         filename: 'index.js',
-        umdNamedDefine: true
     },
     module: {
         rules: [{
@@ -26,14 +27,14 @@ module.exports = {
     },
     resolve: {
         extensions: ['.ts', '.js'],
-        alias: {
-            '@chorda/core': path.resolve('../chorda-core/src'),
-        }
+        // alias: {
+        //     '@chorda/core': 'chorda-core' //path.resolve('../chorda-core/src'),
+        // }
     },
     plugins: [
         /*new CompressionPlugin()*/
     ],
     externals: {
-        '@chorda/core': 'Chorda',
+        'chorda-core': 'common-js @chorda/core',
     }
 }

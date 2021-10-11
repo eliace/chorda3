@@ -1,12 +1,12 @@
 import { Blueprint, HtmlEvents, HtmlScope, InferBlueprint, mix, observable, pipe, Renderable } from "@chorda/core"
-import { createPatchScheduler } from "@chorda/engine"
+import { createAsyncPatcher } from "@chorda/engine"
 import { createInfernoRenderer } from "@chorda/inferno"
 import { watch } from "../../utils"
 
 
 
 const infernoRenderer = createInfernoRenderer()
-const infernoPatcher = createPatchScheduler('inferno')
+const infernoPatcher = createAsyncPatcher('inferno')
 
 
 export const withInferno = <T, E>(props: Blueprint<T, E>) : InferBlueprint<T, E> => {

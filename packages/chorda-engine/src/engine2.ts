@@ -68,6 +68,6 @@ export class PatchEngine extends AsyncEngine<Task<Stateable>> {
 
 
 
-export const createPatchScheduler = (name?: string) : Scheduler<Task<Stateable>> => {
+export const createAsyncPatcher = (name?: string) : Scheduler<Task<Stateable>> => {
     return new PatchEngine(name)
 }

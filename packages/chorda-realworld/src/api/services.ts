@@ -18,6 +18,9 @@ export const api = {
             throw err.errors
         })
     },
+    logout: () => {
+        saveToken(null)
+    },
     register: (username: string, email: string, password: string) : Promise<User> => {
         return post_no_auth('/users', {user: {username, email, password}})
             .then(response => response.user, err => {throw err.errors})

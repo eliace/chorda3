@@ -151,6 +151,8 @@ export const ProfilePage = () : InferBlueprint<ProfileScope&AuthScope> => {
         joints: {
             autoLoad: ({user, profile, selectedGroup, articles}) => {
 
+                profile.username = user.username
+
                 api.getProfile(user.username)
                     .then(data => {
                         profile.$value = data

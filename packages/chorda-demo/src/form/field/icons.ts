@@ -3,29 +3,29 @@ import { faCheck, faEnvelope, faExclamationTriangle, faUser } from "@fortawesome
 import { Color, Field, Icon } from "chorda-bulma"
 import { withBlueprint } from "../../utils"
 import { FaIcon, TextInput } from "../../helpers"
-import { withControlIcons } from "./with-icon"
+import { withFieldIcons } from "./with-icon"
 
 
 
 export default () : InferBlueprint<unknown> => {
     return {
         items: [
-            withControlIcons(withBlueprint({
-                injections: {
-                    leftIcon: () => FaIcon({icon: faUser}),
-                    rightIcon: () => FaIcon({icon: faCheck}),                    
-                },
-                as: Field({
-                    label: 'Username',
-                    control: TextInput({
-                        placeholder: 'Text input',
-                        value: 'bulma'
-                    }),
-                    help: 'This username is available',
-                    color: Color.Success
+            Field({
+                label: 'Username',
+                control: TextInput({
+                    placeholder: 'Text input',
+                    value: 'bulma'
+                }),
+                help: 'This username is available',
+                color: Color.Success,
+                as: withFieldIcons({
+                    injections: {
+                        leftIcon: () => FaIcon({icon: faUser}),
+                        rightIcon: () => FaIcon({icon: faCheck}),                    
+                    },        
                 })
-            })),
-            withControlIcons(withBlueprint({
+            }),
+            withFieldIcons(withBlueprint({
                 injections: {
                     leftIcon: () => FaIcon({icon: faEnvelope}),
                     rightIcon: () => FaIcon({icon: faExclamationTriangle}),                    

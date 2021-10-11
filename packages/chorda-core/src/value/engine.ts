@@ -96,8 +96,10 @@ class UpdateEngine {
 
                 // ?
                 session.deleted.forEach(del => {
-//                    console.log('delete', del)
-                    del.$destroy()
+//                    if (del.$subscriptions.length == 0) {
+                        del.$destroy()
+                    // }
+                    // console.log('del has subscriptions', del)
                 })
 
 //                const lastUpdateMap = new Map<Subscriber<any>, NodeUpdate>()

@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { Blueprint, defaultGearFactory, Gear, GearOptions, observable, patch, mixin, mix, iterable } from '../src'
+import { Blueprint, defaultGearFactory, Gear, GearOptions, observable, patch, mixin, mix, iterable, isObservable } from '../src'
 import { createPatchScheduler, immediateTick } from './utils'
 import * as _ from 'lodash'
 
@@ -27,7 +27,7 @@ const createGearList = <T>(list: any[]) : Gear<T> => {
     return createGear<any>({
         defaultItem: {
             injections: {               
-                name: (ctx) => (ctx as any).__it.$value
+                name: (ctx) => (ctx as any).__it
             }
         },
         reactions: {
@@ -44,7 +44,7 @@ const createGearList = <T>(list: any[]) : Gear<T> => {
 }
 
 
-const toNames = (itm: Gear) => itm.scope.name
+const toNames = (itm: Gear) => itm.scope.name.$value
 
 
 
@@ -447,7 +447,6 @@ describe ('Gear', () => {
             gear.scope.items.$value = [5,4,3,2,1]
 
             immediateTick()
-//            gear.scope.$engine.immediate()
 
             expect(gear.items.length).to.be.eq(5)
             expect(gear.items.map(toNames)).to.be.deep.eq([5,4,3,2,1])
@@ -471,9 +470,13 @@ describe ('Gear', () => {
             gear.scope.items.$value = [3,4,5]
 
             immediateTick()
-//            gear.scope.$engine.immediate()
+
+            // console.log('NAME', gear.items[0].scope['name'])
+            // console.log('NAME', gear.items[1].scope['name'])
+            // console.log('NAME', gear.items[2].scope['name'])
 
             expect(gear.items.length).to.be.eq(3)
+            expect(gear.items.map(itm => itm.index)).to.be.deep.eq([0, 1, 2])
             expect(gear.items.map(toNames)).to.be.deep.eq([3,4,5])
         })
 

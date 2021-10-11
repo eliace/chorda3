@@ -152,7 +152,7 @@ export const ArticlePage = () : InferBlueprint<ArticleScope&AppScope&RouterScope
             container: Block({
                 css: 'page container',
                 addons: {
-                    content: Row({
+                    message: Row({
                         css: 'article-content',
                         columns: [
                             Column({

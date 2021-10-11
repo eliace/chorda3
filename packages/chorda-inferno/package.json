@@ -1,5 +1,5 @@
 {
-  "name": "chorda-inferno",
+  "name": "@chorda/inferno",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",

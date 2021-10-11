@@ -1,37 +1,73 @@
-import { defaultHtmlFactory, defaultLayout, Html, HtmlOptions, InferBlueprint, pipe } from "@chorda/core";
-import { createPatchScheduler } from "@chorda/engine";
-import { createRenderScheduler } from "@chorda/react";
+import { createHtmlContext, createHtmlOptions, Html, InferBlueprint, observable, patch } from "@chorda/core";
+import { createAsyncPatcher } from "@chorda/engine";
+import { createEmbedReactRenderer, DomEvents } from "@chorda/react";
 import * as React from "react";
 
-const engine = createPatchScheduler()
-const renderer = createRenderScheduler()
 
-export const Test = <T, E>() : InferBlueprint<T, E> => {
+let roots = null
+let html = null
+
+export const Test = () : InferBlueprint<{value: string}, DomEvents> => {
     return {
-        tag: 'input'
+        initials: {
+            value: () => observable('')
+        },
+        items: [{
+            tag: 'input',
+            events: {
+                $dom: {
+                    change: (e, {value}) => {
+                        value.$value = (e.currentTarget as HTMLInputElement).value
+                    }
+                }
+            }
+        }, {
+            tag: 'p',
+            reactions: {
+                value: v => patch({text: v})
+            }
+        }]
     }
 }
 
-const html = new Html(Test() as HtmlOptions<unknown, unknown, any>, {
-    $renderer: renderer,
-    $engine: engine,
-    $defaultFactory: defaultHtmlFactory,
-    $defaultLayout: defaultLayout,
-    $pipe: pipe(engine, renderer)
-})
+export const ChordaComponent = () => {
 
-export const Foo = () => {
+    const [ignored, forceUpdate] = React.useReducer((x) => x + 1, 0)
 
-    const ref = (el: HTMLElement) => {
-        if (el) {
-            renderer.attach(el, html)
+
+    React.useEffect(() => {
+//        console.log('effect')
+
+        if (!html) {
+
+            const patcher = createAsyncPatcher()
+            const renderer = createEmbedReactRenderer((r: any[]) => {
+                roots = html.render(true)// r[0]
+                forceUpdate()
+            })
+            
+            html = new Html(createHtmlOptions(Test()), createHtmlContext(patcher, renderer))
+            
+            renderer.attach(null, html)
+
+            return () => {
+                html.destroy()
+            }
         }
-        else {
-            renderer.detach(html)
-        }
-    }
+    }, [])
 
-    return React.createElement('div', {
-        ref
-    })
+    return roots// vnode ? vnode : null//React.createElement('h1', {}, 'aaaa')// vnode ? vnode : null
+
+    // const ref = (el: HTMLElement) => {
+    //     if (el) {
+    //         renderer.attach(el, html)
+    //     }
+    //     else {
+    //         renderer.detach(html)
+    //     }
+    // }
+
+    // return React.createElement('div', {
+    //     ref
+    // })
 }

@@ -22,7 +22,7 @@ export type HtmlBlueprint<D=unknown, E=unknown, H=any> = HtmlOptions<D, E, H>|st
 
 export interface HtmlOptions<D, E, H, B=HtmlBlueprint<NoInfer<D>, NoInfer<E>, H>> extends GearOptions<D, E, B> {
     layout?: Function
-    renderer?: Renderer
+    render?: boolean
     dom?: H
 //    domEvents?: {[key: string]: (e: any, s: {[key: string]: Observable}) => void|boolean}
     tag?: string|boolean
@@ -178,6 +178,10 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
         }
 
         if (!asRoot && this.isRoot) {
+            return null
+        }
+
+        if (this.options.render === false) {
             return null
         }
 

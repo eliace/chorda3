@@ -1,4 +1,4 @@
-import { HtmlBlueprint, HtmlOptions, HtmlScope, Injector, iterable, Joint, mix, mix2, Mixed, NoInfer, observable, patch, Scope } from "@chorda/core"
+import { HtmlBlueprint, HtmlOptions, HtmlScope, Injector, iterable, Joint, mix, Mixed, NoInfer, observable, patch, Scope } from "@chorda/core"
 import { Coerced, ItemScope, IteratorScope } from "../../../utils"
 
 

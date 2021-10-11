@@ -1,4 +1,4 @@
-import { HtmlBlueprint, mix, Blueprint } from "@chorda/core"
+import { HtmlBlueprint, mix, Blueprint, InferBlueprint } from "@chorda/core"
 
 
 type RowProps<T, E> = {
@@ -6,7 +6,7 @@ type RowProps<T, E> = {
     css?: string
 }
 
-export const Row = <T, E>(props: RowProps<T, E>) : HtmlBlueprint<T, E> => {
+export const Row = <T, E>(props: RowProps<T, E>) : InferBlueprint<T, E> => {
     return mix({
         css: 'row',
     }, {

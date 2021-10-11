@@ -1,5 +1,5 @@
 {
-  "name": "chorda-engine",
+  "name": "@chorda/engine",
   "version": "3.0.0",
   "description": "",
   "main": "lib/index.js",

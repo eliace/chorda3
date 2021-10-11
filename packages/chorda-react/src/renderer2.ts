@@ -11,7 +11,7 @@ type RenderRoot = {
 }
 
 
-class ReactRenderer2 extends AsyncEngine implements Renderer, VNodeFactory {
+export class ReactRenderer2 extends AsyncEngine implements Renderer, VNodeFactory {
 
     roots: RenderRoot[]
 
@@ -105,6 +105,6 @@ const domMap = new WeakMap<any, Function>()
 
 
 
-export const createRenderScheduler = () : Scheduler&Renderer&VNodeFactory => {
+export const createReactRenderer = () : Scheduler&Renderer&VNodeFactory => {
     return new ReactRenderer2()
 }

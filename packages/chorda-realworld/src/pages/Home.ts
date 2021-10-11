@@ -15,16 +15,21 @@ enum Feeds {
 
 
 type HomeScope = {
-    tags: string[]
+    tags: {
+        list: string[]
+        fetching: boolean
+    }
     articles: {
         page: number
 //        group: string //?
-        list: Article[],
+        list: Article[]
         total: number
+        fetching: boolean
     }
     selectedTag: string
     selectedGroup: string
     hasTags: boolean
+    //isFetchingArticles: boolean
 }
 
 
@@ -112,6 +117,24 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
                                         },
                                         items$: $ => $.articles.list,
                                         itemAs: ArticlePreview,
+                                    }),
+                                    loading: ArticlePreview({
+                                        meta: false,
+                                        previewLink: false,
+                                        text: ' Loading articles... '
+                                    }),
+                                    noArticles: ArticlePreview({
+                                        meta: false,
+                                        previewLink: false,
+                                        text: ' No articles are here... yet. '    
+                                    })
+                                },
+                                reactions: {
+                                    articles: (v) => patch({
+                                        components: {
+                                            loading: v.fetching,
+                                            noArticles: v.list.length == 0 && !v.fetching
+                                        }
                                     })
                                 }
                             }
@@ -134,7 +157,7 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
                                                 e.preventDefault()
                                             }
                                         }),
-                                        items$: $ => $.tags
+                                        items$: $ => $.tags.list
                                     }),
                                     preview: {
                                         css: 'post-preview',
@@ -159,17 +182,21 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
             })
         },
         initials: {
-            tags: () => observable([]),
+            tags: () => observable({
+                list: [],
+                fetching: false
+            }),
             articles: () => observable({
                 page: 1,
                 list: [],
-                total: 0
+                total: 0,
+                fetching: false
             }),
             selectedGroup: () => observable(null),
         },
         injections: {
             hasTags: $ => computable(() => {
-                return $.tags.length > 0
+                return $.tags.list.length > 0
             })
         },
         joints: {
@@ -178,15 +205,19 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
                 const pageSize = 10
                 const pageNo = articles.page
 
+                tags.fetching.$value = true
                 api.getAllTags()
                     .then(data => {
-                        tags.$value = data.tags
+                        tags.fetching.$value = false
+                        tags.list.$value = data.tags
                     })
 
 
 
+                articles.fetching.$value = true
                 api.getAllArticles({offset: (pageNo-1)*pageSize, limit: pageSize})
                     .then(data => {
+                        articles.fetching.$value = false
                         articles.list.$value = data.articles
                         articles.total.$value = data.articlesCount
                     })

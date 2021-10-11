@@ -1,7 +1,15 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { Foo } from './chorda';
+import { ChordaComponent } from './chorda';
+
+
+
+const handleClick = () => {
+
+}
+
+
 
 function App() {
   return (
@@ -19,7 +27,8 @@ function App() {
         >
           Learn React
         </a>
-        <Foo/>
+        <ChordaComponent/>
+        <button onClick={handleClick}>Test button</button>
       </header>
     </div>
   );
