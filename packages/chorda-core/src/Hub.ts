@@ -217,7 +217,7 @@ const createMonitoredThenable = (thenable: Thenable) : Thenable => {
         isPending: true,
         isFailed: false,
         isDone: false,
-        then: (resolve: Function, reject?: Function) => monitored.then(resolve, reject)
+        then: (resolve, reject) => monitored.then(resolve, reject)
     }
     return mt
 }

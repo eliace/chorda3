@@ -1,7 +1,7 @@
 import React from 'react';
 import logo from './logo.svg';
 import './App.css';
-import { ChordaComponent } from './chorda';
+import { ChordaComponent, ChordaComponent2, ChordaComponent3, TestContext } from './chorda';
 
 
 
@@ -27,7 +27,9 @@ function App() {
         >
           Learn React
         </a>
-        <ChordaComponent/>
+        <TestContext.Provider value={{i18n: 'en'}}>
+          <ChordaComponent2/>
+        </TestContext.Provider>
         <button onClick={handleClick}>Test button</button>
       </header>
     </div>

@@ -1,4 +1,4 @@
-import { autoTerminalAware, Blueprint, callable, Callable, createHtmlContext, createHtmlOptions, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, ownTask, patch, pipe, PublishFunc, Scope, spyGetters, Value } from "@chorda/core"
+import { autoTerminalAware, Blueprint, callable, Callable, buildHtmlContext, buildHtmlOptions, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, ownTask, patch, pipe, PublishFunc, Scope, spyGetters, Value } from "@chorda/core"
 import { createAsyncPatcher } from "@chorda/engine"
 import { createReactRenderer, defaultVNodeFactory, DomEvents } from "@chorda/react"
 import { Transaction } from "chorda-core/src/value/engine"
@@ -39,7 +39,7 @@ export const createAppScope = () : HtmlScope => {
 //         router: null
 //     }
 
-    const context: HtmlScope&RouterScope = {router: null, ...createHtmlContext(
+    const context: HtmlScope&RouterScope = {router: null, ...buildHtmlContext(
         createAsyncPatcher(),
         createReactRenderer()
     )}
@@ -53,7 +53,7 @@ export const createAppScope = () : HtmlScope => {
 }
 
 export const createAppOptions = () : HtmlOptions<unknown, unknown, any> => {
-    return createHtmlOptions(App())
+    return buildHtmlOptions(App())
 }
 
 

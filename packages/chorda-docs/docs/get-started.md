@@ -20,17 +20,17 @@ npm i @chorda/react react react-dom
 Создаем и отрисовываем дерево компонентов
 
 ```javascript
-import { Html, attach, createHtmlOptions, createHtmlContext } from "@chorda/core"
+import { Html, attach, buildHtmlOptions, buildHtmlContext } from "@chorda/core"
 import { createAsyncPatcher } from "@chorda/engine"
 import { createReactRenderer } from "@chorda/react"
 
 // 1. объявляем конфигурацию нашего корневого компонента
-const options = createHtmlOptions({
+const options = buildHtmlOptions({
     tag: 'span'
 })
 
 // 2. создаем контекст
-const context = createHtmlContext(
+const context = buildHtmlContext(
     createAsyncPatcher(), // асинхронная очередь обработки патчей
     createReactRenderer() // используем VDOM React
 )
@@ -48,11 +48,11 @@ attach(html, () => document.getElementById('root'))
 
 #### Создание конфигурации
 
-Конфигурация может быть задана несколькими способами, их надо интерпретировать и собрать в набор опций, который понимает используемый компонент `Html`. Это выполняетмся методом `createHtmlOptions`. В нашем примере мы указываем опцию `tag`, чтобы задать тэг DOM элемента
+Конфигурация может быть задана несколькими способами, их надо интерпретировать и собрать в набор опций, который понимает используемый компонент `Html`. Это выполняетмся методом `buildHtmlOptions`. В нашем примере мы указываем опцию `tag`, чтобы задать тэг DOM элемента
 
 #### Создание контекста
 
-Компонент типа `Html` для своего создания требует минимальный набор переменных, который инициализируется методом `createHtmlContext`. Однако патчер и рендерер нам придется задать явно
+Компонент типа `Html` для своего создания требует минимальный набор переменных, который инициализируется методом `buildHtmlContext`. Однако патчер и рендерер нам придется задать явно
 
 #### Создание дерева компонентов
 

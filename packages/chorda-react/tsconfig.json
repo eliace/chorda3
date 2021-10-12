@@ -7,10 +7,11 @@
       "target": "es5",
       "allowJs": true,
       "moduleResolution": "node",
-      "baseUrl": "../",
-      "paths": {
-        "@chorda/core": ["chorda-core/src"],
-      }
+      "declaration": true,
+      // "baseUrl": "../",
+      // "paths": {
+      //   "@chorda/core": ["chorda-core/src"],
+      // }
     },
     "exclude": [
       "node_modules",

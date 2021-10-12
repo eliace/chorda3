@@ -63,8 +63,8 @@ export type Handler<E> = {
 
 
 
-export interface Thenable {
-    then: Function
+export interface Thenable<T=unknown> {
+    then: <R>(resolve: (v?: T) => R, reject?: Function) => Thenable<R>
 }
 
 

@@ -38,8 +38,8 @@ module.exports = {
         /*new CompressionPlugin()*/
     ],
     externals: {
-        'chorda-core': 'commonjs @chorda/core',
-        'react': 'React',
-        'react-dom': 'ReactDOM'
+        '@chorda/core': 'commonjs @chorda/core',
+        'react': 'commonjs react',
+        'react-dom': 'commonjs react-dom'
     }
 }

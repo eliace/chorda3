@@ -121,7 +121,7 @@ export const buildOpts = (opts: any, nextOpts: any, rules?: MixRules) : any => {
     }
     else if (nextOpts instanceof Promise) {
         return Promise.all([opts, nextOpts]).then(o => {
-        return buildOpts(o[0], o[1], rules)
+          return buildOpts(o[0], o[1], rules)
         })
     }
     else {//if (nextOpts !== undefined) {

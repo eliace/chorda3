@@ -17,7 +17,7 @@ export const mix = <T, E=unknown>(...args: Blueprint<T, E>[]) : InferBlueprint<u
 //     return mixin(b as any, a as any) as Mixed<HtmlBlueprint<T&X>>
 // }
 
-export const createHtmlOptions = <T>(blueprint: InferBlueprint<T>) : HtmlOptions<any, any, any> => {
+export const buildHtmlOptions = <T>(blueprint: InferBlueprint<T>) : HtmlOptions<any, any, any> => {
     const b = mixin(blueprint as T).build(defaultHtmlInitRules)
     if (typeof b === 'boolean') {
         return null
@@ -25,7 +25,7 @@ export const createHtmlOptions = <T>(blueprint: InferBlueprint<T>) : HtmlOptions
     return b
 }
 
-export const createHtmlContext = (patcher: Scheduler, renderer: Scheduler&Renderer&VNodeFactory) : HtmlScope => {
+export const buildHtmlContext = (patcher: Scheduler, renderer: Scheduler&Renderer&VNodeFactory) : HtmlScope => {
     return {
         $defaultFactory: defaultHtmlFactory,
         $defaultLayout: defaultLayout,
@@ -39,4 +39,8 @@ export const attach = (html: Html, el: () => Element) => {
     document.addEventListener('DOMContentLoaded', () => {
         html.attach(el())
     })    
+}
+
+export const detach = (html: Html) => {
+    html.detach()
 }

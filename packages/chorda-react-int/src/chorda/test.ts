@@ -1,13 +1,17 @@
-import { createHtmlContext, createHtmlOptions, Html, InferBlueprint, observable, patch } from "@chorda/core";
+import { buildHtmlContext, buildHtmlOptions, Html, InferBlueprint, observable, patch } from "@chorda/core";
 import { createAsyncPatcher } from "@chorda/engine";
-import { createEmbedReactRenderer, DomEvents } from "@chorda/react";
+import { ChordaEmbedded, ChordaStandalone, createEmbedReactRenderer, DomEvents } from "@chorda/react";
 import * as React from "react";
 
 
 let roots = null
 let html = null
 
-export const Test = () : InferBlueprint<{value: string}, DomEvents> => {
+type TestScope = {
+    i18n: string
+}
+
+export const Test = () : InferBlueprint<{value: string}&TestScope, DomEvents> => {
     return {
         initials: {
             value: () => observable('')
@@ -25,6 +29,11 @@ export const Test = () : InferBlueprint<{value: string}, DomEvents> => {
             tag: 'p',
             reactions: {
                 value: v => patch({text: v})
+            }
+        }, {
+            tag: 'div',
+            reactions: {
+                i18n: v => patch({text: v})
             }
         }]
     }
@@ -46,7 +55,7 @@ export const ChordaComponent = () => {
                 forceUpdate()
             })
             
-            html = new Html(createHtmlOptions(Test()), createHtmlContext(patcher, renderer))
+            html = new Html(buildHtmlOptions(Test()), buildHtmlContext(patcher, renderer))
             
             renderer.attach(null, html)
 
@@ -70,4 +79,30 @@ export const ChordaComponent = () => {
     // return React.createElement('div', {
     //     ref
     // })
+}
+
+
+export const TestContext = React.createContext<TestScope>({
+    i18n: 'ru'
+})
+  
+
+
+
+export const ChordaComponent2 = () => {
+
+    const ctx = React.useContext(TestContext)
+
+    return ChordaStandalone({
+        blueprint: Test(),
+        patcher: createAsyncPatcher(),
+        context: ctx
+    })
+}
+
+export const ChordaComponent3 = () => {
+    return ChordaEmbedded({
+        blueprint: Test(),
+        patcher: createAsyncPatcher()
+    })
 }

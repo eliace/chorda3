@@ -35,6 +35,6 @@ module.exports = {
         /*new CompressionPlugin()*/
     ],
     externals: {
-        'chorda-core': 'common-js @chorda/core',
+        '@chorda/core': 'common-js @chorda/core',
     }
 }
