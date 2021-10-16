@@ -1,10 +1,10 @@
-import { callable, computable, HtmlBlueprint, HtmlScope, MethodsOf, mix, observable, Scoped } from "@chorda/core"
+import { InferBlueprint, observable } from "@chorda/core"
 import { Field, Fields, RowLayout } from "chorda-bulma"
-import { Coerced, Custom, DynamicList, ItemScope, watch } from "../../utils"
+import { DynamicList, ListBlueprint, withIterableItems, withList } from "../../utils"
 import { Tmdb } from "../../api"
 import { TextInput } from "../../helpers"
 import { MovieListItem } from "./common/items"
-import { InfiniteScrollScope, withInfiniteScroll } from "./common/scroll"
+import { InfiniteScrollBlueprintType, InfiniteScrollEvents, InfiniteScrollScope, withInfiniteScroll } from "./common/scroll"
 
 
 const query = observable('' as string)
@@ -26,9 +26,17 @@ type MoviesScope = {
 }
 
 
+type X = ListBlueprint<Tmdb.Movie> & InfiniteScrollBlueprintType<Tmdb.Movie>
+
+const x : X = {
+    injections: {
+        //infiniteItems: () => []
+        //items: $ => $.
+    }
+}
 
 
-export default <T>() : HtmlBlueprint<T> => {
+export default () : InferBlueprint<unknown> => {
     return RowLayout([
         Fields({
             fields: [
@@ -39,45 +47,123 @@ export default <T>() : HtmlBlueprint<T> => {
                 })
             ]
         }),
-        DynamicList<Tmdb.Movie[], MoviesScope&InfiniteScrollScope<Tmdb.Movie>>({
-            defaultItem: MovieListItem({
+        withInfiniteScroll(withList(<ListBlueprint<Tmdb.Movie, InfiniteScrollScope<Tmdb.Movie>, InfiniteScrollEvents<Tmdb.Movie>>>{
+//        withInfiniteScroll(withList(<ListBlueprint<Tmdb.Movie> & InfiniteScrollBlueprintType<Tmdb.Movie>>{
+                defaultItem: MovieListItem({
                 movie$: (scope) => scope.item,
                 genres$: () => genres,
             }),
-            items$: (scope) => scope.infiniteItems,
-            as: withInfiniteScroll({
-                styles: {
-                    maxHeight: 380,
-                    overflowY: 'auto'
-                },
-                joints: {
-                    autoLoad: async ({infiniteScroll}) => {
+            styles: {
+                maxHeight: 380,
+                overflowY: 'auto'
+            },
+            joints: {
+                autoLoad: async ({infiniteScroll}) => {
 
-                        query.$subscribe(() => {
-                            infiniteScroll.resetAndGetFirst()
+                    query.$subscribe(() => {
+                        infiniteScroll.resetAndGetFirst()
+                    })
+
+                    await Promise.all([loadConfig(), loadGenres('ru')])
+
+                    query.$value = 'руб'
+
+                }
+            },
+            events: {
+                onNextPage: (pageId, {infiniteScroll}) => {
+                    if (query.$value != '') {
+                        Tmdb.api.searchMovie({page: pageId, query: query.$value, language: 'ru'}).then(response => {
+                            infiniteScroll.update(pageId, response.results, response.total_pages)
                         })
-
-                        await loadConfig()
-                        await loadGenres('ru')
-
-                        query.$value = 'руб'
-
                     }
-                },
-                events: {
-                    onNextPage: (pageId, {infiniteScroll}) => {
-                        if (query.$value != '') {
-                            Tmdb.api.searchMovie({page: pageId, query: query.$value, language: 'ru'}).then(response => {
-                                infiniteScroll.update(pageId, response.results, response.total_pages)
-                            })
-                        }
-                        else {
-                            infiniteScroll.update(pageId, [], 0)
-                        }
+                    else {
+                        infiniteScroll.update(pageId, [], 0)
                     }
                 }
-            })
-        }),
+            },
+            injections: {
+                items: $ => $.infiniteItems
+            }
+        })),
+        // withIterableItems(<ListBlueprint<Tmdb.Movie, MoviesScope&InfiniteScrollScope<Tmdb.Movie>>>{
+        //     defaultItem: MovieListItem({
+        //         movie$: (scope) => scope.item,
+        //         genres$: () => genres,
+        //     }),
+        //     as: withInfiniteScroll({
+        //         styles: {
+        //             maxHeight: 380,
+        //             overflowY: 'auto'
+        //         },
+        //         joints: {
+        //             autoLoad: async ({infiniteScroll}) => {
+
+        //                 query.$subscribe(() => {
+        //                     infiniteScroll.resetAndGetFirst()
+        //                 })
+
+        //                 await Promise.all([loadConfig(), loadGenres('ru')])
+
+        //                 query.$value = 'руб'
+
+        //             }
+        //         },
+        //         events: {
+        //             onNextPage: (pageId, {infiniteScroll}) => {
+        //                 if (query.$value != '') {
+        //                     Tmdb.api.searchMovie({page: pageId, query: query.$value, language: 'ru'}).then(response => {
+        //                         infiniteScroll.update(pageId, response.results, response.total_pages)
+        //                     })
+        //                 }
+        //                 else {
+        //                     infiniteScroll.update(pageId, [], 0)
+        //                 }
+        //             }
+        //         }
+        //     }),
+        //     injections: {
+        //         items: $ => $.infiniteItems
+        //     }
+        // }),
+        // DynamicList<Tmdb.Movie[], MoviesScope&InfiniteScrollScope<Tmdb.Movie>>({
+        //     defaultItem: MovieListItem({
+        //         movie$: (scope) => scope.item,
+        //         genres$: () => genres,
+        //     }),
+        //     items$: (scope) => scope.infiniteItems,
+        //     as: withInfiniteScroll({
+        //         styles: {
+        //             maxHeight: 380,
+        //             overflowY: 'auto'
+        //         },
+        //         joints: {
+        //             autoLoad: async ({infiniteScroll}) => {
+
+        //                 query.$subscribe(() => {
+        //                     infiniteScroll.resetAndGetFirst()
+        //                 })
+
+        //                 await Promise.all([loadConfig(), loadGenres('ru')])
+
+        //                 query.$value = 'руб'
+
+        //             }
+        //         },
+        //         events: {
+        //             onNextPage: (pageId, {infiniteScroll}) => {
+        //                 if (query.$value != '') {
+        //                     Tmdb.api.searchMovie({page: pageId, query: query.$value, language: 'ru'}).then(response => {
+        //                         infiniteScroll.update(pageId, response.results, response.total_pages)
+        //                     })
+        //                 }
+        //                 else {
+        //                     infiniteScroll.update(pageId, [], 0)
+        //                 }
+        //             }
+        //         }
+        //     })
+        // }),
 
     ])
 }

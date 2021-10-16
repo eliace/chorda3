@@ -5,7 +5,7 @@ import { BgImage, BgImagePropsType, Dropdown, DropdownItem, DropdownOld, Dropdow
 import { faHeart, faRedo, faUserLock } from "@fortawesome/free-solid-svg-icons"
 import { CatApi } from "../../api"
 import { IMAGE_BASE64, IMAGE_PLACEHOLDER } from "../../data"
-import { DomEvents } from "@chorda/react"
+import { ReactDomEvents } from "@chorda/react"
 import { ProgressPlugin } from "webpack"
 
 const favourites = observable(null)
@@ -131,7 +131,7 @@ type FavouriteButtonProps<T, E> = {
 }
 
 const FavouriteButton = <T, E>(props: FavouriteButtonProps<T&FavouriteScope, E>) : InferBlueprint<T, E> => {
-    return mix<FavouriteScope, DomEvents>({
+    return mix<FavouriteScope, ReactDomEvents>({
         injections: {
             favourite: props.isFavourite$
         },
@@ -277,7 +277,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
             images: {
                 css: 'catapi-search',
                 templates: {
-                    content: withList(<ListBlueprint<CatApi.SearchResult&{favourite: boolean}, SearchScope>>{
+                    content: withList(<ListBlueprint<CatApi.SearchResult&{favourite?: boolean}, SearchScope>>{
                         injections: {
                             items: ($) => $.searchResults
                         },

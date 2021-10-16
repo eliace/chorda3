@@ -8,10 +8,39 @@ import { Sandbox } from "./sandbox";
 import { AppScope, buildHtmlTree, Coerced } from "./utils";
 import { Components } from "./components";
 import { Form } from "./form";
+import { CarouselExample } from "./extended/carousel";
+import { ListBoxExample } from "./extended/listbox";
+import { Route } from "router5";
+import countries from "./sandbox/countries";
+import { CatApi } from "./sandbox/catapi";
+import { SelectExample } from "./sandbox/select";
+import { DropdownExample } from "./sandbox/dropdown";
+import { ListExample } from "./sandbox/list";
+import { InfernoExample } from "./sandbox/inferno";
+import { TransitionsExample } from "./sandbox/transitions";
 
 let _network: vis.Network = null
 const _nodes = new visds.DataSet<vis.Node>([])
 const _edges = new visds.DataSet<vis.Edge>([])
+
+
+export const routes: Route[] = [
+    {name: 'home', path: '/'},
+    {name: 'elements', path: '/elements/:element'},
+    {name: 'form', path: '/form/:element'},
+    {name: 'components', path: '/components/:element'},
+//    {name: 'extended', path: '/extended/:element'},
+//    {name: 'sandbox', path: '/sandbox/:element'},
+    {name: 'carousel', path: '/extended/carousel'},
+    {name: 'listbox', path: '/extended/listbox'},
+    {name: 'countries', path: '/sandbox/countries'},
+    {name: 'catapi', path: '/sandbox/catapi'},
+    {name: 'select', path: '/sandbox/select'},
+    {name: 'dropdown', path: '/sandbox/dropdown'},
+    {name: 'list', path: '/sandbox/list'},
+    {name: 'inferno', path: '/sandbox/inferno'},
+    {name: 'transitions', path: '/sandbox/transitions'},
+]
 
 
 export const App = () : HtmlBlueprint<AppScope> => {
@@ -41,21 +70,42 @@ export const App = () : HtmlBlueprint<AppScope> => {
                         as: Menu({
                             groups: [
                                 MenuGroup({
-                                    label: 'Learn',
-                                    items: [
-                                        MenuItem({text: 'Getting started'}),
-                                        MenuItem({text: 'Options'}),
-                                        MenuItem({text: 'Components and Items'})
-                                    ]
-                                }),
-                                MenuGroup({
-                                    label: 'Demo',
+                                    label: 'Bulma',
                                     items: [
                                         MenuItem({text: 'Elements', name: 'elements', link: '/#/elements/box'}),
                                         MenuItem({text: 'Form', name: 'form', link: '/#/form/field'}),
                                         MenuItem({text: 'Components', name: 'components', link: '/#/components/breadcrumb'}),
-                                        MenuItem({text: 'Components+', name: 'extended', link: '/#/extended/carousel'}),
-                                        MenuItem({text: 'Sandbox', name: 'sandbox', link: '/#/sandbox/countries'}),        
+                                    ],
+                                    defaultItem: MenuItem({
+                                        active$: (scope) => computable(() => {
+                                            return scope.name == scope.router.route.name
+                                        }) 
+                                    })
+                                }),
+                                MenuGroup({
+                                    label: 'Components+',
+                                    items: [
+//                                        MenuItem({text: 'Components+', name: 'extended', link: '/#/extended/carousel'}),
+                                        MenuItem({text: 'Carousel', name: 'carousel', link: '/#/extended/carousel'}),
+                                        MenuItem({text: 'ListBox', name: 'listbox', link: '/#/extended/listbox'}),
+                                    ],
+                                    defaultItem: MenuItem({
+                                        active$: (scope) => computable(() => {
+                                            return scope.name == scope.router.route.name
+                                        }) 
+                                    })
+                                }),
+                                MenuGroup({
+                                    label: 'Sandbox',
+                                    items: [
+//                                        MenuItem({text: 'Sandbox', name: 'sandbox', link: '/#/sandbox/countries'}),        
+                                        MenuItem({text: 'Countries', name: 'countries', link: '/#/sandbox/countries'}),        
+                                        MenuItem({text: 'Cats', name: 'catapi', link: '/#/sandbox/catapi'}),        
+                                        MenuItem({text: 'Select', name: 'select', link: '/#/sandbox/select'}),        
+                                        MenuItem({text: 'Dropdown', name: 'dropdown', link: '/#/sandbox/dropdown'}),        
+                                        MenuItem({text: 'List', name: 'list', link: '/#/sandbox/list'}),        
+                                        MenuItem({text: 'Inferno', name: 'inferno', link: '/#/sandbox/inferno'}),        
+                                        MenuItem({text: 'Transitions', name: 'transitions', link: '/#/sandbox/transitions'}),        
                                     ],
                                     defaultItem: MenuItem({
                                         active$: (scope) => computable(() => {
@@ -80,6 +130,15 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                         components: v == 'components',
                                         extended: v == 'extended',
                                         sandbox: v == 'sandbox',
+                                        carousel: v == 'carousel',
+                                        listbox: v == 'listbox',                                        
+                                        countries: v == 'countries',           
+                                        catapi: v == 'catapi',
+                                        select: v == 'select',
+                                        dropdown: v == 'dropdown',
+                                        list: v == 'list',
+                                        inferno: v == 'inferno',
+                                        transitions: v == 'transitions',
                                     }
                                 })
                             },
@@ -89,7 +148,16 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                 sandbox: Sandbox,
                                 extended: Extended,
                                 components: Components,
-                                form: Form
+                                form: Form,
+                                carousel: CarouselExample,
+                                listbox: ListBoxExample,
+                                countries: countries,
+                                catapi: CatApi,
+                                select: SelectExample,
+                                dropdown: DropdownExample,
+                                list: ListExample,
+                                inferno: InfernoExample,
+                                transitions: TransitionsExample,
                             }
                         })
                     },

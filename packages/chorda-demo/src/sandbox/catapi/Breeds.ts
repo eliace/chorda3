@@ -58,7 +58,8 @@ const BreedGallery = () : InferBlueprint<BreedsScope, BreedsEvents> => {
     return Content({
         content: Card({
             content: Carousel({
-                images$: (scope) => scope.imageUrls
+                images$: (scope) => scope.imageUrls,
+                title: false
             })
         })
     })
@@ -159,9 +160,9 @@ export const Breeds = () : HtmlBlueprint<BreedsScope, BreedsEvents> => {
                 }, [selected])
 
                 // FIXME хак из-за того, что события выбрасываются в том же потоке
-                setTimeout(() => {
+                //setTimeout(() => {
                     loadBreeds()
-                })
+                //})
             },
         },
         events: {

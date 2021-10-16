@@ -46,7 +46,9 @@ export const Tab = <T>(props: TabProps<T&TabScope>) : HtmlBlueprint<T> => {
             'is-active': props.active
         },
         events: {
-            click: props.onClick
+            $dom: {
+                click: props.onClick
+            }
         },
         templates: {
             content: Link({
@@ -72,6 +74,7 @@ type TabsProps<T> = {
     defaultTab?: HtmlBlueprint<T>
     tabs$?: Injector<T>
     centered?: boolean
+    right?: boolean
 }
 
 export const Tabs = <T extends Scope>(props: TabsProps<T&TabsScope>) : HtmlBlueprint<T> => {
@@ -83,7 +86,8 @@ export const Tabs = <T extends Scope>(props: TabsProps<T&TabsScope>) : HtmlBluep
     }, 
     props && {
         classes: {
-            'is-centered': props.centered
+            'is-centered': props.centered,
+            'is-right': props.right,
         },
         injections: {
             tabs: props.tabs$

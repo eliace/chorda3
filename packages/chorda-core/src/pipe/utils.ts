@@ -25,6 +25,15 @@ export interface Scheduler<T extends Task = Task> {
 
 
 
+interface Engine {
+    change () : void  // завешенное изменение
+    effect () : void  // эффект отрисовки
+    patch () : void  // патч компонента
+}
+
+
+
+
 
 // - вычисления
 // - патчи

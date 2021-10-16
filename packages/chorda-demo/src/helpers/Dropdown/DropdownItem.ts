@@ -1,5 +1,5 @@
 import { HtmlBlueprint, HtmlScope, Injector, Listener, observable, patch, mix } from "@chorda/core"
-import { DomEvents } from "@chorda/react"
+import { ReactDomEvents } from "@chorda/react"
 import { watch } from "../../utils"
 import { MenuItem } from "./utils"
 
@@ -19,7 +19,7 @@ type DropdownItemProps<T> = {
     as?: HtmlBlueprint<T>
     item$?: Injector<T>
     text$?: Injector<T>
-    onClick?: Listener<T, ReturnType<DomEvents['$dom']['click']>>
+    onClick?: Listener<T, ReturnType<ReactDomEvents['$dom']['click']>>
     isSelected$?: Injector<T>
     offsetTop$?: Injector<T>
     isCurrent$?: Injector<T>
@@ -28,7 +28,7 @@ type DropdownItemProps<T> = {
 }
 
 export const DropdownItem = <I extends MenuItem, T=unknown>(props: DropdownItemProps<T&DropdownItemScope<I>&HtmlScope>) : HtmlBlueprint<T> => {
-    return mix<DropdownItemScope<I>&HtmlScope, DomEvents>(props?.as, {
+    return mix<DropdownItemScope<I>&HtmlScope, ReactDomEvents>(props?.as, {
         css: 'dropdown-item',
         tag: 'a',
         reactions: {

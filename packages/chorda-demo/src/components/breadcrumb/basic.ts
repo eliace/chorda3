@@ -1,27 +1,28 @@
-import { InferBlueprint } from "@chorda/core"
-import { RowLayout } from "chorda-bulma"
+import { InferBlueprint, observable } from "@chorda/core"
+import { Breadcrumb, Breadcrumbs, RowLayout } from "chorda-bulma"
 
 
 
 export default () : InferBlueprint<unknown> => {
     return RowLayout([
-        // rows: [
-        //     Breadcrumb({
-        //         items: [
-        //             BreadcrumbItem({text: 'Europe', link: '#'}),
-        //             BreadcrumbItem({text: 'Asia'}),
-        //             BreadcrumbItem({text: 'Africa'}),
-        //             BreadcrumbItem({text: 'America', active: true})
-        //         ]
-        //     }),
-        //     Breadcrumb({
-        //         data: [
-        //             {text: 'Europe', link: '#'},
-        //             {text: 'Asia'},
-        //             {text: 'Africa'},
-        //             {text: 'America'}
-        //         ]
-        //     })
-        // ]
+        Breadcrumbs({
+            items: [
+                Breadcrumb({text: 'Europe', link: '#'}),
+                Breadcrumb({text: 'Asia'}),
+                Breadcrumb({text: 'Africa'}),
+                Breadcrumb({text: 'America', active: true})
+            ]
+        }),
+        Breadcrumbs({
+            itemAs: Breadcrumb({}),
+            items$: () => observable([
+                {text: 'Europe'},
+                {text: 'Asia'},
+                {text: 'Africa'},
+                {text: 'America'},
+            ])
+        })
     ])
 }
+
+

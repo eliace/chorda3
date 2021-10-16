@@ -2,7 +2,7 @@ import { InferBlueprint } from "@chorda/core"
 import { Tab, Tabs } from "chorda-bulma"
 
 
-export default () : InferBlueprint<unknown> => {
+export default () => {
     return Tabs({
         tabs: [
             Tab({text: 'Pictures', active: true}),

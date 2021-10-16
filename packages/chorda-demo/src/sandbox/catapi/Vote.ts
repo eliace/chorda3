@@ -69,7 +69,7 @@ export const Vote = () : InferBlueprint<VoteScope&HtmlScope> => {
             image: {
                 templates: {
                     content: Card({
-                        css: 'catapi-vote-card',
+                        css: 'catapi-vote-card p-4',
                         content: false,
                         image: BgImage({
                             url$: (scope) => scope.imageUrl,

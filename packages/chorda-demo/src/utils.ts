@@ -1,10 +1,10 @@
 import { autoTerminalAware, Blueprint, callable, Callable, buildHtmlContext, buildHtmlOptions, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, ownTask, patch, pipe, PublishFunc, Scope, spyGetters, Value } from "@chorda/core"
 import { createAsyncPatcher } from "@chorda/engine"
-import { createReactRenderer, defaultVNodeFactory, DomEvents } from "@chorda/react"
+import { createReactRenderer, ReactDomEvents } from "@chorda/react"
 import { Transaction } from "chorda-core/src/value/engine"
 import { Route } from "router5"
 import * as vis from "vis-network"
-import { App } from "./App"
+import { App, routes } from "./App"
 import { RouterScope, useRouter } from "./router"
 
 
@@ -12,14 +12,6 @@ import { RouterScope, useRouter } from "./router"
 export type AppScope = {
 } & RouterScope
 
-const routes: Route[] = [
-    {name: 'home', path: '/'},
-    {name: 'elements', path: '/elements/:element'},
-    {name: 'form', path: '/form/:element'},
-    {name: 'components', path: '/components/:element'},
-    {name: 'extended', path: '/extended/:element'},
-    {name: 'sandbox', path: '/sandbox/:element'},
-]
 
 export const createAppScope = () : HtmlScope => {
 
@@ -73,7 +65,7 @@ type CustomProps<T, E> = {
     content?: Blueprint<T, E>
 } & Blueprint<T, E>
 
-export const Coerced = <S, T=unknown, E=unknown>(props: CustomProps<Omit<T, keyof S>&S, E&DomEvents&HtmlEvents>) : InferBlueprint<T> => {
+export const Coerced = <S, T=unknown, E=unknown>(props: CustomProps<Omit<T, keyof S>&S, E&ReactDomEvents&HtmlEvents>) : InferBlueprint<T> => {
     return mix(props.as, props, {
         templates: {
             content: props.content
@@ -92,7 +84,7 @@ export const Custom = <T, E>(props: CustomProps<T, E>) : InferBlueprint<T, E> =>
 export const Content = Custom
 
 
-export const withHtml = <T, E>(props: Blueprint<T&HtmlScope, E&HtmlEvents&DomEvents>) : InferBlueprint<T, E> => {
+export const withHtml = <T, E>(props: Blueprint<T&HtmlScope, E&HtmlEvents&ReactDomEvents>) : InferBlueprint<T, E> => {
     return props as any
 }
 
@@ -288,8 +280,9 @@ export const withItem = <I, T=unknown>(props: HtmlBlueprint<T&DynamicListScope<I
 
 
 
-export type ListBlueprint<I, T=unknown, E=unknown, H=any> = Omit<HtmlOptions<T&{items: unknown[]}, E, H>, 'defaultItem'> & {
+export type ListBlueprint<I, T=unknown, E=unknown, H=any> = Omit<HtmlOptions<T&{items: I[]}, E, H>, 'defaultItem'|'items'> & {
     defaultItem?: Blueprint<T&{item: I}>
+    items?: Blueprint<T&{item: I}>[]
 }
 
 

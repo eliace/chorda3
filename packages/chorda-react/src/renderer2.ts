@@ -1,7 +1,6 @@
-import { AsyncEngine, Dom, HtmlProps, Keyed, Observable, ownTaskFilter, Renderable, Renderer, Scheduler, subscriptionTaskFilter, unknownTaskFilter, VNodeFactory } from "@chorda/core";
+import { AsyncEngine, Dom, HtmlBlueprint, HtmlProps, Keyed, Observable, ownTaskFilter, Renderable, Renderer, Scheduler, subscriptionTaskFilter, unknownTaskFilter, VNodeFactory } from "@chorda/core";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import { EVENT_MAP } from "./renderer";
 
 
 
@@ -9,6 +8,19 @@ type RenderRoot = {
     el: Element
     node: Renderable
 }
+
+
+export const EVENT_MAP : Keyed<string> = {
+    click: 'onClick',
+    change: 'onChange',
+    input: 'onInput',
+    focus: 'onFocus',
+    blur: 'onBlur',
+    keyUp: 'onKeyUp',
+    keyDown: 'onKeyDown',
+    submit: 'onSubmit',
+}
+
 
 
 export class ReactRenderer2 extends AsyncEngine implements Renderer, VNodeFactory {
@@ -107,4 +119,29 @@ const domMap = new WeakMap<any, Function>()
 
 export const createReactRenderer = () : Scheduler&Renderer&VNodeFactory => {
     return new ReactRenderer2()
+}
+
+
+// export type ReactEvents = {
+//     click: React.MouseEvent
+// }
+
+export type ReactAttributes = Partial<{
+    id: string
+}>
+
+//export type ReactBlueprint<D> = HtmlBlueprint<D&ReactEvents, ReactAttributes>
+
+
+export type ReactDomEvents = {
+    $dom: {
+        click: () => React.MouseEvent
+        change: () => React.ChangeEvent
+        input: () => React.FormEvent
+        focus: () => React.FocusEvent
+        blur: () => React.FocusEvent
+        keyUp: () => React.KeyboardEvent
+        keyDown: () => React.KeyboardEvent
+        submit: () => React.FormEvent
+    }
 }

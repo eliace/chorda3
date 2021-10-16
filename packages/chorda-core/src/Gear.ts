@@ -331,7 +331,7 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
                     }
                     else if (comp.state == State.Destroying) {
                         console.log('stop destroying', k)
-                        comp.reset()
+                        comp.reinit()
                     }
                     else {
                         if (comp.state == State.Destroyed) {
@@ -345,7 +345,7 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
                     }
                     else {
                         // FIXME здесь мы предполагаем, что в next именно options
-                        comp.reset(nextComp as GearOptions<any, any>)
+                        comp.reinit(nextComp as GearOptions<any, any>)
                     }
                 }
                 else {
@@ -474,7 +474,7 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
                 let item: Gear<D> = null
                 if (itm.op == ItemOp.ADD) {
                     const v = itm.value
-                    item = this.addIndexed({} as B, i, key ? {[key]: v} : v)
+                    item = this.addIndexed({} as B, i, key != null ? {[key]: v} : v)
                     item.uid = itm.key// v.$uid
 //                        console.log('add', i, itm.key)//v.$uid)
                 }

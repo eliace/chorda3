@@ -1,5 +1,5 @@
 import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, iterable, Listener, mix, patch, Scope } from "@chorda/core"
-import { DomEvents } from "@chorda/react"
+import { ReactDomEvents } from "@chorda/react"
 import { OptionProps, Select, SelectProps, Option } from "./select"
 
 
@@ -19,7 +19,7 @@ interface Select2Props<T, I> extends Omit<SelectProps<T>, 'defaultOption'> {
 
 
 export const Select2 = <D, T extends Scope=unknown>(props: Select2Props<T&Select2Scope<D>, Option2Scope<D>>) : InferBlueprint<T> => {
-    return mix<Select2Scope<D>, DomEvents>(Select(props as SelectProps<T>), {
+    return mix<Select2Scope<D>, ReactDomEvents>(Select(props as SelectProps<T>), {
         injections: {
             options: props.options$,
             value: props.value$,

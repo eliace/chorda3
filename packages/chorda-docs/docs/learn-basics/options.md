@@ -4,20 +4,33 @@ sidebar_position: 1
 
 # Опции
 
+Приложение, реализованное с помощью Chorda, это одна большая конфигурация
+
 ### Конфигурация
 
 ```javascript
 
 const html = new Html({
-    tag: 'div'
+    items: [{
+        tag: 'button',
+    }, {
+        tag: 'a',
+    }]
 })
 
 ```
 
 
-Можем вынести конфигурацию в отдельный файл
+Конфигурации отдельных компонентов можно вынести в отдельные файлы
 
 ```javascript
+// Button.js
+export default () => {
+    return {
+        tag: 'button'
+    }
+}
+
 // Link.js
 export default () => {
     return {
@@ -27,13 +40,26 @@ export default () => {
 
 // App.js
 import Link from "./Link"
+import Button from "./Button"
 
-const app = new Html(Link())
+const App = () => {
+    return {
+        items: [
+            Button, 
+            Link,
+        ]
+    }
+}
 
+const app = new Html(App())
 ```
+
+Таким образом до момента создания корневого компонента конфигурация является просто объектом, который можно свободно модифицировать
 
 
 ### Смесь конфигураций
+
+Chorda предлагает модификацию конфигураций через смешивание
 
 В состав смеси могут входить:
 - `HtmlOptions` - структурированный набор опций
@@ -48,5 +74,5 @@ const app = new Html(Link())
 const mixedOptions = mixin({name: 'myComponent'}, MyComponent, 'Hello')
 ```
 
-Сборка/объединение смеси произойдет только в момент использования. Правила применения зависят от компонента
+Правила применения зависят от компонента
 

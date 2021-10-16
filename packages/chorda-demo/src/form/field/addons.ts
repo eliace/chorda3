@@ -27,6 +27,7 @@ export default () : InferBlueprint<unknown> => {
                 }),
                 addons: {
                     button: Addon({
+                        weight: 1,
                         content: Button({
                             text: 'Transfer'
                         })

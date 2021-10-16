@@ -1,5 +1,5 @@
 import { computable, HtmlBlueprint, HtmlScope, InferBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core"
-import { DomEvents } from "@chorda/react"
+import { ReactDomEvents } from "@chorda/react"
 import { Coerced } from "../../utils"
 
 import './Carousel.scss'
@@ -34,7 +34,7 @@ type CarouselProps<T> = {
 
 
 export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : InferBlueprint<T> => {
-    return mix<CarouselScope, DomEvents>({
+    return mix<CarouselScope, ReactDomEvents>({
         css: 'carousel',
         templates: {
             slides: {
@@ -69,7 +69,7 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : InferBluepr
             indicators: {
                 tag: 'ul',
                 css: 'carousel__indicators',
-                defaultItem: Coerced<CarouselSlideScope, CarouselScope&DomEvents>({
+                defaultItem: Coerced<CarouselSlideScope, CarouselScope&ReactDomEvents>({
                     tag: 'li',
                     reactions: {
                         slide: (v) => {v && patch({

@@ -45,10 +45,10 @@ const config = {
     ({
       navbar: {
         title: 'Chorda',
-        logo: {
-          alt: 'My Site Logo',
-          src: 'img/logo.svg',
-        },
+        // logo: {
+        //   alt: 'My Site Logo',
+        //   src: 'img/logo.svg',
+        // },
         items: [
           {
             type: 'doc',
@@ -57,7 +57,7 @@ const config = {
             label: 'Docs',
           },
           {
-            href: 'https://github.com/facebook/docusaurus',
+            href: 'https://github.com/eliace/chorda3',
             label: 'GitHub',
             position: 'right',
           },

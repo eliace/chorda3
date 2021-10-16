@@ -1,5 +1,5 @@
 import { computable, DomNode, HtmlBlueprint, HtmlScope, Injector, iterable, Joint, Listener, mix, observable, patch, Value } from "@chorda/core";
-import { DomEvents } from "@chorda/react";
+import { ReactDomEvents } from "@chorda/react";
 import { faAngleDown, faAngleUp, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "chorda-bulma";
 import { FaSvgIcon } from "./FaSvgIcon";
@@ -50,7 +50,7 @@ export type DropdownOldProps<T, I, V=I, E=unknown> = {
 export type DropdownOldEvents<I> = {
     itemSelect?: () => I
     cancelSelect?: () => void
-} & OuterClickEvent & DomEvents
+} & OuterClickEvent & ReactDomEvents
 
 
 
@@ -428,7 +428,7 @@ type DropdownOldItemProps<T> = {
     as?: HtmlBlueprint<T>
     item$?: Injector<T>
     text$?: Injector<T>
-    onClick?: Listener<T, ReturnType<DomEvents['$dom']['click']>>
+    onClick?: Listener<T, ReturnType<ReactDomEvents['$dom']['click']>>
     active$?: Injector<T>
     offset$?: Injector<T>
     current$?: Injector<T>
@@ -437,7 +437,7 @@ type DropdownOldItemProps<T> = {
 }
 
 export const DropdownOldItem = <I, V=I, T=DropdownOldScope<I, V>>(props: DropdownOldItemProps<T&DropdownOldItemScope<I>&{__it: I}&HtmlScope>) : HtmlBlueprint<T> => {
-    return mix<DropdownOldItemScope<I>&{__it: I}&HtmlScope, DomEvents>(props?.as, {
+    return mix<DropdownOldItemScope<I>&{__it: I}&HtmlScope, ReactDomEvents>(props?.as, {
         css: 'dropdown-item',
         tag: 'a',
         reactions: {

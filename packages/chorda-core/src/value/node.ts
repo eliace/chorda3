@@ -25,7 +25,7 @@ export enum IsCheck {
 }
 
 export interface ValueSet<T, K extends keyof T=keyof T> extends Value<T> {
-    $at <K extends keyof T=keyof T>(key: K, factory?: Function): ValueSet<T[K]>
+    $at <K extends keyof T=keyof T>(key: K, factory?: Function): Value<T[K]>
     $has (key: ValueKey, check?: HasCheck) : boolean
     $ownKeys () : (string|symbol)[]
     $getOwnPropertyDescriptor (key: ValueKey) : object
@@ -45,7 +45,7 @@ export interface ObservableValueSet<T> extends ObservableValue<T> {
 
 interface ValueNode<T> extends Value<T> {
     readonly $key: ValueKey
-    readonly $source: ValueNode<any>
+    readonly $source: ValueNode<any>&ValueSet<any>
     $update (direction: UpdateDirection, nextValue: any, key?: ValueKey, keyInfo?: {[key: string]: any}): void
     $hasFunction (key: ValueKey) : boolean
     $destroy () : void
@@ -102,13 +102,24 @@ export const spyGetters = (fn: Function) : Observable<any>[] => {
 // }
 
 
+export const isLastValue = (v: any) : boolean => {
+    if (typeof (v as ValueNode<unknown>).$update === 'function') {
+        const node = v as ValueNode<unknown>
+        const arr = node.$source.$value as any
+        return node.$source.$at(arr.length-1) == node
+    }
+    return false
+}
+
+
+
 
 
 
 export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T>, LifecycleProvider {
 
     _memoValue: any
-    _source: Node<unknown>
+    _source: Node<unknown>&ValueSet<unknown>
     _key: ValueKey
     _subscriptions: Subscription[]
     _entries: {[key: string]: Node<unknown>}
@@ -118,7 +129,7 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
     _initialized: boolean
     _destroyed: boolean
 
-    constructor (initValue?: T, source?: Node<unknown>, key?: ValueKey, entryUidFunc?: UidFunc) {
+    constructor (initValue?: T, source?: Node<unknown>&ValueSet<unknown>, key?: ValueKey, entryUidFunc?: UidFunc) {
         super()
         this._memoValue = initValue
         this._source = source

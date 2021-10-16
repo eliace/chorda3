@@ -7,7 +7,7 @@ import { DropdownTrigger } from "./DropdownTrigger"
 import { MenuItem } from "./utils"
 import { watch, withBlueprint, withBounds, withIterableItems, withOuterClick, withPreventDefaultMouseDown, withStopMouseDown } from '../../utils'
 import { DropdownItem } from "./DropdownItem"
-import { DomEvents } from "@chorda/react"
+import { ReactDomEvents } from "@chorda/react"
 
 
 
@@ -61,7 +61,7 @@ export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&
     const value2key: ((v: any) => any) = props.valueToKey || ((v) => v)
     const item2value = props.itemToValue || ((itm) => (itm as any).id)
     
-    return mix<DropdownScope<any>&HtmlScope, DomEvents>({
+    return mix<DropdownScope<any>&HtmlScope, ReactDomEvents>({
         css: 'dropdown',
         templates: {
             trigger: DropdownTrigger({

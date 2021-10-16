@@ -1,5 +1,5 @@
 import { HtmlBlueprint, HtmlScope, Injector, Listener, mix, observable, patch } from "@chorda/core";
-import { DomEvents } from "@chorda/react";
+import { ReactDomEvents } from "@chorda/react";
 import { watch } from "../utils";
 
 
@@ -17,7 +17,7 @@ type TextInputProps<T> = {
 }
 
 export const TextInput = <T>(props: TextInputProps<T&TextInputScope>) : HtmlBlueprint<T> => {
-    return mix<TextInputScope&HtmlScope, DomEvents>({
+    return mix<TextInputScope&HtmlScope, ReactDomEvents>({
         tag: 'input',
         css: 'input',
     },

@@ -1,18 +1,16 @@
 import { HtmlBlueprint, Listener, mix } from "@chorda/core"
+import { ReactDomEvents } from "@chorda/react"
+import * as React from "chorda-react/node_modules/@types/react"
 
-
-type ActionEvents = {
-    click: any
-}
 
 type ActionProps<T> = {
     icon?: string,
     css?: string,
-    onClick: Listener<T, ActionEvents>
+    onClick: Listener<T, React.MouseEvent>
 }
 
 export const Action = <T>(props: ActionProps<T>) : HtmlBlueprint<T> => {
-    return mix({
+    return mix<unknown, ReactDomEvents>({
         tag: 'a',
         css: 'is-action',
         templates: {
@@ -28,7 +26,9 @@ export const Action = <T>(props: ActionProps<T>) : HtmlBlueprint<T> => {
     }, {
         css: props.css,
         events: {
-            click: props.onClick
+            $dom: {
+                click: props.onClick
+            }
         },
         templates: {
             icon: {

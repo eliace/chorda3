@@ -1,4 +1,4 @@
-import { Value, EventBus, Subscription, ObservableValue, Handler, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable, Thenable, isCallable, spySubscriptions, isValueSet } from './value'
+import { Value, EventBus, Subscription, ObservableValue, Handler, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable, Thenable, isCallable, spySubscriptions, isValueSet, isLastValue } from './value'
 import { MixRules, mixin } from './mix'
 import { ownTask, Pipe, Scheduler } from './pipe'
 
@@ -110,7 +110,7 @@ export type Listener<D, R> = (event: R, scope: EventScoped<D>) => boolean | unkn
 
 // Scope bindings
 
-type Reactor<T> = (next: T, prev: T) => void
+type Reactor<T> = (next: T, prev: T, helpers: ReactionHelpers) => void
 
 type Reactors<T> = {
     [P in keyof T]?: Reactor<NoInfer<T[P]>>
@@ -239,6 +239,24 @@ const isMonitoredThenable = (v: any) : v is MonitoredThenable => {
 //     }
 //     return value as any
 // }
+
+
+interface ReactionHelpers {
+    readonly isLast: boolean
+    readonly isFirst: boolean
+}
+
+class DefaultReactionHelpers implements ReactionHelpers {
+    get isLast () {
+        return isLastValue(_PatchingHub.scope[String(_ScopeKey)])
+    }
+    get isFirst () {
+        return false
+    }
+}
+
+const __helpers = new DefaultReactionHelpers()
+
 
 
 export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E> = HubOptions<D, E>> implements Stateable {
@@ -549,7 +567,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
                         const sub = entry.$subscribe((next: any, prev: any) => {
                             autoTerminalAware(() => {
                                 scopeKeyAware(k, () => {
-                                    binding(entry.$isTerminal ? next : entry, prev)
+                                    binding(entry.$isTerminal ? next : entry, prev, __helpers)
                                 })    
                             })
                         })
@@ -571,22 +589,22 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
                     this.events[i] = o.events[i] as any // FIXME
 
-                    for (let k in this.scope) {
+                    // for (let k in this.scope) {
 
-                        const bus = this.scope[k]
-                        const callback = this.events[i]
+                    //     const bus = this.scope[k]
+                    //     const callback = this.events[i]
                         
-                        if (isEventBus(bus) && bus.$hasEvent(i)) {
+                    //     if (isEventBus(bus) && bus.$hasEvent(i)) {
 
-                            const handler = bus.$on(i, (evt: any) => {
-                                noAutoTerminal(() => {
-                                    callback(evt, this.scope)
-                                })
-                            }, this)
+                    //         const handler = bus.$on(i, (evt: any) => {
+                    //             noAutoTerminal(() => {
+                    //                 callback(evt, this.scope)
+                    //             })
+                    //         }, this)
 
-                            newHandlers.push(handler) // FIXME
-                        }
-                    }
+                    //         newHandlers.push(handler) // FIXME
+                    //     }
+                    // }
 
                     const events = o.events[i] as any
                     if (typeof events === 'function') {
@@ -674,7 +692,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
             for (let disjoint of this.joints) {
                 if (disjoint) {
                     if (isMonitoredThenable(disjoint)) {
-                        debugger
+//                        debugger
                         disjoint.isPending && promises.push(disjoint)
                     }
                     else if (typeof disjoint === 'function') {
@@ -800,17 +818,58 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         return {}
     }
 
-    reset (nextOpts?: O) {
+    reinit (nextOpts?: O) {
+
+        // TODO здесь должна происходить очистка компонента
+        // предполагается, что сброс может происходить при удалении
+        // приводим к такому же состоянию, что и в конструкторе, т.е. этапу инициализации
+
+//         for (let joint of this.joints) {
+//             if (joint != null) {
+//                 if (isMonitoredThenable(joint)) {
+//                     console.warn('Ignore async disjoint')
+//                 }
+//                 else if (typeof joint === 'function') {
+//                     joint()
+//                 }
+//             }
+//         }
+
+//         // удаляем подписки на изменения
+//         for (let sub of this.subscriptions) {
+//             if (sub == null) {
+//                 console.error('Undefined subscription')
+//             }
+//             else {
+//                 sub.observable.$unsubscribe(sub)
+//             }
+//         }
+
+//         // удаляем подписки на события
+//         for (let h of this.handlers) {
+//             h.bus.$off(h)
+//         }
+
+// //        this.bindings = {}
+//         this.events = {}
+// //        this.subscriptions = []
+//         this.handlers = []
+//         this.joints = []
+        
+
         this.state = State.Initializing
 
-        if (nextOpts != null) {
-            console.warn('component update not yet ready', nextOpts, this)
-            this.patch(nextOpts)
-            return
+        console.warn('reinitialize', nextOpts, this.options)
+
+        if (nextOpts == null) {
+            nextOpts = this.options
         }
 
-        // FIXME возможно, необходимо сначала почистить хаб
-        this.patch(this.options)
+        this.options = {} as any
+
+        this.patch(nextOpts)
+
+
     }
 
 }

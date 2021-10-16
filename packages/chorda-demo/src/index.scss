@@ -25,6 +25,7 @@ body {
 .app {
     height: 100%;
     overflow-y: auto;
+    background-color: #f8f8f8;
 }
 
 
@@ -32,7 +33,6 @@ body {
 
 main {
     min-height: 100%;
-    background-color: #f8f8f8;
 }
 
 .app-layout {
@@ -185,7 +185,10 @@ main {
 
 
 
-
+.catapi-box {
+  max-width: 800px;
+  margin: 1rem auto;
+}
 
 .catapi-breed-dropdown {
   .dropdown-content {

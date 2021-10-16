@@ -1,4 +1,4 @@
-import { callable, computable, HtmlBlueprint, HtmlScope, mix, observable } from "@chorda/core"
+import { callable, computable, HtmlBlueprint, HtmlOptions, HtmlScope, mix, observable } from "@chorda/core"
 import { Custom, watch } from "../../../utils"
 
 
@@ -25,6 +25,7 @@ export type InfiniteScrollScope<I=any> = {
 
 export type InfiniteScrollEvents<I=any> = Pick<InfiniteScrollScope<I>, 'onNextPage'>
 
+export type InfiniteScrollBlueprintType<I, T=unknown, E=unknown> = HtmlBlueprint<T&InfiniteScrollScope<I>&HtmlScope, E&InfiniteScrollEvents<I>>
 
 export const withInfiniteScroll = <T, E>(props: HtmlBlueprint<T&InfiniteScrollScope&HtmlScope, E&InfiniteScrollEvents>) : HtmlBlueprint<T, E> => {
 

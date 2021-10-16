@@ -16,6 +16,7 @@ type CatApiScope = {
 export const CatApi = () : HtmlBlueprint<CatApiScope> => {
     return Custom({
         as: Box,
+        css: 'catapi-box',
         items: [
             Tabs({
                 centered: true,
@@ -31,6 +32,7 @@ export const CatApi = () : HtmlBlueprint<CatApiScope> => {
                         return selected == name
                     }),
                     onClick: (e, {selected, name}) => {
+                        debugger
                         selected.$value = name
                     }
                 })

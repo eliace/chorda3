@@ -35,6 +35,10 @@ export interface HtmlOptions<D, E, H, B=HtmlBlueprint<NoInfer<D>, NoInfer<E>, H>
 
 }
 
+
+
+
+
 //const o: HtmlOptions<any, any, any> = {}
 
 
@@ -209,7 +213,7 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
                 childrenAndText = [...children]
                 const i = children.findIndex(c => c.options.weight && c.options.weight > 0)
                 if (i == -1) {
-                    childrenAndText.push(text as any)
+                    childrenAndText.unshift(text as any)
                 }
                 else {
                     childrenAndText.splice(i, 0, text as any)
