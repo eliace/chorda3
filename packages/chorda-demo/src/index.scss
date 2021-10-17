@@ -46,6 +46,10 @@ main {
         padding-top: 4rem;
         border-right: 1px solid #eee;
         background-color: #fff;
+
+        .menu {
+          font-size: 0.875em;
+        }
     }
     > .app-content {
         width: calc(100% - 240px);

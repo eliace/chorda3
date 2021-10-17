@@ -60,12 +60,12 @@ export default <T>() : HtmlBlueprint<T> => {
                 //     __it: (v) => patch({items: v})
                 // },
                 joints: {
-                    detectBounds: ({$dom, bounds, items, $engine, $renderer}) => {
+                    detectBounds: ({$dom, bounds, items, $patcher, $renderer}) => {
 
                         const detect = () => {
     //                        console.log('detect bounds')
                             if ($dom.$value) {
-                                $engine.publish($renderer.task(() => {
+                                $patcher.publish($renderer.task(() => {
                                     bounds.$value = $dom.$value.getBoundingClientRect()
                                 }))
                             }
@@ -97,14 +97,14 @@ export default <T>() : HtmlBlueprint<T> => {
                         //     t = t2
                         // })
                     },
-                    watchScrollHeight: ({$dom, $engine, $renderer, items, scrollHeight, scrollHeightLock, scrollTop, bounds}) => {
+                    watchScrollHeight: ({$dom, $patcher, $renderer, items, scrollHeight, scrollHeightLock, scrollTop, bounds}) => {
 
                         const detectScrollHeight = () => {
     //                        console.log('detect scroll height')
                             const el = $dom.$value
     //                        console.log('detect scroll height')
                             if (el) {
-                                $engine.publish($renderer.task(() => {
+                                $patcher.publish($renderer.task(() => {
                                     // if (scrollTop + bounds.height > scrollHeight) {
                                     //     el.scrollTop = scrollHeight - bounds.height - 1
                                     // }
@@ -125,7 +125,7 @@ export default <T>() : HtmlBlueprint<T> => {
                         items.$subscribe(detectScrollHeight)
 
                     },
-                    detectLoadNeed: ({scrollHeight, scrollTop, bounds, scrollHeightLock, bus, $engine}) => {
+                    detectLoadNeed: ({scrollHeight, scrollTop, bounds, scrollHeightLock, bus, $patcher}) => {
 
                         const update = () => {
     //                        console.log('scroll', +scrollHeight, +scrollTop, +bounds.height)
@@ -154,7 +154,7 @@ export default <T>() : HtmlBlueprint<T> => {
                         //lastPage.$subscribe(update)
                             
                     },
-                    loadNextPage: ({lastPage, loading, totalPages, bus, scrollHeightLock, $engine, $renderer, $dom}) => {
+                    loadNextPage: ({lastPage, loading, totalPages, bus, scrollHeightLock, $patcher, $renderer, $dom}) => {
 
                         const loadNextPage = (p: number, q: string) => {
                             return Tmdb.api.searchMovie({page: p, query: q, language: 'ru'}).then(response => {
@@ -165,7 +165,7 @@ export default <T>() : HtmlBlueprint<T> => {
                         }
 
                         const resetScroll = () => {
-                            $engine.publish($renderer.task(() => {
+                            $patcher.publish($renderer.task(() => {
                                 $dom.$value.scrollTo(0, 0)
                             }))
                         }

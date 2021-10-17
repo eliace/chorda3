@@ -4,7 +4,6 @@ import { Keyed, NoInfer, Stateable } from './Hub'
 import { Mixed, mixin, MixRules } from './mix'
 import { buildClassName, Dom, DomNode, Renderable, Renderer, VNodeFactory } from './render'
 import { DefaultRules } from './rules'
-import { Observable } from './value'
 
 //------------------------------------
 // HTML
@@ -14,8 +13,6 @@ export type HtmlScope = {
     $renderer: Renderer&Scheduler&VNodeFactory
     $defaultLayout: Function
     $dom?: HTMLElement
-    //$vnodeFactory: VNodeFactory
-//    afterRender?: any
 } & GearScope
 
 export type HtmlBlueprint<D=unknown, E=unknown, H=any> = HtmlOptions<D, E, H>|string|boolean|Function|Mixed<any>//<HtmlBlueprint>
@@ -24,7 +21,6 @@ export interface HtmlOptions<D, E, H, B=HtmlBlueprint<NoInfer<D>, NoInfer<E>, H>
     layout?: Function
     render?: boolean
     dom?: H
-//    domEvents?: {[key: string]: (e: any, s: {[key: string]: Observable}) => void|boolean}
     tag?: string|boolean
     text?: string
 
@@ -49,7 +45,7 @@ export type HtmlEvents = GearEvents & {
     afterInit?: () => Stateable&Renderable
 }
 
-export type HtmlProps = {
+export type VdomProps = {
     className?: string
     styles?: {[k: string]: string|number}
     html?: string
@@ -114,7 +110,7 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
 
         // TODO
 
-        const dom = this.scope.$dom as HtmlProps
+        const dom = this.scope.$dom as VdomProps
 
         if (optPatch.classes) {
             dom.className = buildClassName(dom.className, o.classes)
@@ -140,8 +136,9 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
             if (html.isRoot) {
 //                debugger
                     // планируем перерисовку в свой такт (после всех патчей)
-                html.scope.$pipe.push(html.scope.$renderer.task(null))
-//                break
+                    //html.scope.$engine.publish(html.scope.$renderer.task(null))
+                    html.scope.$pipe.push(html.scope.$renderer.task(null))
+                    //                break
             }
             html = html.parent
         }
@@ -252,7 +249,7 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
                         }
                         else {
                             // немедленное удаление синхронизируем с патчами, чтобы избежать "моргания"
-                            html.scope.$engine.publish(html.scope.$renderer.task(null))
+                            html.scope.$patcher.publish(html.scope.$renderer.task(null))
                         }
         //                debugger
         //                break

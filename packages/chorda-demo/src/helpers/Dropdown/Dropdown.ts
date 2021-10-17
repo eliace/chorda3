@@ -101,7 +101,7 @@ export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&
                         onClick: (e, {selectItem, item}) => selectItem(item),
                         as: {
                             joints: {
-                                updateOffsets: ({$dom, $engine, $renderer, active, isSelected, isCurrent}) => {
+                                updateOffsets: ({$dom, $patcher, $renderer, active, isSelected, isCurrent}) => {
                                     // watch(() => {
                                     //     if ($dom.$value && isSelected.$value && active.$value) {
                                     //         $engine.pipeTask(() => {
@@ -116,7 +116,7 @@ export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&
                                                 $dom.$value.scrollIntoView({block: 'nearest'})
                                             }
                                             else {
-                                                $engine.publish($renderer.task(() => {
+                                                $patcher.publish($renderer.task(() => {
                                                     $dom.$value.scrollIntoView({block: 'nearest'})
                                                 }))
                                             }

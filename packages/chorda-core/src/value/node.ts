@@ -230,6 +230,8 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
             this._destroyed = false
         }
 
+        // FIXME в режиме auto terminal изменение значения запрещено
+
         // если новое значение является наблюдаемым, то берем только его значение
         // сейчас эта проверка дублирует аналогичную в publish
         if (newValue && typeof (newValue as ValueSet<any>).$at === 'function') {

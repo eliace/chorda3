@@ -148,7 +148,7 @@ export interface HubOptions<D, E> {
 
 
 export type HubScope = {
-    $engine: Scheduler
+    $patcher: Scheduler
     $pipe: Pipe
 //    afterDestroy?: () => void
 }
@@ -183,7 +183,7 @@ export type Keyed<T=unknown> = {
 let _PatchingHub : Hub<unknown, any> = undefined
 
 export const patch = (o: any) => {
-    _PatchingHub.scope.$engine.publish(ownTask(_PatchingHub.patch, o, _PatchingHub))
+    _PatchingHub.scope.$patcher.publish(ownTask(_PatchingHub.patch, o, _PatchingHub))
     //_PatchingHub.scope.$pipe.push(ownTask(_PatchingHub.patch, o, _PatchingHub))
 }
 
@@ -418,7 +418,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
                     // }
                 }
 
-                if (this.state == State.Initializing && (p == '$engine' || p == '$renderer' || p == '$pipe' )) {
+                if (this.state == State.Initializing && (p == '$patcher' || p == '$renderer' || p == '$pipe' )) {
                     const out = (target[p] && isAutoTerminal() && target[p].$isTerminal) ? target[p].$value : target[p]
                     delete target[p]
                     _InjectProps[String(p)] = PropState.None
@@ -477,7 +477,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         this.state = State.Initializing
 
         // добавляем патч в очередь задач
-        this.scope.$engine.publish(ownTask(this.patch, options, this))
+        this.scope.$patcher.publish(ownTask(this.patch, options, this))
     }
 
     patch (optPatch: O) : void {
@@ -567,7 +567,8 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
                         const sub = entry.$subscribe((next: any, prev: any) => {
                             autoTerminalAware(() => {
                                 scopeKeyAware(k, () => {
-                                    binding(entry.$isTerminal ? next : entry, prev, __helpers)
+                                    // здесь скоуп должен быть доступен только для чтения
+                                    binding(entry.$isTerminal ? next : entry, prev/*, this.scope*/)
                                 })    
                             })
                         })

@@ -1,11 +1,10 @@
 import { Blueprint, buildHtmlContext, buildHtmlOptions, Html, Scheduler } from "@chorda/core"
 import * as React from "react"
-import { createReactRenderer } from "."
+import { createReactRenderer } from "./renderer2"
 
 
 type StandaloneProps = {
     blueprint: Blueprint<unknown, unknown>
-    patcher: Scheduler
     context?: any
 }
 
@@ -15,7 +14,7 @@ export const ChordaStandalone = (props: StandaloneProps) => {
 
     const html = new Html(
         buildHtmlOptions(props.blueprint), 
-        {...props.context, ...buildHtmlContext(props.patcher, createReactRenderer())}
+        {...props.context, ...buildHtmlContext(createReactRenderer())}
     )
 
     const ref = (el: HTMLElement) => {

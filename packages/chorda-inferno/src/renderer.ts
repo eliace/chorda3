@@ -1,4 +1,4 @@
-import { AsyncEngine, Dom, HtmlProps, Keyed, Observable, ownTaskFilter, Renderable, Renderer, Scheduler, subscriptionTaskFilter, unknownTaskFilter, VNodeFactory } from "@chorda/core";
+import { AsyncEngine, Dom, VdomProps, Keyed, Observable, ownTaskFilter, Renderable, Renderer, Scheduler, subscriptionTaskFilter, unknownTaskFilter, VNodeFactory } from "@chorda/core";
 import { createTextVNode, createVNode, Ref, render } from "inferno";
 import { VNodeFlags, ChildFlags } from 'inferno-vnode-flags';
 
@@ -45,7 +45,7 @@ class InfernoRenderer extends AsyncEngine implements Renderer, VNodeFactory {
 
             this.roots.forEach((root, i) => {
                 render(rendered[i], root.el, () => {
-                    console.log('render inferno')
+//                    console.log('[inferno] dom ready')
 
                     tasks
                         .filter(ownTaskFilter(this))
@@ -55,6 +55,10 @@ class InfernoRenderer extends AsyncEngine implements Renderer, VNodeFactory {
                     console.log('[inferno] render end')
                 })
             })
+
+            if (this.roots.length == 0) {
+                console.log('[inferno] render end. no registered roots')
+            }
 
             this.processing = false
         })
@@ -68,7 +72,7 @@ class InfernoRenderer extends AsyncEngine implements Renderer, VNodeFactory {
         return this.roots.find((root) => root.node == node) != null
     }
 
-    createVNode <P, O extends HtmlProps>(key: string, vnodeProps: P, dom: O&Dom&Observable<HTMLElement>, children: any[]) {
+    createVNode <P, O extends VdomProps>(key: string, vnodeProps: P, dom: O&Dom&Observable<HTMLElement>, children: any[]) {
         const props: any = {
             ...vnodeProps
         }

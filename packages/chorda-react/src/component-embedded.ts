@@ -6,7 +6,6 @@ import { createEmbedReactRenderer } from "./embedded"
 
 type EmbeddedProps = {
     blueprint: Blueprint<unknown, unknown>
-    patcher: Scheduler
 }
 
 
@@ -29,7 +28,7 @@ export const ChordaEmbedded = (props: EmbeddedProps) => {
 
         debugger
         
-        const html = new Html(buildHtmlOptions(props.blueprint), buildHtmlContext(props.patcher, renderer))
+        const html = new Html(buildHtmlOptions(props.blueprint), buildHtmlContext(renderer))
         
         html.attach(null)
         //renderer.attach(null, html)

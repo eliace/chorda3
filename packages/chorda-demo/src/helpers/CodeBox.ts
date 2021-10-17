@@ -1,4 +1,4 @@
-import { HtmlBlueprint, HtmlProps, HtmlScope, mix, Value } from "@chorda/core"
+import { HtmlBlueprint, VdomProps, HtmlScope, mix, Value } from "@chorda/core"
 
 import * as Prism from 'prismjs'
 import 'prismjs/themes/prism-tomorrow.css'

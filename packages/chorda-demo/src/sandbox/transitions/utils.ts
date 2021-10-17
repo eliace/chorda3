@@ -1,5 +1,4 @@
 import { Blueprint, callable, HtmlScope, InferBlueprint, mix, observable } from "@chorda/core";
-import { dom } from "@fortawesome/fontawesome-svg-core";
 import { watch } from "../../utils";
 
 
@@ -20,7 +19,7 @@ export const withShowHide = <T, E>(props: Blueprint<T, E>, showName: string = 'f
             animation: () => observable(null)
         },
         joints: {
-            showHide: ({$dom, $pipe, $renderer, $engine, animation}) => {
+            showHide: ({$dom, $pipe, $renderer, $patcher, animation}) => {
 
                 console.log('join showHide')
 
@@ -50,7 +49,7 @@ export const withShowHide = <T, E>(props: Blueprint<T, E>, showName: string = 'f
 
                     el.classList.add(name+'-enter-active', name+'-enter')
                     
-                    $engine.publish($renderer.task(() => {
+                    $patcher.publish($renderer.task(() => {
                         if ($dom.$value == null) {
                             console.warn('dom detached')
                             return
@@ -58,14 +57,14 @@ export const withShowHide = <T, E>(props: Blueprint<T, E>, showName: string = 'f
                         console.log('show begin')
                         el.classList.remove(name+'-enter')    
                         // el.classList.add(name+'-leave-to')
-                        $engine.publish($renderer.task(() => {
+                        $patcher.publish($renderer.task(() => {
                             if ($dom.$value == null) {
                                 console.warn('dom detached')
                                 return
                             }
                             waitTransitionEnd(el, () => {
                                 console.log('show end')
-                                $engine.publish($renderer.task(() => {
+                                $patcher.publish($renderer.task(() => {
                                     el.classList.remove(name+'-enter-active')
 
                                     if (animation.$value == 'show') {
@@ -98,7 +97,7 @@ export const withShowHide = <T, E>(props: Blueprint<T, E>, showName: string = 'f
 
 //                    const cnt = performance.now()
                     
-                    $engine.publish($renderer.task(() => {
+                    $patcher.publish($renderer.task(() => {
                         if ($dom.$value == null) {
                             console.warn('dom detached')
                             done()
@@ -107,7 +106,7 @@ export const withShowHide = <T, E>(props: Blueprint<T, E>, showName: string = 'f
                         console.log('hide begin')
                         el.classList.remove(name+'-leave')    
                         el.classList.add(name+'-leave-to')
-                        $engine.publish($renderer.task(() => {
+                        $patcher.publish($renderer.task(() => {
                             if ($dom.$value == null) {
                                 console.warn('dom detached')
                                 done()
@@ -161,7 +160,7 @@ export const withFLIP = <T, E>(props: Blueprint<T&FLIPScope, E>) : InferBlueprin
             flip: () => callable(null)
         },
         joints: {
-            flip: ({$dom, flip, $engine, $renderer}) => {
+            flip: ({$dom, flip, $patcher, $renderer}) => {
 
                 const name = 'flip-list'
 
@@ -178,7 +177,7 @@ export const withFLIP = <T, E>(props: Blueprint<T&FLIPScope, E>) : InferBlueprin
 
                     el.style.transform = 'none'
 
-                    $engine.publish($renderer.task(() => {
+                    $patcher.publish($renderer.task(() => {
                         const bcr2 = el.getBoundingClientRect()
 
                         const dx = bcr.left - bcr2.left
@@ -194,9 +193,9 @@ export const withFLIP = <T, E>(props: Blueprint<T&FLIPScope, E>) : InferBlueprin
                         el.style.transition = 'none'
                         console.log('[flip] last+invert', dx, dy)
 
-                        $engine.publish($renderer.task(() => {
+                        $patcher.publish($renderer.task(() => {
 
-                            el.getBoundingClientRect()
+                            el.getBoundingClientRect() // force reflow
 
                             el.classList.add(name+'-move')
                             el.style.transform = ''

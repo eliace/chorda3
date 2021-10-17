@@ -4,6 +4,7 @@ import { BreadcrumbExample } from "./breadcrumb"
 import { CardExample } from "./card"
 import { MenuExample } from "./menu"
 import { MessageExample } from "./message"
+import { ModalExample } from "./modal"
 import { NavbarExample } from "./navbar"
 import { TabsExample } from "./tabs"
 
@@ -32,6 +33,11 @@ export const Components = () : InferBlueprint<unknown> => {
             name: 'message',
             link: '/#/components/message',
             example: MessageExample
+        }, {
+            title: 'Modal',
+            name: 'modal',
+            link: '/#/components/modal',
+            example: ModalExample
         }, {
             title: 'Navbar',
             name: 'navbar',

@@ -105,10 +105,10 @@ export default <T>() : InferBlueprint<T> => {
                     templates: {
                         menu: withBounds({
                             joints: {
-                                updateBounds: ({$dom, bounds, active, $engine, $renderer}) => {
+                                updateBounds: ({$dom, bounds, active, $patcher, $renderer}) => {
                                     watch(() => {
                                         if ($dom.$value /*&& active.$value*/) {
-                                            $engine.publish($renderer.task(() => {
+                                            $patcher.publish($renderer.task(() => {
                                                 const prevDisplay = $dom.$value.style.display
                                                 $dom.$value.style.display = 'block'
                                                 bounds.$value = $dom.$value.getBoundingClientRect()

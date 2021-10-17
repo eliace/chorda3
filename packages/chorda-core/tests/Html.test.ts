@@ -1,14 +1,14 @@
 import { expect } from "chai"
 import { defaultHtmlFactory, defaultLayout, EventBus, Gear, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, observable, patch, Value } from "../src"
-import { attachRoot, createPatchScheduler, createRenderScheduler, immediateRender, immediateTick } from "./utils"
+import { attachRoot, createTestPatcher, createTestRenderer, immediateRender, immediateTick } from "./utils"
 
 
 
 
 const createHtml = <D, E=unknown, H=any>(o: HtmlOptions<D&HtmlScope, E, H>) : Html<D, E> => {
     const s = new Html<D, E>(o, {
-        $engine: createPatchScheduler(), 
-        $renderer: createRenderScheduler(),
+        $patcher: createTestPatcher(), 
+        $renderer: createTestRenderer(),
         $pipe: null,
         $defaultFactory: defaultHtmlFactory,
         $defaultLayout: defaultLayout,

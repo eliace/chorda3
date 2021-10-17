@@ -1,4 +1,4 @@
-import { HtmlBlueprint, iterable, observable } from "@chorda/core";
+import { HtmlBlueprint, InferBlueprint, iterable, observable } from "@chorda/core";
 import { Cell, Row, Table } from "chorda-bulma";
 import { COUNTRIES, Country } from "../data";
 import { Coerced } from "../utils";
@@ -13,8 +13,8 @@ const countries = observable(COUNTRIES, (v) => v.name)
 
 const screenNulls = <T>(v: T) => v == null ? '-' : String(v)
 
-export default () : HtmlBlueprint => {
-    return Table<ExampleScope>({
+export default () : InferBlueprint<ExampleScope> => {
+    return Table({
         headerRows: [
             Row({
                 cells: [

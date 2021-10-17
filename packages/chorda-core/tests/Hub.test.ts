@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { Hub, State, HubOptions, observable, EventBus, computable, ObservableValueIterator } from '../src'
-import { createPatchScheduler, immediateTick } from './utils'
+import { createTestPatcher, immediateTick } from './utils'
 
 
 
@@ -11,7 +11,7 @@ type Data = {
 
 
 const createHub = <D, E=unknown>(o: HubOptions<D, E>) : Hub<D, E> => {
-    const s = new Hub<D, E>(o, {$engine: createPatchScheduler(), $pipe: null})
+    const s = new Hub<D, E>(o, {$patcher: createTestPatcher(), $pipe: null})
     immediateTick()
     return s
 }

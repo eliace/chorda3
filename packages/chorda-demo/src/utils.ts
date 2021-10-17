@@ -1,8 +1,5 @@
 import { autoTerminalAware, Blueprint, callable, Callable, buildHtmlContext, buildHtmlOptions, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, ownTask, patch, pipe, PublishFunc, Scope, spyGetters, Value } from "@chorda/core"
-import { createAsyncPatcher } from "@chorda/engine"
 import { createReactRenderer, ReactDomEvents } from "@chorda/react"
-import { Transaction } from "chorda-core/src/value/engine"
-import { Route } from "router5"
 import * as vis from "vis-network"
 import { App, routes } from "./App"
 import { RouterScope, useRouter } from "./router"
@@ -31,10 +28,7 @@ export const createAppScope = () : HtmlScope => {
 //         router: null
 //     }
 
-    const context: HtmlScope&RouterScope = {router: null, ...buildHtmlContext(
-        createAsyncPatcher(),
-        createReactRenderer()
-    )}
+    const context: HtmlScope&RouterScope = {router: null, ...buildHtmlContext(createReactRenderer())}
 
     useRouter(context, (router) => {
         router.setOption('defaultRoute', 'home')
@@ -93,6 +87,10 @@ export const withHtml = <T, E>(props: Blueprint<T&HtmlScope, E&HtmlEvents&ReactD
 // }
 
 export const withBlueprint = <T, E=unknown>(props: CustomProps<T, E>) : InferBlueprint<T, E> => {
+    return mix(props.as, props)
+}
+
+export const withHtmlBlueprint = <T, E=unknown>(props: CustomProps<T&HtmlScope, E&HtmlEvents&ReactDomEvents>) : InferBlueprint<T, E> => {
     return mix(props.as, props)
 }
 
@@ -286,7 +284,7 @@ export type ListBlueprint<I, T=unknown, E=unknown, H=any> = Omit<HtmlOptions<T&{
 }
 
 
-export const withList = <T extends Scope, E> (props: ListBlueprint<unknown, T, E>) : InferBlueprint<T, E> => {
+export const withList = <T extends Scope, E> (props: ListBlueprint<unknown, T&{items: unknown[]}, E>) : InferBlueprint<T, E> => {
     return mix<{$items: unknown[], items: unknown[], $item: unknown, item: unknown}>(props, {
         injections: {
             $items: ($) => iterable($.items, '$item')

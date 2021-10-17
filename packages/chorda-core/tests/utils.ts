@@ -1,4 +1,4 @@
-import { HtmlProps, Keyed, ownTaskFilter, Scheduler, Stateable, subscriptionTaskFilter, unknownTaskFilter, BufferedEngine } from "../src"
+import { VdomProps, Keyed, ownTaskFilter, Scheduler, Stateable, subscriptionTaskFilter, unknownTaskFilter, BufferedEngine } from "../src"
 import { Dom, Renderable, Renderer, VNodeFactory } from "../src/render"
 
 
@@ -66,7 +66,7 @@ import { Dom, Renderable, Renderer, VNodeFactory } from "../src/render"
 const _testEngine = new BufferedEngine()
 
 
-export const createPatchScheduler = () : Scheduler => {
+export const createTestPatcher = () : Scheduler => {
     return _testEngine
 }
 
@@ -119,7 +119,7 @@ class TestRenderer extends BufferedEngine implements Renderer, VNodeFactory {
         this.flush()
     }
 
-    createVNode <P, H extends HtmlProps>(key: string, vnodeProps: P, htmlProps: Dom&H, children?: any[]) : any {
+    createVNode <P, H extends VdomProps>(key: string, vnodeProps: P, htmlProps: Dom&H, children?: any[]) : any {
         const props: any = {...vnodeProps}
         if (key != null) {
             props.key = key
@@ -210,7 +210,7 @@ export class TestRenderer implements Renderer, Engine<any> {
 
 const _testRenderer = new TestRenderer()
 
-export const createRenderScheduler = () => {
+export const createTestRenderer = () => {
     return _testRenderer
 }
 

@@ -1,7 +1,7 @@
-import { Html } from ".";
-import { defaultHtmlFactory, defaultHtmlInitRules, defaultLayout, HtmlBlueprint, HtmlOptions, HtmlScope } from "./Html";
+import { createAsyncPatcher } from "./patcher";
+import { defaultHtmlFactory, defaultHtmlInitRules, defaultLayout, Html, HtmlBlueprint, HtmlOptions, HtmlScope } from "./Html";
 import { NoInfer } from "./Hub";
-import { Mixed, mixin } from "./mix";
+import { mixin } from "./mix";
 import { pipe, Scheduler } from "./pipe";
 import { Renderer, VNodeFactory } from "./render";
 
@@ -25,11 +25,12 @@ export const buildHtmlOptions = <T>(blueprint: InferBlueprint<T>) : HtmlOptions<
     return b
 }
 
-export const buildHtmlContext = (patcher: Scheduler, renderer: Scheduler&Renderer&VNodeFactory) : HtmlScope => {
+export const buildHtmlContext = (renderer: Scheduler&Renderer&VNodeFactory) : HtmlScope => {
+    const patcher = createAsyncPatcher()
     return {
         $defaultFactory: defaultHtmlFactory,
         $defaultLayout: defaultLayout,
-        $engine: patcher,
+        $patcher: patcher,
         $renderer: renderer,
         $pipe: pipe(patcher, renderer)
     }

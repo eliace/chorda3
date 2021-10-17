@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, mix, observable, patch } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, mix, observable, patch } from "@chorda/core"
 import { Image } from "chorda-bulma";
 import { Custom } from "../../utils";
 
@@ -11,12 +11,15 @@ import './ListBox.scss'
 type ListBoxProps<T> = {
     defaultItem?: HtmlBlueprint<T>
     items?: HtmlBlueprint<T>[]
+    as?: HtmlBlueprint<T>
 }
 
 export const ListBox = <T>(props: ListBoxProps<T>) : HtmlBlueprint<T> => {
     return mix({
         css: 'list-box'
-    }, props && {
+    },
+    props?.as, 
+    props && {
         defaultItem: props.defaultItem,
         items: props.items,
     })
@@ -40,9 +43,10 @@ type ListBoxItemProps<T> = {
     text$?: Injector<T>
     subtitle$?: Injector<T>
     image$?: Injector<T>
+    as?: Blueprint<T>
 }
 
-export const ListBoxItem = <T>(props: ListBoxItemProps<T&ListBoxItemScope>) : HtmlBlueprint<T> => {
+export const ListBoxItem = <T>(props: ListBoxItemProps<T&ListBoxItemScope>) : InferBlueprint<T> => {
     return mix<ListBoxItemScope>({
         css: 'list-box-item',
         templates: {
@@ -74,7 +78,9 @@ export const ListBoxItem = <T>(props: ListBoxItemProps<T&ListBoxItemScope>) : Ht
                 })
             })
         }
-    }, props && {
+    },
+    props?.as, 
+    props && {
         templates: {
             image: props.image,
             content: {

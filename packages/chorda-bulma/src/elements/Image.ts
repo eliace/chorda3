@@ -8,6 +8,7 @@ type ImageProps<T> = {
     css?: string
     url$?: Injector<T>
     rounded?: boolean
+    lazy?: boolean
 }
 
 
@@ -28,7 +29,8 @@ export const Image = <T>(props: ImageProps<T>) : HtmlBlueprint<T> => {
         components: {
             image: {
                 dom: {
-                    src: props.url
+                    src: props.url,
+                    loading: props.lazy && "lazy"
                 },
                 classes: {
                     'is-rounded': props.rounded

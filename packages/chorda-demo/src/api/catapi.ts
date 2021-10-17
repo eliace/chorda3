@@ -124,7 +124,7 @@ export namespace CatApi {
 
 const rest = axios.create({
     baseURL: 'https://api.thecatapi.com/v1',
-    headers: {'x-api-key': 'b732ff52-c3f2-4406-a0ee-f6b40ef3aab1'}
+    headers: {'x-api-key': 'API_KEY'}
 })
 
 

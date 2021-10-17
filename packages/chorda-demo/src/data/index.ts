@@ -14,6 +14,8 @@ export const IMAGE_BASE64 = require('./Yosemite_sq.jpg?base64')
 
 export const IMAGE_PLACEHOLDER = require('./Yosemite_3_sq.jpg')
 
+export const CURIOSITY_IMAGE_URL = require('./curiosity.jpg')
+
 export type Country = {
     name: string
     capital: string
@@ -79,4 +81,23 @@ export type User = {
         thumbnail: string
     },
     nat: string
+}
+
+export type Movie = {
+    "Title": string
+    "US Gross": number
+    "Worldwide Gross": number
+    "US DVD Sales": number 
+    "Production Budget": number 
+    "Release Date": string 
+    "MPAA Rating": string
+    "Running Time min": number
+    "Distributor": string
+    "Source": string
+    "Major Genre": string
+    "Creative Type": string
+    "Director": string
+    "Rotten Tomatoes Rating": number
+    "IMDB Rating": number
+    "IMDB Votes": number
 }

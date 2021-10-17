@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { Blueprint, defaultGearFactory, Gear, GearOptions, observable, patch, mixin, mix, iterable, isObservable } from '../src'
-import { createPatchScheduler, immediateTick } from './utils'
+import { createTestPatcher, immediateTick } from './utils'
 import * as _ from 'lodash'
 
 
@@ -17,7 +17,7 @@ type TestEvents = {
 
 
 const createGear = <D>(o: Blueprint<D>) : Gear<D> => {
-    const s = new Gear<D>(o as GearOptions<D, unknown>, {$engine: createPatchScheduler(), $defaultFactory: defaultGearFactory} as any)
+    const s = new Gear<D>(o as GearOptions<D, unknown>, {$engine: createTestPatcher(), $defaultFactory: defaultGearFactory} as any)
     immediateTick()
     return s
 }

@@ -49,13 +49,12 @@ export const ChordaComponent = () => {
 
         if (!html) {
 
-            const patcher = createAsyncPatcher()
             const renderer = createEmbedReactRenderer((r: any[]) => {
                 roots = html.render(true)// r[0]
                 forceUpdate()
             })
             
-            html = new Html(buildHtmlOptions(Test()), buildHtmlContext(patcher, renderer))
+            html = new Html(buildHtmlOptions(Test()), buildHtmlContext(renderer))
             
             renderer.attach(null, html)
 
@@ -95,7 +94,6 @@ export const ChordaComponent2 = () => {
 
     return ChordaStandalone({
         blueprint: Test(),
-        patcher: createAsyncPatcher(),
         context: ctx
     })
 }
@@ -103,6 +101,5 @@ export const ChordaComponent2 = () => {
 export const ChordaComponent3 = () => {
     return ChordaEmbedded({
         blueprint: Test(),
-        patcher: createAsyncPatcher()
     })
 }

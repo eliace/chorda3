@@ -7,3 +7,4 @@ export * from './value'
 export * from './render'
 export * from './mix'
 export * from './pipe'
+export * from "./patcher"

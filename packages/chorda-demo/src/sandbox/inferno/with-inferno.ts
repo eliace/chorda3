@@ -1,42 +1,44 @@
-import { Blueprint, HtmlEvents, HtmlScope, InferBlueprint, mix, observable, pipe, Renderable } from "@chorda/core"
-import { createAsyncPatcher } from "@chorda/engine"
+import { Blueprint, HtmlEvents, HtmlScope, InferBlueprint, mix, observable, patch, pipe, Renderable } from "@chorda/core"
 import { createInfernoRenderer } from "@chorda/inferno"
 import { watch } from "../../utils"
 
+type InfernoScope = {
+    infernoRoot: Renderable
+    parentEl: HTMLElement
+}
 
-
-const infernoRenderer = createInfernoRenderer()
-const infernoPatcher = createAsyncPatcher('inferno')
-
+const renderer = createInfernoRenderer()
 
 export const withInferno = <T, E>(props: Blueprint<T, E>) : InferBlueprint<T, E> => {
-    return mix<{_root: Renderable, _contextDom: any}&HtmlScope, HtmlEvents>({
+    return mix<InfernoScope&HtmlScope, HtmlEvents>({
         initials: {
-            _root: () => observable(null),
-            $engine: () => infernoPatcher,
-            $renderer: () => infernoRenderer,
+            infernoRoot: () => observable(null),
+//            parentEl: () => observable(null),
+//            $engine: () => patcher,
+            $renderer: () => renderer,
         },
         injections: {
-            _contextDom: ($) => $.$context.$dom,
-            $pipe: ($) => pipe($.$engine, $.$renderer),
+            parentEl: $ => $.$context.$dom,
+            $pipe: $ => pipe($.$patcher, $.$renderer),
         },
         events: {
-            afterInit: (html, {_root}) => {
-                _root.$value = html
+            afterInit: (html, {infernoRoot}) => {
+                infernoRoot.$value = html
             }
         },
         joints: {
-            connectToContextDom: ({_contextDom, _root}) => {
+            connectToContextDom: ({infernoRoot, parentEl, $renderer}) => {
+                
                 watch(() => {
-                    if (_contextDom.$value) {
-                        console.log('inferno attach', _root.$value)
-                        infernoRenderer.attach(_contextDom.$value, _root.$value)
+                    if (parentEl.$value) {
+                        console.log('inferno attach')
+                        $renderer.attach(parentEl.$value, infernoRoot.$value)
                     }
                     else {
-                        console.log('inferno detach', _root.$value)
-                        infernoRenderer.detach(_root.$value)
+                        console.log('inferno detach')
+                        $renderer.detach(infernoRoot.$value)
                     }
-                }, [_contextDom, _root])
+                }, [parentEl])
             }
         },
     }, props)

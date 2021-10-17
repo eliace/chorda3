@@ -1,4 +1,4 @@
-import { AsyncEngine, Dom, HtmlBlueprint, HtmlProps, Keyed, Observable, ownTaskFilter, Renderable, Renderer, Scheduler, subscriptionTaskFilter, unknownTaskFilter, VNodeFactory } from "@chorda/core";
+import { AsyncEngine, Dom, VdomProps, Keyed, Observable, ownTaskFilter, Renderable, Renderer, Scheduler, subscriptionTaskFilter, unknownTaskFilter, VNodeFactory } from "@chorda/core";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
@@ -78,7 +78,7 @@ export class ReactRenderer2 extends AsyncEngine implements Renderer, VNodeFactor
         return this.roots.find((root) => root.node == node) != null
     }
 
-    createVNode <P, O extends HtmlProps>(key: string, vnodeProps: P, dom: O&Dom&Observable<HTMLElement>, children: any[]) {
+    createVNode <P, O extends VdomProps>(key: string, vnodeProps: P, dom: O&Dom&Observable<HTMLElement>, children: any[]) {
         const tag = dom.tag
         const props: any = {
             ...vnodeProps,

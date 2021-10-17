@@ -1,6 +1,6 @@
 import { InferBlueprint, observable } from "@chorda/core"
 import { Field, Fields, RowLayout } from "chorda-bulma"
-import { DynamicList, ListBlueprint, withIterableItems, withList } from "../../utils"
+import { DynamicList, ListBlueprint, watch, withIterableItems, withList } from "../../utils"
 import { Tmdb } from "../../api"
 import { TextInput } from "../../helpers"
 import { MovieListItem } from "./common/items"
@@ -48,8 +48,7 @@ export default () : InferBlueprint<unknown> => {
             ]
         }),
         withInfiniteScroll(withList(<ListBlueprint<Tmdb.Movie, InfiniteScrollScope<Tmdb.Movie>, InfiniteScrollEvents<Tmdb.Movie>>>{
-//        withInfiniteScroll(withList(<ListBlueprint<Tmdb.Movie> & InfiniteScrollBlueprintType<Tmdb.Movie>>{
-                defaultItem: MovieListItem({
+            defaultItem: MovieListItem({
                 movie$: (scope) => scope.item,
                 genres$: () => genres,
             }),
@@ -57,12 +56,15 @@ export default () : InferBlueprint<unknown> => {
                 maxHeight: 380,
                 overflowY: 'auto'
             },
+            injections: {
+                items: $ => $.infiniteItems
+            },
             joints: {
                 autoLoad: async ({infiniteScroll}) => {
 
-                    query.$subscribe(() => {
+                    watch(() => {
                         infiniteScroll.resetAndGetFirst()
-                    })
+                    }, [query])
 
                     await Promise.all([loadConfig(), loadGenres('ru')])
 
@@ -82,9 +84,6 @@ export default () : InferBlueprint<unknown> => {
                     }
                 }
             },
-            injections: {
-                items: $ => $.infiniteItems
-            }
         })),
         // withIterableItems(<ListBlueprint<Tmdb.Movie, MoviesScope&InfiniteScrollScope<Tmdb.Movie>>>{
         //     defaultItem: MovieListItem({

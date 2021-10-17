@@ -26,6 +26,8 @@ export interface Renderer<P=any, H=any> {
 export interface Renderable {
     render(asRoot?: boolean) : VNode
     readonly isRoot : boolean
+    // attach (root: Element) : void
+    // detach () : void
 }
 
 export interface VNodeFactory {

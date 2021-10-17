@@ -7,7 +7,7 @@ import { InfernoExample } from "./inferno"
 import { ListExample } from "./list"
 import { SelectExample } from "./select"
 import { TransitionsExample } from "./transitions"
-
+import Huge from "./huge"
 
 
 export const Sandbox = () : HtmlBlueprint => {
@@ -48,6 +48,11 @@ export const Sandbox = () : HtmlBlueprint => {
             name: 'transitions',
             link: '/#/sandbox/transitions',
             example: TransitionsExample
+        }, {
+            title: 'Huge',
+            name: 'huge',
+            link: '/#/sandbox/huge',
+            example: Huge
         }]
     })
 }
