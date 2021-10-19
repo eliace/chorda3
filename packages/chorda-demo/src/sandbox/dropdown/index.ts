@@ -20,10 +20,10 @@ export const DropdownExample = () : HtmlBlueprint => {
             files: [{
                 name: 'index.ts',
                 code: require('!raw-loader!./dropdown-component').default
-            }, {
+            }/*, {
                 name: 'dropdown.ts',
                 code: require('!raw-loader!../../helpers/dropdown').default
-            }]
+            }*/]
         }),
         Example({
             title: 'Dropdown + multi',
