@@ -8,10 +8,10 @@
       "allowJs": true,
       "moduleResolution": "node",
       "declaration": true,
-      // "baseUrl": "../",
-      // "paths": {
-      //   "@chorda/core": ["chorda-core/src"],
-      // }
+      "baseUrl": "../",
+      "paths": {
+        "@chorda/core": ["chorda-core/src"],
+      }
     },
     "exclude": [
       "node_modules",

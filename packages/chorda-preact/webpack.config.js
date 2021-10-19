@@ -26,9 +26,9 @@ module.exports = {
     },
     resolve: {
         extensions: ['.ts', '.js'],
-        // alias: {
-        //     '@chorda/core': path.resolve('../chorda-core/src'),
-        // }
+        alias: {
+            '@chorda/core': path.resolve('../chorda-core/src'),
+        }
     },
     plugins: [
         /*new CompressionPlugin()*/

@@ -8,9 +8,9 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@chorda/core": "^3.0.0",
-    "inferno": "^7.4.10"
+  "peerDependencies": {
+    "inferno": "^7.4.10",
+    "inferno-vnode-flags": "^7.4.10"
   },
   "devDependencies": {
     "ts-loader": "^9.2.6",

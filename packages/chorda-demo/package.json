@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve",
-    "build": "webpack build"
+    "build": "npm run prepare:react && npm run prepare:inferno && npm run prepare:preact && webpack build",
+    "prepare:react": "cd ../chorda-react && npm i react react-dom && cd ../chorda-demo",
+    "prepare:inferno": "cd ../chorda-inferno && npm i inferno inferno-vnode-flags && cd ../chorda-demo",
+    "prepare:preact": "cd ../chorda-preact && npm i preact && cd ../chorda-demo"
   },
   "author": "",
   "license": "MIT",

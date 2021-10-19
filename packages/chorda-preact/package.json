@@ -8,8 +8,7 @@
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@chorda/core": "^3.0.0",
+  "peerDependencies": {
     "preact": "^10.5.15"
   },
   "devDependencies": {
