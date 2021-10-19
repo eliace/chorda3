@@ -7,7 +7,6 @@ module.exports = {
         "alias": {
           // Add your aliases here
           "@chorda/core": "../chorda-core/src",
-          "@chorda/engine": "../chorda-engine/src",
           "@chorda/react": "../chorda-react/src",
         }
       }

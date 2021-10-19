@@ -71,6 +71,7 @@ module.exports = {
         alias: {
             'chorda-bulma': path.resolve('../chorda-bulma/src'),
             '@chorda/react': path.resolve('../chorda-react/src'),
+            '@chorda/preact': path.resolve('../chorda-preact/src'),
 //            '@chorda/engine': path.resolve('../chorda-engine/src'),
             '@chorda/core': path.resolve('../chorda-core/src'),
             '@chorda/inferno': path.resolve('../chorda-inferno/src'),

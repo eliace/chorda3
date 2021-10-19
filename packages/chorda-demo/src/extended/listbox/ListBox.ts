@@ -70,7 +70,10 @@ export const ListBoxItem = <T>(props: ListBoxItemProps<T&ListBoxItemScope>) : In
                 }
             },
             image: Custom({
-                css: 'list-box-item__image is-after',
+                css: 'list-box-item__image',
+                classes: {
+                    'is-after': true
+                },
                 weight: 10,
                 as: Image({
                     rounded: true,

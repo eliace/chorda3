@@ -42,7 +42,8 @@ export class ReactRenderer2 extends AsyncEngine implements Renderer, VNodeFactor
 
     schedule () {
         this.scheduled = true
-        requestAnimationFrame(() => {
+        queueMicrotask(() => {
+//        requestAnimationFrame(() => {
 //            console.log('[react] render start')
             this.scheduled = false
 

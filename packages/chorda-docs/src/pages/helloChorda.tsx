@@ -1,15 +1,12 @@
 import React from 'react';
 import Layout from '@theme/Layout';
-import { createHtmlContext, createHtmlOptions, Html } from "../../../chorda-core/src";
-import { createAsyncPatcher } from "../../../chorda-engine/src";
+import { buildHtmlContext, buildHtmlOptions, Html } from "../../../chorda-core/src";
 import { createReactRenderer } from "../../../chorda-react/src";
-import App from "../../../chorda-realworld/src/App";
 
 
-const options = createHtmlOptions(App())
+const options = buildHtmlOptions({})
 
-const context = createHtmlContext(
-  createAsyncPatcher(), 
+const context = buildHtmlContext(
   createReactRenderer() 
 )
 

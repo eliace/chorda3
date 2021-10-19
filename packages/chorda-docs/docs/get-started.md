@@ -24,8 +24,8 @@ import { Html, attach, buildHtmlOptions, buildHtmlContext } from "@chorda/core"
 import { createReactRenderer } from "@chorda/react"
 
 
-// 1. создаем конфигурацию
-const App = () => {
+// 1. создаем конфигурацию приложения
+const createApp = () => {
     return {
         tag: 'span',
         text: 'Hello!'
@@ -34,7 +34,7 @@ const App = () => {
 
 // 2. создаем дерево компонентов
 const html = new Html(
-    buildHtmlOptions(App()),
+    buildHtmlOptions(createApp()),
     buildHtmlContext(createReactRenderer())
 )
 

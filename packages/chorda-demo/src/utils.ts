@@ -86,9 +86,11 @@ export const withHtml = <T, E>(props: Blueprint<T&HtmlScope, E&HtmlEvents&ReactD
 //     return mix(props.as, props)
 // }
 
-export const withBlueprint = <T, E=unknown>(props: CustomProps<T, E>) : InferBlueprint<T, E> => {
+export const withBlueprint = <T, E>(props: CustomProps<T, E>) : InferBlueprint<T, E> => {
     return mix(props.as, props)
 }
+
+export const withAs = withBlueprint
 
 export const withHtmlBlueprint = <T, E=unknown>(props: CustomProps<T&HtmlScope, E&HtmlEvents&ReactDomEvents>) : InferBlueprint<T, E> => {
     return mix(props.as, props)
@@ -279,8 +281,8 @@ export const withItem = <I, T=unknown>(props: HtmlBlueprint<T&DynamicListScope<I
 
 
 export type ListBlueprint<I, T=unknown, E=unknown, H=any> = Omit<HtmlOptions<T&{items: I[]}, E, H>, 'defaultItem'|'items'> & {
-    defaultItem?: Blueprint<T&{item: I}>
-    items?: Blueprint<T&{item: I}>[]
+    defaultItem?: Blueprint<T&{item: I}, E>
+    items?: Blueprint<T&{item: I}, E>[]
 }
 
 

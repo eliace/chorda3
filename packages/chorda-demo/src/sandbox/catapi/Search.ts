@@ -132,6 +132,7 @@ type FavouriteButtonProps<T, E> = {
 
 const FavouriteButton = <T, E>(props: FavouriteButtonProps<T&FavouriteScope, E>) : InferBlueprint<T, E> => {
     return mix<FavouriteScope, ReactDomEvents>({
+        css: 'action',
         injections: {
             favourite: props.isFavourite$
         },
@@ -302,7 +303,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                                     onClick: (e, {markAsFavourite, item}) => markAsFavourite(item),
                                     as: FaIcon({
                                         icon: faHeart
-                                    })
+                                    }),
                                 })
                             },
                             // joints: {

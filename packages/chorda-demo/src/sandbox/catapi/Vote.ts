@@ -78,7 +78,7 @@ export const Vote = () : InferBlueprint<VoteScope&HtmlScope> => {
                                 templates: {
                                     content: {
                                         joints: {
-                                            showHide: ({$dom, url, $renderer}) => {
+                                            showHide: ({$dom, url, $renderer, $patcher}) => {
         
                                                 const name = 'fade'
         
@@ -86,7 +86,7 @@ export const Vote = () : InferBlueprint<VoteScope&HtmlScope> => {
                                                     if ($dom.$value && url.$value) {
                                                         const el = $dom.$value
                                                         el.classList.add(name+'-enter')
-                                                        $renderer.publish(ownTask(() => {
+                                                        $patcher.publish($renderer.task(() => {
                                                             el.classList.add(name+'-enter-active'/*, name+'-enter'*/)
                                                             
                                                             el.classList.remove(name+'-enter')

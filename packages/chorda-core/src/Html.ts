@@ -208,9 +208,9 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
             let childrenAndText = children
             if (text) {
                 childrenAndText = [...children]
-                const i = children.findIndex(c => c.options.weight && c.options.weight > 0)
+                const i = children.findIndex(c => !c.options.weight || c.options.weight >= 0)
                 if (i == -1) {
-                    childrenAndText.unshift(text as any)
+                    childrenAndText.push(text as any)
                 }
                 else {
                     childrenAndText.splice(i, 0, text as any)

@@ -74,7 +74,9 @@ class InfernoRenderer extends AsyncEngine implements Renderer, VNodeFactory {
 
     createVNode <P, O extends VdomProps>(key: string, vnodeProps: P, dom: O&Dom&Observable<HTMLElement>, children: any[]) {
         const props: any = {
-            ...vnodeProps
+            ...vnodeProps,
+            key,
+            style: dom.styles,
         }
         let ref: Ref = null
         if (dom.$isSubscribed) {

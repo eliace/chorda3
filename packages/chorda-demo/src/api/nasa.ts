@@ -8,6 +8,10 @@ const rest = axios.create({
     params: {api_key: API_KEY}
 })
 
+const imagesRest = axios.create({
+    baseURL: 'https://images-api.nasa.gov',
+})
+
 
 export namespace Nasa {
 
@@ -48,6 +52,16 @@ export namespace Nasa {
             getRoverPhotos: (rover: Rovers, sol: number) : Promise<{photos: Photo[]}> => {
                 return rest.get(`/rovers/${rover}/photos?`, {params: {sol}}).then(response => response.data)
             }
+        },
+        images: {
+            search: (query: string) => {
+                return imagesRest.get('/search', {params: {q: query}}).then(response => response.data)
+            }
         }
+    }
+
+    export namespace Images {
+
+
     }
 }

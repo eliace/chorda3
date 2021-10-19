@@ -19,6 +19,7 @@ import { ListExample } from "./sandbox/list";
 import { InfernoExample } from "./sandbox/inferno";
 import { TransitionsExample } from "./sandbox/transitions";
 import huge from "./sandbox/huge";
+import { NasaExample } from "./sandbox/nasa";
 
 let _network: vis.Network = null
 const _nodes = new visds.DataSet<vis.Node>([])
@@ -41,7 +42,7 @@ export const routes: Route[] = [
     {name: 'list', path: '/sandbox/list'},
     {name: 'inferno', path: '/sandbox/inferno'},
     {name: 'transitions', path: '/sandbox/transitions'},
-    {name: 'huge', path: '/sandbox/huge'},
+    {name: 'nasa', path: '/sandbox/nasa'},
 ]
 
 
@@ -106,9 +107,9 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                         MenuItem({text: 'Select', name: 'select', link: '/#/sandbox/select'}),        
                                         MenuItem({text: 'Dropdown', name: 'dropdown', link: '/#/sandbox/dropdown'}),        
                                         MenuItem({text: 'List', name: 'list', link: '/#/sandbox/list'}),        
-                                        MenuItem({text: 'Inferno', name: 'inferno', link: '/#/sandbox/inferno'}),        
+                                        MenuItem({text: 'Renderer', name: 'inferno', link: '/#/sandbox/inferno'}),        
                                         MenuItem({text: 'Transitions', name: 'transitions', link: '/#/sandbox/transitions'}),        
-                                        MenuItem({text: 'Huge', name: 'huge', link: '/#/sandbox/huge'}),        
+                                        MenuItem({text: 'Nasa', name: 'nasa', link: '/#/sandbox/nasa'}),        
                                     ],
                                     defaultItem: MenuItem({
                                         active$: (scope) => computable(() => {
@@ -142,7 +143,7 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                         list: v == 'list',
                                         inferno: v == 'inferno',
                                         transitions: v == 'transitions',
-                                        huge: v == 'huge',
+                                        nasa: v == 'nasa',
                                     }
                                 })
                             },
@@ -162,7 +163,7 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                 list: ListExample,
                                 inferno: InfernoExample,
                                 transitions: TransitionsExample,
-                                huge: huge,
+                                nasa: NasaExample,
                             }
                         })
                     },

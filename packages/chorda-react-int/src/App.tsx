@@ -2,6 +2,7 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 import { ChordaComponent, ChordaComponent2, ChordaComponent3, TestContext } from './chorda';
+import MyComponent from './MyComponent';
 
 
 
@@ -30,6 +31,11 @@ function App() {
         <TestContext.Provider value={{i18n: 'en'}}>
           <ChordaComponent2/>
         </TestContext.Provider>
+        <MyComponent 
+          rootProps={{className: 'custom'}} 
+          buttonProps={{className: 'custom-button'}}
+          text={props => <p className="custom-text">{props.children}</p>}
+          />
         <button onClick={handleClick}>Test button</button>
       </header>
     </div>

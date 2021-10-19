@@ -1,4 +1,4 @@
-import { computable, HtmlBlueprint, observable, patch } from "@chorda/core";
+import { computable, HtmlBlueprint, InferBlueprint, observable, patch } from "@chorda/core";
 import { Box, Tab, Tabs } from "chorda-bulma";
 import { Custom } from "../../utils";
 import { Breeds } from "./Breeds";
@@ -13,7 +13,7 @@ type CatApiScope = {
 }
 
 
-export const CatApi = () : HtmlBlueprint<CatApiScope> => {
+export const CatApi = () : InferBlueprint<CatApiScope> => {
     return Custom({
         as: Box,
         css: 'catapi-box',
@@ -37,7 +37,7 @@ export const CatApi = () : HtmlBlueprint<CatApiScope> => {
                     }
                 })
             }),
-            Custom({
+            {
                 components: false,
                 templates: {
                     vote: Vote,
@@ -53,7 +53,7 @@ export const CatApi = () : HtmlBlueprint<CatApiScope> => {
                         favourites: v == 'favourites',
                     }})
                 }
-            })
+            }
         ],
         injections: {
             selected: () => observable('search')
