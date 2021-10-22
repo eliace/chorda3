@@ -2,11 +2,10 @@ import { computable, InferBlueprint, observable, patch, PublishFunc } from "@cho
 import { ReactDomEvents } from "@chorda/react"
 import { faCamera } from "@fortawesome/free-solid-svg-icons"
 import { Link, Modal, Image, Field, Button, Addon, Fields, Pagination } from "chorda-bulma"
-import dayjs from "dayjs"
 import { Nasa } from "../../api"
 import { BgImage, FaIcon, FaSvgIcon, Text, Radio, Slider, Dropdown, DropdownPropsType, DropdownItem, DropdownItemPropsType, DropdownTrigger } from "../../helpers"
-import { ListBlueprint, watch, withAs, withList } from "../../utils"
-
+import { ListBlueprint, watch, withAs, withHtml, withHtmlBlueprint, withList } from "../../utils"
+import Chart from "chart.js/auto"
 
 const photos = observable([] as Nasa.Photo[])
 
@@ -135,6 +134,92 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                                         }
                                     })
                                 })
+                            })
+                        ]
+                    }),
+                    chart: Fields({
+                        label: '',
+                        fields: [
+                            Field({
+                                control: {
+                                    templates: {
+                                        content: withHtml({
+                                            tag: 'canvas',
+                                            styles: {
+                                                marginRight: '10.2rem',
+                                                maxHeight: 150
+                                            },
+                                            joints: {
+                                                addGraph: ({$dom, $renderer, $patcher, mission}) => {
+                    
+                                                    let myChart: Chart = null
+                    
+                                                    watch(() => {
+                                                        if ($dom.$value && mission.$value.photos.length) {
+                    
+                                                            myChart && myChart.destroy()
+
+                                                            //requestAnimationFrame(() => {
+                                                            $patcher.publish($renderer.task(() => {
+                    
+                                                                //console.log(mission.photos.slice(0, 100).map(photo => photo.total_photos))
+                    
+                                                            myChart = new Chart($dom.$value, {
+                                                                type: 'bar',
+                                                                data: {
+                                                                    //labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+                                                                    labels: mission.photos.map(photo => ''),
+                                                                    datasets: [{
+                                                                        //backgroundColor: '#209cee',
+                                                                        backgroundColor: '#209cee44',
+                    //                                                    label: '# of Votes',
+                                                                        //data: [12, 19, 3, 5, 2, 3],
+                                                                        data: mission.photos.map(photo => photo.total_photos),
+                                                                        //barPercentage: 0.5,
+                                                                        barThickness: 2,
+                                                                        maxBarThickness: 8,
+                                                                    }]
+                                                                },
+                                                                options: {
+                                                                    responsive: true,
+                                                                    scales: {
+                                                                        y: {
+                    //                                                        beginAtZero: true,
+                                                                            display: false,
+                                                                        },
+                                                                        x: {
+                                                                            display: false
+                                                                        }
+                                                                    },
+                                                                    plugins: {
+                                                                        title: {
+                                                                            display: false
+                                                                        },
+                                                                        subtitle: {
+                                                                            display: false
+                                                                        },
+                                                                        legend: {
+                                                                            display: false
+                                                                        },
+                                                                        tooltip: {
+                                                                            enabled: false
+                                                                        }
+                                                                    }
+                                                                }
+                                                            })
+                    
+                                                        }))
+                                                        }
+                                                    }, [$dom, mission])
+                    
+                                                    return () => {
+                                                        myChart && myChart.destroy()
+                                                    }
+                                                }
+                                            }
+                                        })
+                                    }
+                                },            
                             })
                         ]
                     }),
