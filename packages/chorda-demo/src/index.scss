@@ -255,6 +255,12 @@ main {
         }  
       }      
   }
+
+  .tiles-5 {
+    .flex-tile {
+      flex-basis: 20%;
+    }
+  }
   
 //}
 
@@ -343,5 +349,53 @@ main {
   position: absolute;
   top: 1rem;
   left: 1rem;
-  color: #fff;  
+  color: #fff;
+  font-size: 0.8em;
+}
+
+
+input[type=range].slider:not([orient=vertical]).has-output {
+  width: calc(100% - (5.2rem));  
+}
+input[type=range].slider:not([orient=vertical]).has-output+output {
+  width: 4rem;
+}
+
+.earth-day-slider {
+  input[type=range].slider:not([orient=vertical]).has-output {
+    width: calc(100% - (10.2rem));  
+  }
+  input[type=range].slider:not([orient=vertical]).has-output+output {
+    width: 9rem;
+  }
+}
+
+.camera-dropdown {
+  button {
+    min-width: 180px;
+    span {
+      width: 100%;
+      text-align: justify;      
+    }
+  }
+
+  .item-subtitle {
+    display: inline-block;
+    opacity: 0.5;
+    margin-left: 0.5rem;
+    // display: block;
+    // opacity: 0.5;
+    // font-size: 0.8em;
+  }
+
+  .dropdown-content {
+    min-height: fit-content;
+  }
+}
+
+.rover-images-pagination {
+  .pagination-link.is-current {
+    background-color: #209cee;
+    border-color: darken($color: #209cee, $amount: 0.5);
+  }
 }

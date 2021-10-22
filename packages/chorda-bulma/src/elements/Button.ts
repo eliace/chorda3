@@ -11,6 +11,7 @@ type ButtonScope = {
     color: string
     text: string
     disabled: boolean
+    active: boolean
 }
 
 type ButtonProps<T, E> = {
@@ -26,6 +27,8 @@ type ButtonProps<T, E> = {
     onClick?: Listener<T, void>
     css?: string|string[]
     disabled$?: Injector<T>
+    active$?: Injector<T>
+    active?: boolean
 }
 
 
@@ -54,7 +57,12 @@ export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : HtmlBluepri
                     [prev]: false
                 }
             }),
-            disabled: (v) => patch({dom: {disabled: v}})
+            disabled: (v) => patch({dom: {disabled: v}}),
+            active: (v) => patch({
+                classes: {
+                    'is-active': v
+                }
+            })
         }
     }, 
     props?.as,
@@ -75,10 +83,15 @@ export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : HtmlBluepri
             icon: props.icon,
             content: (!!props.leftIcon || !!props.rightIcon),
         },
+        initials: {
+            color: () => observable(props.color),
+            active: () => observable(props.active),
+        },
         injections: {
-            color: props.color$ || (() => observable(props.color)), //(ctx) => observable(props.color || ctx.color),
-            text: props.text$, //|| ((ctx: any) => observable(props.text))
+            color: props.color$,
+            text: props.text$,
             disabled: props.disabled$,
+            active: props.active$,
         },
         events: {
             $dom: {

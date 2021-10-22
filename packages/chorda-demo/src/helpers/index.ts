@@ -11,3 +11,5 @@ export * from './FaIcon'
 export * from './BgImage'
 export * from './TextInput'
 export * from './SvgImagePlaceholder'
+export * from "./Radio"
+export * from "./Slider"

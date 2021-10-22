@@ -1,7 +1,7 @@
 import { Blueprint, callable, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, Injector, iterable, Listener, mix, observable, patch, Scope } from "@chorda/core"
 import { Button, Field, Fields } from "chorda-bulma"
 import { Coerced, createAppScope, IteratorScope, ListBlueprint, watch, withList } from "../../utils"
-import { BgImage, BgImagePropsType, Dropdown, DropdownItem, DropdownOld, DropdownOldItem, DropdownPropsType, FaIcon, SvgImagePlaceholder } from "../../helpers"
+import { BgImage, BgImagePropsType, Dropdown, DropdownItem, DropdownItemPropsType, DropdownOld, DropdownOldItem, DropdownPropsType, FaIcon, SvgImagePlaceholder } from "../../helpers"
 import { faHeart, faRedo, faUserLock } from "@fortawesome/free-solid-svg-icons"
 import { CatApi } from "../../api"
 import { IMAGE_BASE64, IMAGE_PLACEHOLDER } from "../../data"
@@ -229,7 +229,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                                     items$: () => ORDERS,
                                     value$: ($) => $.orderId,
                                     text$: (scope) => scope.selected.name,
-                                    defaultItem: DropdownItem<Record>({
+                                    defaultItem: DropdownItem(<DropdownItemPropsType<Record>>{
                                         text$: (scope) => scope.item.name
                                     })
                                 })
@@ -240,7 +240,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                                     items$: () => TYPES,
                                     value$: (scope) => scope.typeId,
                                     text$: (scope) => scope.selected.name,
-                                    defaultItem: DropdownItem<Record>({
+                                    defaultItem: DropdownItem(<DropdownItemPropsType<Record>>{
                                         text$: (scope) => scope.item.name
                                     })
                                 })
@@ -255,7 +255,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                                     items$: (scope) => scope.categories,
                                     value$: (scope) => scope.categoryId,
                                     text$: (scope) => scope.selected.name,
-                                    defaultItem: DropdownItem<Record>({
+                                    defaultItem: DropdownItem(<DropdownItemPropsType<Record>>{
                                         text$: (scope) => scope.item.name
                                     })
                                 })
@@ -266,7 +266,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                                     items$: (scope) => scope.breeds,
                                     value$: (scope) => scope.breedId,
                                     text$: (scope) => scope.selected.name,
-                                    defaultItem: DropdownItem<CatApi.Breed>({
+                                    defaultItem: DropdownItem(<DropdownItemPropsType<CatApi.Breed>>{
                                         text$: (scope) => scope.item.name
                                     })
                                 })
@@ -328,7 +328,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                                     value$: (scope) => scope.limit,
                                     text$: (scope) => scope.selected.name,
                                     items$: () => LIMITS,
-                                    defaultItem: DropdownItem<Record>({
+                                    defaultItem: DropdownItem(<DropdownItemPropsType<Record>>{
                                         text$: (scope) => scope.item.name
                                     })
                                 })

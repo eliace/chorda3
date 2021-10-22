@@ -45,12 +45,33 @@ export namespace Nasa {
         rover: Rover
     }
 
+    export type PhotoSet = {
+        sol: number
+        earth_date: string
+        total_photos: number
+        cameras: string[]
+    }
+
+    export type Mission = {
+        name: Rovers
+        landing_date: string
+        launch_date: string
+        status: string
+        max_sol: number
+        max_date: string
+        total_photos: number
+        photos: PhotoSet[]
+    }
+
 
 
     export const api = {
         mars: {
-            getRoverPhotos: (rover: Rovers, sol: number) : Promise<{photos: Photo[]}> => {
-                return rest.get(`/rovers/${rover}/photos?`, {params: {sol}}).then(response => response.data)
+            getRoverPhotos: (rover: Rovers, sol: number, page?: number, camera?: string) : Promise<{photos: Photo[]}> => {
+                return rest.get(`/rovers/${rover}/photos?`, {params: {sol, page, camera}}).then(response => response.data)
+            },
+            getMission: (rover: Rovers) : Promise<{photo_manifest: Mission}> => {
+                return rest.get(`/manifests/${rover}`).then(response => response.data)
             }
         },
         images: {

@@ -1,7 +1,7 @@
 import { Blueprint, callable, computable, EventBus, HtmlBlueprint, InferBlueprint, mix, observable, Scope, Value } from "@chorda/core"
 import { Card, Field, Title } from "chorda-bulma"
 import { Coerced, Custom, Content, watch } from "../../utils"
-import { Carousel, Dropdown, DropdownItem, DropdownOld, DropdownOldItem, DropdownProps, DropdownPropsType, DropdownScope, Paragraph, Text } from "../../helpers"
+import { Carousel, Dropdown, DropdownItem, DropdownItemPropsType, DropdownOld, DropdownOldItem, DropdownProps, DropdownPropsType, DropdownScope, Paragraph, Text } from "../../helpers"
 import { CatApi } from "../../api"
 
 
@@ -39,7 +39,7 @@ const BreedSelect = () : InferBlueprint<BreedsScope, BreedsEvents> => {
                     as: {
                         css: 'catapi-breed-dropdown'
                     },
-                    defaultItem: DropdownItem<CatApi.Breed>({
+                    defaultItem: DropdownItem(<DropdownItemPropsType<CatApi.Breed>>{
                         text$: (scope) => scope.item.name
                     }),
                     items$: ({breeds}) => breeds,

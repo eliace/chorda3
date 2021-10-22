@@ -3,7 +3,7 @@ import { createPreactRenderer } from "@chorda/preact"
 import { watch } from "../../utils"
 
 type PreactScope = {
-    infernoRoot: Renderable
+    preactRoot: Renderable
     parentEl: HTMLElement
 }
 
@@ -12,9 +12,7 @@ const renderer = createPreactRenderer()
 export const withPreact = <T, E>(props: Blueprint<T, E>) : InferBlueprint<T, E> => {
     return mix<PreactScope&HtmlScope, HtmlEvents>({
         initials: {
-            infernoRoot: () => observable(null),
-//            parentEl: () => observable(null),
-//            $engine: () => patcher,
+            preactRoot: () => observable(null),
             $renderer: () => renderer,
         },
         injections: {
@@ -22,21 +20,21 @@ export const withPreact = <T, E>(props: Blueprint<T, E>) : InferBlueprint<T, E> 
             $pipe: $ => pipe($.$patcher, $.$renderer),
         },
         events: {
-            afterInit: (html, {infernoRoot}) => {
-                infernoRoot.$value = html
+            afterInit: (html, {preactRoot}) => {
+                preactRoot.$value = html
             }
         },
         joints: {
-            connectToContextDom: ({infernoRoot, parentEl, $renderer}) => {
+            connectToContextDom: ({preactRoot, parentEl, $renderer}) => {
                 
                 watch(() => {
                     if (parentEl.$value) {
                         console.log('preact attach')
-                        $renderer.attach(parentEl.$value, infernoRoot.$value)
+                        $renderer.attach(parentEl.$value, preactRoot.$value)
                     }
                     else {
                         console.log('preact detach')
-                        $renderer.detach(infernoRoot.$value)
+                        $renderer.detach(preactRoot.$value)
                     }
                 }, [parentEl])
             }

@@ -1,4 +1,4 @@
-import { Blueprint, HtmlBlueprint, Keyed, mix } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, Keyed, mix, passthruLayout } from "@chorda/core"
 
 
 export type FieldScope = {
@@ -19,6 +19,8 @@ export type FieldProps<T> = {
     expanded?: boolean
     color?: Color
     as?: Blueprint<T>
+    addonAs?: Blueprint<T>
+    horizontal?: boolean
 }
 
 
@@ -31,6 +33,7 @@ export const Field = <T>(props: FieldProps<T&FieldScope>): HtmlBlueprint<T> => {
     const isContent = !!props.control
     const isAddons = !!props.addons
     const isColor = !!props.color
+    const isHorizontal = !!props.horizontal
     
     return mix({
         css: 'field',
@@ -40,18 +43,25 @@ export const Field = <T>(props: FieldProps<T&FieldScope>): HtmlBlueprint<T> => {
             },
             control: {
                 css: 'control'
+            },
+            addons: {
+                layout: passthruLayout
             }
         }
     }, 
     props?.as, 
     props && {
         classes: {
-            'has-addons': isAddons
+            'has-addons': isAddons,
+            'horizontal': isHorizontal,
         },
         components: {
             label: isLabel,
             control: isContent,
-            ...props.addons,
+            addons: {
+                templates: props.addons,
+                defaultComponent: props.addonAs,
+            }
         },
         templates: {
             label: {
