@@ -10,9 +10,9 @@ import { ProgressPlugin } from "webpack"
 
 const favourites = observable(null)
 
-CatApi.api.searchFavourites({page: 1}).then(result => {
-    favourites.$value = result
-})
+// CatApi.api.searchFavourites({page: 1}).then(result => {
+//     favourites.$value = result
+// })
 
 
 type SearchScope = {

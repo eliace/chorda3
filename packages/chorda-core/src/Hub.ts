@@ -325,7 +325,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
 //                if () {
 
-                    if (/*!isInjected && this.state != State.Initializing &&*/ (p in target)) {
+                    if ((p in target)) {
                         isInjected = true
 //                        return (target[p] && isAutoTerminal() && target[p].$isTerminal) ? target[p].$value : target[p]
                     }

@@ -169,7 +169,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                                                             output: {
                                                                 injections: {
                                                                     value: $ => computable(() => {
-                                                                        return `${$.mission.photos?.[$.$context.value].earth_date} / ${$.mission.photos?.[$.$context.value].sol}` as any //dayjs($.mission.landing_date).add($.sol, 'days').format('YYYY-MM-DD') as any
+                                                                        return `${$.mission.photos[$.$context.value]?.earth_date} / ${$.mission.photos[$.$context.value]?.sol}` as any //dayjs($.mission.landing_date).add($.sol, 'days').format('YYYY-MM-DD') as any
                                                                     })
                                                                 }
                                                             }
@@ -261,7 +261,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
             modal: () => observable(false),
             roverImageUrl: () => observable(null),
             rover: () => observable(Nasa.Rovers.Curiosity),
-            mission: () => observable({} as Nasa.Mission),
+            mission: () => observable({photos: []} as Nasa.Mission),
             page: () => observable(1),
             camera: () => observable('All'),
             day: () => observable(0),

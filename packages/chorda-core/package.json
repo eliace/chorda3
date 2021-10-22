@@ -1,6 +1,6 @@
 {
   "name": "@chorda/core",
-  "version": "3.0.0",
+  "version": "3.0.0-alpha.1",
   "description": "",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -17,20 +17,19 @@
   },
   "author": "",
   "license": "MIT",
-  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.2.18",
     "@types/lodash": "^4.14.170",
-    "@types/mocha": "^8.2.2",
+    "@types/mocha": "^9.0.0",
     "chai": "^4.3.4",
     "lodash": "^4.17.21",
-    "mocha": "^8.4.0",
+    "mocha": "^9.1.3",
     "ts-loader": "^9.2.2",
     "ts-node": "^10.0.0",
     "typescript": "^4.3.2",
     "webpack": "^5.38.1",
     "webpack-cli": "^4.7.0",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-merge": "^5.8.0"
   },
   "publishConfig": {
     "access": "public"
