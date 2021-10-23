@@ -441,3 +441,20 @@ export const withBounds = <T, E>(props: Blueprint<T&BoundsScope, E>) : InferBlue
 export const withMix = <T, E>(...args: Blueprint<T, E>[]) : InferBlueprint<T, E> => {
     return mix.apply(this, args)
 }
+
+
+
+export const debounced = <T extends () => void>(timeout: number, fn: T) : any => {
+
+    let t : any = null
+
+    return () => {
+        if (t) {
+            clearTimeout(t)
+        }
+        t = setTimeout(() => {
+            t = null
+            fn()
+        }, timeout)
+    }
+}

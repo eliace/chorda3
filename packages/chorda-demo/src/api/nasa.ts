@@ -12,6 +12,11 @@ const imagesRest = axios.create({
     baseURL: 'https://images-api.nasa.gov',
 })
 
+const apodRest = axios.create({
+    baseURL: 'https://api.nasa.gov/planetary/apod',
+    params: {api_key: API_KEY}
+})
+
 
 export namespace Nasa {
 
@@ -75,14 +80,83 @@ export namespace Nasa {
             }
         },
         images: {
-            search: (query: string) => {
-                return imagesRest.get('/search', {params: {q: query}}).then(response => response.data)
+            search: (query: string, page?: number) : Promise<{collection: Images.Collection}> => {
+                return imagesRest.get('/search', {params: {q: query, page}}).then(response => response.data)
+            }
+        },
+        apod: {
+            get: (request: Apod.Request) : Promise<Apod.Media[]> => {
+                return apodRest.get('', {params: request}).then(response => response.data)
             }
         }
     }
 
     export namespace Images {
 
+        export type Link = {
+            href: string
+            prompt: string
+            rel: string
+        }
+
+        export type Item = {
+            data: ItemData[]
+            href: string
+            links: Link[]
+        }
+
+        export type ItemData = {
+            center: string
+            date_created: string
+            description: string
+            keywords: string[]
+            media_type: string
+            nasa_id: string
+            title: string
+            photographer: string
+            location: string
+        }
+
+        export type Collection = {
+            href: string
+            items: Item[]
+            links: Link[]
+            metadata: {
+                total_hits: number
+            }
+            version: string
+        }
+
+
+    }
+
+    export namespace Apod {
+
+        export enum MediaType {
+            Image = 'image',
+            Video = 'video'
+        }
+
+        export type Request = {
+            date?: string
+            start_date?: string
+            end_date?: string
+            count?: number
+            thumbs?: boolean
+            hd?: boolean
+            concept_tags?: boolean
+        }
+
+        export type Media = {
+            copyright: string
+            date: string
+            explanation: string
+            hdurl: string
+            media_type: MediaType
+            service_version: string
+            title: string
+            url: string       
+        }
 
     }
 }

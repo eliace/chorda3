@@ -399,3 +399,17 @@ input[type=range].slider:not([orient=vertical]).has-output+output {
     border-color: darken($color: #209cee, $amount: 0.5);
   }
 }
+
+
+.search-preview {
+  width: 180px;
+  height: 180px;
+}
+
+.image-copyright {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  color: #fff;
+  opacity: 0.6;  
+}

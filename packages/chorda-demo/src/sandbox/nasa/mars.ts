@@ -4,7 +4,7 @@ import { faCamera } from "@fortawesome/free-solid-svg-icons"
 import { Link, Modal, Image, Field, Button, Addon, Fields, Pagination } from "chorda-bulma"
 import { Nasa } from "../../api"
 import { BgImage, FaIcon, FaSvgIcon, Text, Radio, Slider, Dropdown, DropdownPropsType, DropdownItem, DropdownItemPropsType, DropdownTrigger } from "../../helpers"
-import { ListBlueprint, watch, withAs, withHtml, withHtmlBlueprint, withList } from "../../utils"
+import { debounced, ListBlueprint, watch, withAs, withHtml, withHtmlBlueprint, withList } from "../../utils"
 import Chart from "chart.js/auto"
 
 const photos = observable([] as Nasa.Photo[])
@@ -41,20 +41,6 @@ type MarsScope = {
 }
 
 
-const debounced = <T extends () => void>(timeout: number, fn: T) : any => {
-
-    let t : any = null
-
-    return () => {
-        if (t) {
-            clearTimeout(t)
-        }
-        t = setTimeout(() => {
-            t = null
-            fn()
-        }, timeout)
-    }
-}
 
 
 //console.log(dayjs('2012-08-06').diff('2021-10-19','days'))

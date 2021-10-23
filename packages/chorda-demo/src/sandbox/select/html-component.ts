@@ -32,7 +32,7 @@ export default () : HtmlBlueprint => {
             }),
             as: withIterableItems<Country[]>({
                 injections: {
-                    list: () => COUNTRIES
+                    items: () => COUNTRIES
                 },
             })
         }),

@@ -1,4 +1,4 @@
-import { computable, HtmlBlueprint, HtmlScope, InferBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core"
+import { Blueprint, computable, HtmlBlueprint, HtmlScope, InferBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import { Coerced } from "../../utils"
 
@@ -27,9 +27,10 @@ type CarouselProps<T> = {
     css?: string
     height?: number|string
     images$?: Injector<T>
-    image?: HtmlBlueprint<T>
-    title?: HtmlBlueprint<T>
+    image?: Blueprint<T>
+    title?: Blueprint<T>
     current?: number
+    as?: Blueprint<T>
 }
 
 
@@ -95,7 +96,9 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : InferBluepr
                 css: 'carousel__title'
             }
         }
-    }, props && {
+    },
+    props?.as, 
+    props && {
         css: props.css,
         templates: {
             slides: {
