@@ -1,9 +1,8 @@
-import { InferBlueprint } from "@chorda/core"
 import { Box, Progress } from "chorda-bulma"
 
 
 
-export default () : InferBlueprint<unknown> => {
+export default () => {
     return Box({
         css: 'is-paddingless is-roundless',
         styles: {

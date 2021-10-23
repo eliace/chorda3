@@ -1,9 +1,8 @@
-import { Blueprint } from "@chorda/core"
 import { Box, Notification } from "chorda-bulma"
 import { LOREM_IPSUM } from "../../data"
 
 
-export default () : Blueprint<any> => {
+export default () => {
     return Box({
         css: 'is-paddingless is-roundless',
         styles: {

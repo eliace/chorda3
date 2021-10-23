@@ -1,6 +1,5 @@
-import { HtmlBlueprint } from "@chorda/core"
 
-export default () : HtmlBlueprint => {
+export default () => {
     return {
         tag: 'select',
         defaultItem: {

@@ -173,6 +173,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                                                                         y: {
                     //                                                        beginAtZero: true,
                                                                             display: false,
+                                                                            max: 1500
                                                                         },
                                                                         x: {
                                                                             display: false
@@ -364,7 +365,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                     camera.$value = 'All'
                 }, [rover])
 
-                watch(() => {
+                watch(_.debounce(() => {
                     if (day == -1) {
                         return
                     }
@@ -373,7 +374,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                             page.$value = 1
                             photos.$value = response.photos
                         })
-               }, [camera, day, mission])
+               }, 50, {leading: false}), [camera, day, mission])
                 
             }
         }

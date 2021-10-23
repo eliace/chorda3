@@ -2,7 +2,7 @@ import { HtmlBlueprint } from "@chorda/core"
 import { Box, Image } from "chorda-bulma"
 import { IMAGE_1 } from "../../data"
 
-export default () : HtmlBlueprint => {
+export default () => {
     return Box({
         css: 'is-paddingless is-radiusless',
         styles: {

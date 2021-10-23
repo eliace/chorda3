@@ -272,8 +272,9 @@ export const withIterableItems = <A extends any[], T=unknown, I=ItemOf<A>>(props
     }, props?.as, props)
 }
 
+export type ItemBlueprint<I, T=unknown> = HtmlBlueprint<T&DynamicListScope<I[]>&DynamicItemScope<I>>
 
-export const withItem = <I, T=unknown>(props: HtmlBlueprint<T&DynamicListScope<I[]>&DynamicItemScope<I>>) : HtmlBlueprint<T> => {
+export const withItem = <I, T=unknown>(props: ItemBlueprint<I, T>) : InferBlueprint<T> => {
     return mix(props)
 }
 

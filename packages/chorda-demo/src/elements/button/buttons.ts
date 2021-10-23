@@ -1,9 +1,8 @@
-import { HtmlBlueprint } from "@chorda/core"
 import { Button, Buttons } from "chorda-bulma"
 
 
 
-export default () : HtmlBlueprint => {
+export default () => {
     return Buttons({
         defaultButton: Button({
             onClick: (evt) => {
@@ -14,12 +13,7 @@ export default () : HtmlBlueprint => {
             Button({text: 'GitHub', color: 'is-info'}),
             Button({text: '@jgthms', color: 'is-success'}),
             Button({text: 'Save', color: 'is-warning'}),
-            Button({
-                text: 'Delete',
-                // onClick: (evt, {color}) => {
-                //     color.$set(nextColor(color.$get()))
-                // }
-            })
+            Button({text: 'Delete'})
         ]
     })
 }

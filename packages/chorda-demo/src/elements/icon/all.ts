@@ -1,8 +1,6 @@
-import { HtmlBlueprint, Injector, iterable, mix, observable, patch } from '@chorda/core'
 import * as FaSvgLib from '@fortawesome/free-solid-svg-icons'
-import { DataScope, IteratorScope } from 'chorda-demo/src/utils'
+import { DataScope, IteratorScope, ListBlueprint, withList } from '../../utils'
 import { FaIcon } from './common'
-
 
 
 const allIcons = Object
@@ -10,19 +8,14 @@ const allIcons = Object
     .filter((icon:FaSvgLib.IconDefinition) => !!icon.icon && icon.iconName != 'font-awesome-logo-full')
     .map((icon:FaSvgLib.IconDefinition) => 'fa-' + icon.iconName)
 
-type AllIconsScope = DataScope<string[]>&IteratorScope<string>
 
-
-export default () : HtmlBlueprint<AllIconsScope> => {
-    return {
+export default ()=> {
+    return withList(<ListBlueprint<string>>{
         defaultItem: FaIcon({
-            icon$: (scope) => scope.__it
+            icon$: (scope) => scope.item
         }),
         injections: {
-            data: () => iterable(allIcons)
+            items: () => allIcons
         },
-        reactions: {
-            data: (v) => patch({items: v})
-        }
-    }
+    })
 }

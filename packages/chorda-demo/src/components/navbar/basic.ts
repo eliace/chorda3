@@ -1,6 +1,6 @@
 import { InferBlueprint } from "@chorda/core"
 import { Box, Button, Buttons, Link, Navbar, NavbarBrand, NavbarDivider, NavbarDropdown, NavbarMenu } from "chorda-bulma"
-import { withBlueprint } from "../../utils"
+import { withAs } from "../../utils"
 
 
 
@@ -10,7 +10,7 @@ export default () : InferBlueprint<unknown> => {
         content: Navbar({
             brand: NavbarBrand({
                 items: [
-                    withBlueprint({
+                    withAs({
                         as: Link,
                         content: {
                             tag: 'span',

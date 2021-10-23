@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, mix, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, InferBlueprint, Injector, mix, observable, patch } from "@chorda/core"
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons"
 
 
@@ -19,7 +19,7 @@ interface FaSvgIconProps<T> {
     data$?: Injector<T>
 }
 
-export const FaSvgIcon = <T>(props: FaSvgIconProps<T&FaSvgIconScope>) : HtmlBlueprint<T> => {
+export const FaSvgIcon = <T, E>(props: FaSvgIconProps<T&FaSvgIconScope>) : InferBlueprint<T, E> => {
     return mix<FaSvgIconScope>({
         tag: 'i',
         css: 'icon',

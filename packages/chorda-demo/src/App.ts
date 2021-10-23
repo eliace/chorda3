@@ -18,7 +18,6 @@ import { DropdownExample } from "./sandbox/dropdown";
 import { ListExample } from "./sandbox/list";
 import { InfernoExample } from "./sandbox/inferno";
 import { TransitionsExample } from "./sandbox/transitions";
-import huge from "./sandbox/huge";
 import { NasaExample } from "./sandbox/nasa";
 
 let _network: vis.Network = null

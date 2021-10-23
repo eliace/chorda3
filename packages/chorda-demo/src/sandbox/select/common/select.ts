@@ -5,7 +5,7 @@ export interface SelectProps<T> {
     options?: Blueprint<T>[]
     size?: number
     value?: string
-    defaultOption?: Blueprint<T>
+    optionAs?: Blueprint<T>
     as?: Blueprint<T>
 }
 
@@ -17,7 +17,7 @@ export const Select = <T>(props: SelectProps<T>) : InferBlueprint<T> => {
     props?.as, 
     props && {
         items: props.options,
-        defaultItem: props.defaultOption,
+        defaultItem: props.optionAs,
         dom: {
             size: props.size,
             defaultValue: props.value

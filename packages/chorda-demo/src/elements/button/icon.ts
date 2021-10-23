@@ -1,4 +1,3 @@
-import { HtmlBlueprint } from "@chorda/core"
 import { faGithub, faTwitter } from "@fortawesome/free-brands-svg-icons"
 import { faBold, faCheck, faItalic, faTimes, faUnderline } from "@fortawesome/free-solid-svg-icons"
 import { Button, Buttons } from "chorda-bulma"
@@ -6,7 +5,7 @@ import { FaIcon, FaSvgIcon } from "../../helpers"
 
 
 
-export default () : HtmlBlueprint => {
+export default () => {
     return {
         items: [
             Buttons({
