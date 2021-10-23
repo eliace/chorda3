@@ -9,10 +9,11 @@ module.exports = {
     output: {
         library: {
             type: "umd",
-            name: "Chorda"
+            name: "Chorda",
+            umdNamedDefine: true
         },
-        filename: 'index.js',
-        path: path.resolve(__dirname, 'lib-umd'),
+        filename: 'chorda-core.production.js',
+        path: path.resolve(__dirname, 'umd'),
         // library: 'Chorda',
         // libraryTarget: 'umd',
         // filename: 'index.js',

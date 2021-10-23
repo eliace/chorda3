@@ -263,6 +263,10 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
 
                 if (k in components) {
                     componentsToUpdate[k] = components[k]
+                    // console.log(components[k].key, components[k].uid, k)
+                    // if (components[k].uid != k) {
+                    //     debugger
+                    // }
                 }
                 else {
                     componentsToAdd[k] = result
@@ -272,26 +276,13 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
 
             })
 
-            // let result = it.next()
-            // while (!result.done) {
+//            console.log(next)
 
-            //     const k = result.value.$uid
-
-            //     if (k in components) {
-            //         componentsToUpdate[k] = components[k]
-            //     }
-            //     else {
-            //         componentsToAdd[k] = result.value
-            //     }
-
-            //     delete components[k]
-
-            //     result = it.next()
-            // }
 
             for (let k in componentsToAdd) {
                 // FIXME не бьются типы скоупа и нового элемента
-                this.addKeyed(k, {} as B, {[key]: componentsToAdd[k]} as any)
+                const comp = this.addKeyed(k, {} as B, {[key]: componentsToAdd[k]} as any)
+                comp.uid = k
             }
             for (let k in components) {
                 this.removeKeyed(k)

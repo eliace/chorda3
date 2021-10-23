@@ -106,7 +106,7 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                         MenuItem({text: 'Cats', name: 'catapi', link: '/#/sandbox/catapi'}),        
                                         MenuItem({text: 'Select', name: 'select', link: '/#/sandbox/select'}),        
                                         MenuItem({text: 'Dropdown', name: 'dropdown', link: '/#/sandbox/dropdown'}),        
-                                        MenuItem({text: 'List', name: 'list', link: '/#/sandbox/list'}),        
+//                                        MenuItem({text: 'List', name: 'list', link: '/#/sandbox/list'}),        
                                         MenuItem({text: 'Renderer', name: 'inferno', link: '/#/sandbox/inferno'}),        
                                         MenuItem({text: 'Transitions', name: 'transitions', link: '/#/sandbox/transitions'}),        
                                         MenuItem({text: 'Nasa', name: 'nasa', link: '/#/sandbox/nasa'}),        

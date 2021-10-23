@@ -77,7 +77,7 @@ export const Pagination = <T, E>(props: PaginationProps<T, E>) : InferBlueprint<
             pages: $ => computable(() => {
                 const pages = {} as {[key: string]: number}
                 for (let i = 0; i < $.maxPages; i++) {
-                    pages[i] = i+1
+                    pages[i+1] = i+1
                 }
                 return pages
             }),

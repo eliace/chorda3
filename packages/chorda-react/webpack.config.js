@@ -9,14 +9,15 @@ module.exports = {
         app: './src/index.ts'
     },
     output: {
-        path: path.resolve(__dirname, 'lib-umd'),
+        path: path.resolve(__dirname, 'umd'),
         library: {
             name: 'ChordaReact',
-            type: 'umd'
+            type: 'umd',
+            umdNamedDefine: true
         },
         // library: 'ChordaReact',
         // libraryTarget: 'umd',
-        filename: 'index.js',
+        filename: 'chorda-react.production.js',
         // umdNamedDefine: true
     },
     module: {
@@ -30,16 +31,16 @@ module.exports = {
     },
     resolve: {
         extensions: ['.ts', '.js'],
-        alias: {
-            '@chorda/core': path.resolve('../chorda-core/src'),
-        }
+        // alias: {
+        //     '@chorda/core': path.resolve('../chorda-core/src'),
+        // }
     },
     plugins: [
         /*new CompressionPlugin()*/
     ],
     externals: {
-        '@chorda/core': 'commonjs @chorda/core',
-        'react': 'commonjs react',
-        'react-dom': 'commonjs react-dom'
+        '@chorda/core': 'Chorda',
+        'react': 'React',
+        'react-dom': 'ReactDOM'
     }
 }

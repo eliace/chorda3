@@ -3,6 +3,7 @@ import { Field, MediaLayout, Image } from "chorda-bulma"
 import { Nasa } from "../../api"
 import { debounced, ListBlueprint, watch, withItem, withList } from "../../utils"
 import { BgImage, TextInput } from "../../helpers"
+import _ from "lodash"
 
 
 
@@ -57,14 +58,14 @@ export const Images = () : InferBlueprint<ImagesScope> => {
             }
         },
         initials: {
-            query: () => observable(''),
+            query: () => observable('soyuz'),
             collection: () => observable(null),
             page: () => observable(1),
         },
         joints: {
             search: ({query, collection, page}) => {
 
-                watch(debounced(500, () => {
+                watch(_.debounce(() => {
 
                     if (query.$value) {
                         Nasa.api.images.search(query.$value, page.$value).then(data => {
@@ -75,7 +76,7 @@ export const Images = () : InferBlueprint<ImagesScope> => {
                         collection.$value = null
                     }
 
-                }), [query])
+                }, 600), [query])
 
             }
         }

@@ -347,8 +347,8 @@ main {
 
 .rover-camera {
   position: absolute;
-  top: 1rem;
-  left: 1rem;
+  top: .6rem;
+  left: .6rem;
   color: #fff;
   font-size: 0.8em;
 }
@@ -397,6 +397,13 @@ input[type=range].slider:not([orient=vertical]).has-output+output {
   .pagination-link.is-current {
     background-color: #209cee;
     border-color: darken($color: #209cee, $amount: 0.5);
+  }
+  .pagination-link:not(.is-current) {
+    border-color: transparent;
+    box-shadow: none;
+    &:hover {
+      color: #209cee;
+    }
   }
 }
 

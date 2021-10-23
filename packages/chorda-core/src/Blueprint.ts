@@ -37,9 +37,14 @@ export const buildHtmlContext = (renderer: Scheduler&Renderer&VNodeFactory) : Ht
 }
 
 export const attach = (html: Html, el: () => Element) => {
-    document.addEventListener('DOMContentLoaded', () => {
+    if (document.readyState == 'complete') {
         html.attach(el())
-    })    
+    }
+    else {
+        document.addEventListener('DOMContentLoaded', () => {
+            html.attach(el())
+        })    
+    }
 }
 
 export const detach = (html: Html) => {

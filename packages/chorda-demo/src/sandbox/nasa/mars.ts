@@ -6,6 +6,7 @@ import { Nasa } from "../../api"
 import { BgImage, FaIcon, FaSvgIcon, Text, Radio, Slider, Dropdown, DropdownPropsType, DropdownItem, DropdownItemPropsType, DropdownTrigger } from "../../helpers"
 import { debounced, ListBlueprint, watch, withAs, withHtml, withHtmlBlueprint, withList } from "../../utils"
 import Chart from "chart.js/auto"
+import _ from "lodash"
 
 const photos = observable([] as Nasa.Photo[])
 
@@ -248,9 +249,9 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                                                         joints: {
                                                             deferredChange: ({value, day, mission}) => {
 
-                                                                watch(debounced(300, () => {
+                                                                watch(_.debounce(() => {
                                                                     day.$value = value
-                                                                }), [value])
+                                                                }, 300), [value])
 
                                                             }
                                                         }
