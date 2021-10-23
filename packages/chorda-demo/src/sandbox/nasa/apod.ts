@@ -41,9 +41,11 @@ export const Apod = () : InferBlueprint<unknown> => {
         joints: {
             autoLoad: () => {
 
-                Nasa.api.apod.get({count: 8, thumbs: true, hd: true}).then(data => {
-                    images.$value = data
-                })
+                if (images.length == 0) {
+                    Nasa.api.apod.get({count: 8, thumbs: true, hd: true}).then(data => {
+                        images.$value = data
+                    })    
+                }
 
             }
         }

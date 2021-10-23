@@ -251,7 +251,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
 
                                                                 watch(_.debounce(() => {
                                                                     day.$value = value
-                                                                }, 300), [value])
+                                                                }, 400), [value])
 
                                                             }
                                                         }
@@ -336,7 +336,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
             mission: () => observable({photos: []} as Nasa.Mission),
             page: () => observable(1),
             camera: () => observable('All'),
-            day: () => observable(0),
+            day: () => observable(-1),
         },
         injections: {
             totalPages: $ => computable(() => {
@@ -361,19 +361,19 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                 photos.$value = []
 
                 watch(() => {
-                    page.$value = 1
-                }, [rover, camera, day, mission])
-
-                watch(() => {
                     camera.$value = 'All'
                 }, [rover])
 
                 watch(() => {
+                    if (day == -1) {
+                        return
+                    }
                     Nasa.api.mars.getRoverPhotos(rover, mission.photos[day].sol, undefined, camera.$value == 'All' ? undefined : camera.$value)
                         .then(response => {
+                            page.$value = 1
                             photos.$value = response.photos
                         })
-               }, [rover, camera, day, mission])
+               }, [camera, day, mission])
                 
             }
         }
