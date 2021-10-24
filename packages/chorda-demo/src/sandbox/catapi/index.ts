@@ -56,7 +56,7 @@ export const CatApi = () : InferBlueprint<CatApiScope> => {
             }
         ],
         injections: {
-            selected: () => observable('search')
+            selected: () => observable('vote')
         }
     })
 }

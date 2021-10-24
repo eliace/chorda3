@@ -1,7 +1,7 @@
 import { computable, HtmlBlueprint, Injector, mix, observable, patch } from "@chorda/core"
 import { Card, LevelLayout, Tab, Tabs, Title } from "chorda-bulma"
 import { Selected } from "../App"
-import { Coerced, Custom, withHtml } from "../utils"
+import { Custom, withHtml } from "../utils"
 import { Action } from "./Action"
 import { CodeBox } from "./CodeBox"
 

@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core"
 
 
 
@@ -8,17 +8,17 @@ export type TableScope = {
 }
 
 type TableProps<T> = {
-    defaultRow?: HtmlBlueprint<T>
+    defaultRow?: Blueprint<T>
 //    defaultCell?: HtmlConfig|Options|Function
-    headerRows: HtmlBlueprint<T>[]
-    rows?: HtmlBlueprint<T>[]
+    headerRows: Blueprint<T>[]
+    rows?: Blueprint<T>[]
     data?: any[],
     data$?: Injector<T>,
-    cols?: HtmlBlueprint<T>[]
+    cols?: Blueprint<T>[]
 }
 
 
-export const Table = <T>(props: TableProps<T&TableScope>) : HtmlBlueprint<T> => {
+export const Table = <T>(props: TableProps<T&TableScope>) : InferBlueprint<T> => {
     return mix<TableScope>({
         tag: 'table',
         css: 'table',
@@ -98,7 +98,7 @@ type ColProps = {
 }
 
 
-export const Col = <T>(props: ColProps) : HtmlBlueprint<T> => {
+export const Col = <T>(props: ColProps) : InferBlueprint<T> => {
     return {
 //        tag: 'col',
         dom: {
@@ -118,16 +118,17 @@ type RowScope<D=any> = {
 }
 
 export type RowProps<I, T> = {
-    defaultCell?: HtmlBlueprint<T&CellScope<I>>
-    cells?: HtmlBlueprint<T&CellScope<I>>[]
+    defaultCell?: Blueprint<T&CellScope<I>>
+    cells?: Blueprint<T&CellScope<I>>[]
     data$?: Injector<T>
     data?: T
 //    dataId?: string
 }
 
+export type RowPropsType<I, T=unknown> = RowProps<I, T&RowScope>
 
 
-export const Row = <T>(props: RowProps<any, T&RowScope>) : HtmlBlueprint<T> => {
+export const Row = <T>(props: RowPropsType<unknown, T>) : InferBlueprint<T> => {
     return mix<RowScope>({
     }, {
         defaultItem: props.defaultCell,
@@ -157,7 +158,7 @@ export type CellProps<T> = {
     format?: (s: T) => string
 }
 
-export const Cell = <T>(props: CellProps<T>) : HtmlBlueprint<T> => {
+export const Cell = <T>(props: CellProps<T>) : InferBlueprint<T> => {
     return mix<any>(/*{
 //        tag: 'td'
     }, */props && {

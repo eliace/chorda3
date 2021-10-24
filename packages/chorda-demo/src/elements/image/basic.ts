@@ -1,4 +1,3 @@
-import { HtmlBlueprint } from "@chorda/core"
 import { Box, Image } from "chorda-bulma"
 import { IMAGE_1 } from "../../data"
 

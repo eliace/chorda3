@@ -8,6 +8,7 @@ type TextInputScope = {
 }
 
 type TextInputProps<T> = {
+    type?: string
     value?: string
     value$?: Injector<T>
     onInput?: Listener<T, string>
@@ -75,7 +76,8 @@ export const TextInput = <T>(props: TextInputProps<T&TextInputScope>) : HtmlBlue
             },
         },
         dom: {
-            placeholder: props.placeholder
+            placeholder: props.placeholder,
+            type: props.type,
         }
     })
 }

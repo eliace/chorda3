@@ -16,5 +16,10 @@ export const ButtonExample = () : HtmlBlueprint => {
             content: require('./icon').default,
             code: require('!raw-loader!./icon').default
         }),
+        Example({
+            title: 'Group',
+            content: require('./group').default,
+            code: require('!raw-loader!./group').default
+        }),
     ])
 }

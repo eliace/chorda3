@@ -39,6 +39,7 @@ type MarsScope = {
     day: number
     totalPages: number
     pagePhotos: Nasa.Photo[]
+    activeSet: number
 }
 
 
@@ -137,7 +138,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                                                 maxHeight: 150
                                             },
                                             joints: {
-                                                addGraph: ({$dom, $renderer, $patcher, mission}) => {
+                                                addGraph: ({$dom, $renderer, $patcher, mission, activeSet}) => {
                     
                                                     let myChart: Chart = null
                     
@@ -157,14 +158,15 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                                                                     //labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
                                                                     labels: mission.photos.map(photo => ''),
                                                                     datasets: [{
-                                                                        //backgroundColor: '#209cee',
-                                                                        backgroundColor: '#209cee44',
+                                                                        backgroundColor: mission.photos.map(photo => '#209cee44'),
+                                                                        //backgroundColor: '#209cee44',
                     //                                                    label: '# of Votes',
                                                                         //data: [12, 19, 3, 5, 2, 3],
                                                                         data: mission.photos.map(photo => photo.total_photos),
                                                                         //barPercentage: 0.5,
                                                                         barThickness: 2,
                                                                         maxBarThickness: 8,
+                                                                        //hoverBackgroundColor: '#000',
                                                                     }]
                                                                 },
                                                                 options: {
@@ -191,14 +193,23 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                                                                         },
                                                                         tooltip: {
                                                                             enabled: false
-                                                                        }
-                                                                    }
+                                                                        },
+                                                                    },
                                                                 }
                                                             })
+
+                                                            
                     
                                                         }))
                                                         }
                                                     }, [$dom, mission])
+
+                                                    // watch(() => {
+                                                    //     if (myChart) {
+                                                    //         (myChart.data.datasets[0].backgroundColor as any)[activeSet.$value] = '#000'
+                                                    //         myChart.canvas..update() 
+                                                    //     }
+                                                    // }, [activeSet])
                     
                                                     return () => {
                                                         myChart && myChart.destroy()
@@ -232,7 +243,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                                                     // max$: $ => computable(() => {
                                                     //     return dayjs($.mission.max_date).diff($.mission.landing_date, 'days')
                                                     // }),
-                                                    value$: $ => observable(1000),
+                                                    value$: $ => $.activeSet,
                                                     name: 'earth-slider',
                                                     as: {
                                                         templates: {
@@ -338,6 +349,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
             page: () => observable(1),
             camera: () => observable('All'),
             day: () => observable(-1),
+            activeSet: () => observable(1000),
         },
         injections: {
             totalPages: $ => computable(() => {

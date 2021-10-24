@@ -1,6 +1,5 @@
-import { computable, HtmlBlueprint, InferBlueprint, observable, patch } from "@chorda/core"
+import { Blueprint, computable, HtmlBlueprint, InferBlueprint, observable, patch } from "@chorda/core"
 import { Box, RowLayout } from "chorda-bulma"
-import { Coerced, Custom } from "../../utils"
 import { COUNTRIES, Country } from "../../data"
 import { Select2, Option2 } from "./common/select2"
 import { Paragraph, Text } from '../../helpers'
@@ -15,11 +14,11 @@ export default () : InferBlueprint<unknown> => {
     return RowLayout([
         Select2<Country>({
             options$: () => countries,
-            defaultOption: Option2<Country>({
+            optionAs: Option2<Country>({
                 text$: ({option}) => option.name
             })
         }),
-        Coerced<SelectedScope>({
+        <Blueprint<SelectedScope>>{
             injections: {
                 selected: () => observable('Andorra')
             },
@@ -27,7 +26,7 @@ export default () : InferBlueprint<unknown> => {
                 Select2<Country, SelectedScope>({
                     options$: () => countries,
                     value$: ({selected}) => selected,
-                    defaultOption: Option2<Country>({
+                    optionAs: Option2<Country>({
                         text$: ({option}) => option.name
                     }),
                 }),
@@ -36,8 +35,8 @@ export default () : InferBlueprint<unknown> => {
                     text$: ({selected}) => computable(() => `selected: ${selected}`)
                 })    
             ]
-        }),
-        Coerced<SelectedScope>({
+        },
+        <Blueprint<SelectedScope>>{
             injections: {
                 selected: () => observable('TH')
             },
@@ -45,7 +44,7 @@ export default () : InferBlueprint<unknown> => {
                 Select2<Country, SelectedScope>({
                     options$: () => countries,
                     value$: (scope) => scope.selected,
-                    defaultOption: Option2<Country>({
+                    optionAs: Option2<Country>({
                         text$: (scope) => scope.option.name,
                         key$: (scope) => scope.option.alpha2Code,
                     }),
@@ -55,6 +54,6 @@ export default () : InferBlueprint<unknown> => {
                     text$: (scope) => computable(() => `selected: ${scope.selected}`)
                 })    
             ]
-        }),
+        },
     ])
 }

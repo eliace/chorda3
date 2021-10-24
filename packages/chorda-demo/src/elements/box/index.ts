@@ -9,8 +9,13 @@ export const BoxExample = () : HtmlBlueprint => {
     return RowLayout([
         Example({
             title: 'Basic',
-            content: require('./box1').default,
-            code: require('!raw-loader!./box1').default
+            content: require('./basic').default,
+            code: require('!raw-loader!./basic').default
+        }),
+        Example({
+            title: 'Form',
+            content: require('./form').default,
+            code: require('!raw-loader!./form').default
         }),
         // Example({
         //     title: 'Styles',

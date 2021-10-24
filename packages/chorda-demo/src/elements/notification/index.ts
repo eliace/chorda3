@@ -10,5 +10,10 @@ export const NotificationExample = () : InferBlueprint<unknown> => {
             content: require('./basic').default,
             code: require('!raw-loader!./basic').default
         }),
+        Example({
+            title: 'Colors',
+            content: require('./colors').default,
+            code: require('!raw-loader!./colors').default
+        }),
     ])
 }

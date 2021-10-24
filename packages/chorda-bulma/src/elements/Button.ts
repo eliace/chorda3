@@ -72,11 +72,11 @@ export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : HtmlBluepri
             'is-static': props.static
         },
         text: (!props.leftIcon && !props.rightIcon) && !props.icon && props.text,
-        templates: {
-            content: {
-                text: props.text
-            }
-        },
+        // templates: {
+        //     content: {
+        //         text: props.text
+        //     }
+        // },
         components: {
             leftIcon: props.leftIcon,
             rightIcon: props.rightIcon,
@@ -86,6 +86,7 @@ export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : HtmlBluepri
         initials: {
             color: () => observable(props.color),
             active: () => observable(props.active),
+            text: () => observable(props.text),
         },
         injections: {
             color: props.color$,

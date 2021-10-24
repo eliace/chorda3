@@ -10,5 +10,10 @@ export const ImageExample = () : HtmlBlueprint => {
             content: require('./basic').default,
             code: require('!raw-loader!./basic').default
         }),
+        Example({
+            title: 'Round',
+            content: require('./round').default,
+            code: require('!raw-loader!./round').default
+        }),
     ])
 }

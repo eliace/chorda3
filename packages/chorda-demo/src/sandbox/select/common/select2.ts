@@ -9,9 +9,9 @@ type Select2Scope<D> = {
     __it: D[]
 }
 
-interface Select2Props<T, I> extends Omit<SelectProps<T>, 'defaultOption'> {
+interface Select2Props<T, I> extends Omit<SelectProps<T>, 'optionAs'> {
     options$?: Injector<T>
-    defaultOption?: Blueprint<Omit<T, keyof I>&I>
+    optionAs?: Blueprint<Omit<T, keyof I>&I>
 //    onChange?: Listener<T, any>
     value$?: Injector<T>
 }

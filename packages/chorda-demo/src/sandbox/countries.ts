@@ -1,7 +1,6 @@
-import { HtmlBlueprint, InferBlueprint, iterable, observable } from "@chorda/core";
-import { Cell, Row, Table } from "chorda-bulma";
+import { InferBlueprint, iterable, observable } from "@chorda/core";
+import { Cell, Row, RowProps, RowPropsType, Table } from "chorda-bulma";
 import { COUNTRIES, Country } from "../data";
-import { Coerced } from "../utils";
 
 
 type ExampleScope = {
@@ -27,17 +26,15 @@ export default () : InferBlueprint<ExampleScope> => {
                 ]
             })
         ],
-        defaultRow: Coerced<{data: Country}>({
-            as: Row({
-                cells: [
-                    Cell({ data$: ({data}) => data.name }),
-                    Cell({ data$: ({data}) => data.capital }),
-                    Cell({ data$: ({data}) => data.region }),
-                    Cell({ data$: ({data}) => data.area }),
-                    Cell({ data$: ({data}) => data.population }),
-                    Cell({ data$: ({data}) => data.gini, format: screenNulls }),
-                ]
-            })
+        defaultRow: Row(<RowPropsType<Country>>{
+            cells: [
+                Cell({ data$: ({data}) => data.name }),
+                Cell({ data$: ({data}) => data.capital }),
+                Cell({ data$: ({data}) => data.region }),
+                Cell({ data$: ({data}) => data.area }),
+                Cell({ data$: ({data}) => data.population }),
+                Cell({ data$: ({data}) => data.gini, format: screenNulls }),
+            ]
         }),
         data$: () => countries
     })
