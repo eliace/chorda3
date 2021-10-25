@@ -53,8 +53,18 @@ const config = {
           {
             type: 'doc',
             docId: 'get-started',
-            position: 'left',
+            position: 'right',
             label: 'Docs',
+          },
+          {
+            to: 'blog', 
+            label: 'Blog', 
+            position: 'right'
+          },
+          {
+            href: 'https://chorda-demo.netlify.app/#/elements/box', 
+            label: 'Demo', 
+            position: 'right'
           },
           {
             href: 'https://github.com/eliace/chorda3',

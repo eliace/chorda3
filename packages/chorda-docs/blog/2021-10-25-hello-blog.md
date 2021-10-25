@@ -1,6 +1,16 @@
-# Версия 3.0
-
-Новая версия
+---
+title: Новая версия Chorda 3.0
+description: Описание нововведений Chorda 3.0
+slug: chorda-release-3
+authors:
+  - name: Eliace
+    title: Author and maintainer of Chorda
+    url: https://github.com/eliace
+    image_url: https://avatars.githubusercontent.com/u/281135?s=96&v=4
+tags: [chorda, release 3.0]
+image: https://i.imgur.com/mErPwqL.png
+hide_table_of_contents: true
+---
 
 Что нового?
 - "Ленивый" скоуп
@@ -11,6 +21,7 @@
 - Служебные события
 - Ну и костыли typescript
 
+<!--truncate-->
 
 ## "Ленивый" скоуп
 
@@ -61,14 +72,10 @@
 Частичное применение генериков так же недоступно. Общая рекомендация: не модифицировать генерики ответа, работать только с расширением или приведением типов аргументов
 
 
-
-
 # Концептуальные проблемы
 
 - невозможно использовать один узел в разных деревьях
 - использование VDOM, хотя есть полная информация об изменении DOM
 - невозможно клонирование или перенос поддерева
-
-
 
 

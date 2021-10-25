@@ -16,6 +16,8 @@
   --ifm-color-primary-lightest: rgb(146, 224, 208);
   --ifm-code-font-size: 95%;
   --ifm-code-padding-horizontal: 0.3rem;
+
+  --ifm-h1-font-size: 2rem;
 }
 
 .docusaurus-highlight-code-line {
@@ -27,4 +29,13 @@
 
 html[data-theme='dark'] .docusaurus-highlight-code-line {
   background-color: rgba(0, 0, 0, 0.3);
+}
+
+.navbar__title {
+  text-transform: uppercase;
+  color: #888;
+}
+
+.markdown h1:first-child {
+  font-size: 2rem;
 }
