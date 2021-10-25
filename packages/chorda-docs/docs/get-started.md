@@ -84,3 +84,7 @@ const createApp = () => {
     }
 }
 ```
+
+:::info
+Можно продолжить в [CodeSandbox](https://codesandbox.io/s/yq6fo)
+:::
