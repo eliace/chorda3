@@ -1,5 +1,4 @@
 import { computable, InferBlueprint, observable } from "@chorda/core"
-import dayjs from "dayjs"
 import { Nasa } from "../../api"
 import { Carousel, Text } from "../../helpers"
 

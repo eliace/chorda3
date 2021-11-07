@@ -1,4 +1,4 @@
-import { Blueprint, computable, HtmlBlueprint, InferBlueprint, observable, patch } from "@chorda/core"
+import { Blueprint, computable, Infer, observable } from "@chorda/core"
 import { Box, RowLayout } from "chorda-bulma"
 import { COUNTRIES, Country } from "../../data"
 import { Select2, Option2 } from "./common/select2"
@@ -10,7 +10,7 @@ type SelectedScope = {
 
 const countries = observable(COUNTRIES)
 
-export default () : InferBlueprint<unknown> => {
+export default () : Infer.Blueprint<unknown> => {
     return RowLayout([
         Select2<Country>({
             options$: () => countries,

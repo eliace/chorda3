@@ -10,11 +10,23 @@ export const defaultGearFactory = <D, E>(opts: GearOptions<D, E>, context: GearS
 }
 
 
+
+// interface Projection {
+//     $each (): void
+//     [key: string]: any
+// }
+
+// export const project = (v: any) : Projection => {
+//     return v
+// }
+
+
+
 //------------------------------------
 // GEAR
 //------------------------------------
 
-export type GearBlueprint<D=unknown, E=unknown> = GearOptions<D, E>|string|boolean|Function|Mixed<any>//<Blueprint<D, E>>
+export type GearBlueprint<D=unknown, E=unknown> = GearOptions<D, E>|string|boolean|Function|Promise<any>|Mixed<any>//<Blueprint<D, E>>
 
 
 export const defaultInitRules = {
@@ -51,18 +63,18 @@ type KeyedAndIndexed = {
 
 
 
-export interface GearOptions<D, E, B extends GearBlueprint<D, E>=GearBlueprint<D, E>> extends HubOptions<D, E> {
+export interface GearOptions<D, E, B extends GearBlueprint<D, E>=GearBlueprint<D, E>> extends HubOptions<D, E, B> {
     
     weight?: number
     name?: string
 
     // контейнер items
-    items?: B[] | boolean
+    items?: B[] | boolean | IterableValue<any>// | Projection
     itemFactory?: Function
     defaultItem?: B
 
     // контейнер components
-    components?: {[key: string]: B} | boolean
+    components?: {[key: string]: B} | boolean | IterableValue<any>// | Projection
     componentFactory?: Function
     defaultComponent?: B
 
@@ -93,6 +105,15 @@ export const isGear = (obj: any) : obj is Gear => {
 }
 
 
+enum Command {
+    Add = 'add',
+    Remove = 'remove'
+}
+
+// const command = (cmd: Command, idx?: number, key?: string) => {
+//     console.log(cmd, idx, key)
+// }
+
 
 export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends GearOptions<D, E>=GearOptions<D, E>, B extends GearBlueprint<D, E>=GearBlueprint<D, E>> extends Hub<D, E, S, O> {
 
@@ -103,13 +124,14 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
     components: {[k: string]: Gear<D>}
     items: Gear<D>[]
     uid?: string | number | symbol
+    commands: any[]
 
     constructor (options: O, context?: S, scope?: any) {
         super(options, context, scope)
 
         this.components = {}
         this.items = []
-        
+        this.commands = []
     }
 
     patch (optPatch: O) {
@@ -122,19 +144,21 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
 
 
         if (optPatch.templates != null) {
-            if (o.components && o.components !== true) {
+            // FIXME в options.components должен находится только {key: Options}
+            const components = o.components as any
+            if (components && components !== true) {
                 // пересоздаем компоненты
                 for (let k in optPatch.templates) {
                     // if (this.components[k]) {
                     //     this.updateComponent(k, o.components[k] as B)
                     // }
 //                    console.log('template component', k, o.components[k])
-                    if (o.components[k] === undefined) {
+                    if (components[k] === undefined) {
                         this.addKeyed(k, null)
                     }
                 }
             }
-            else if (o.components == null) {
+            else if (components == null) {
                 // создаем компоненты по умолчанию
                 for (let k in optPatch.templates) {
                     this.addKeyed(k, null)
@@ -143,16 +167,27 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
         }
 
         if (optPatch.components != null) {
-            if (o.components === true) {
+            const components = o.components as any
+            if (components === true) {
                 for (let k in o.templates) {
                     this.addKeyed(k, null)
                 }
             }
-            else if (o.components === false) {
+            else if (components === false) {
                 // TODO здесь мы должны выключать все компоненты
             }
             else {
-                this.syncKeyed(o.components as Keyed<Mixed<B>>)
+                if (isIterable(components)) {
+                    this.syncKeyed(components as any)
+                }
+                else {
+                    // FIXME optPatch.components может быть boolean
+                    const patchedComponents = {} as any
+                    for (let k in optPatch.components as any) {
+                        patchedComponents[k] = components[k]
+                    }
+                    this.syncKeyed(patchedComponents)
+                }
             }
         }
 
@@ -210,7 +245,13 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
             blueprint.key = key
             this.components[key] = blueprint
             return blueprint
-        }    
+        }
+        else if (blueprint instanceof Promise) {
+            blueprint.then(asyncBlueprint => {
+                this.addKeyed(key, asyncBlueprint, scope)
+            })
+            return
+        }
 
         const {defaultComponent, templates, componentFactory} = this.options
 
@@ -230,6 +271,9 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
 
             this.events.afterAddKeyed?.(comp, this.scope)
 
+            this.commands.push([Command.Add, undefined, key])
+//            command(Command.Add, undefined, key)
+
             return comp
         }
     }
@@ -237,6 +281,8 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
     removeKeyed (key: string) {
         this.events.beforeRemoveKeyed?.(key, this.scope)
         delete this.components[key]
+//        command(Command.Remove, undefined, key)
+        this.commands.push([Command.Remove, undefined, key])
     }
 
     updateKeyed (key: string, blueprint: B) {
@@ -370,6 +416,12 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
             this.items.push(blueprint)
             return blueprint
         }
+        else if (blueprint instanceof Promise) {
+            blueprint.then(asyncBlueprint => {
+                this.addIndexed(asyncBlueprint, idx, scope)
+            })
+            return
+        }
 
         const {defaultItem, itemFactory} = this.options
 
@@ -396,6 +448,9 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
 
             this.items.splice(index, 0, item)
 
+//            command(Command.Add, index, undefined)
+            this.commands.push([Command.Add, index, undefined])
+
             return item
         }
     }
@@ -411,6 +466,8 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
                 itm.index--
             }
         })
+//        command(Command.Add, idx, undefined)
+        this.commands.push([Command.Remove, idx, undefined])
     }
 
     syncIndexed (next: Mixed<B>[] | IterableValue<any>) {
@@ -572,6 +629,8 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
         }
     }
 }
+
+
 
 
 

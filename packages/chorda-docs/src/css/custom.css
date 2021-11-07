@@ -18,6 +18,7 @@
   --ifm-code-padding-horizontal: 0.3rem;
 
   --ifm-h1-font-size: 2rem;
+  --ifm-h2-font-size: 1.6rem;
 }
 
 .docusaurus-highlight-code-line {
@@ -38,4 +39,12 @@ html[data-theme='dark'] .docusaurus-highlight-code-line {
 
 .markdown h1:first-child {
   font-size: 2rem;
+}
+
+.markdown > h2 {
+  font-size: 1.6rem;
+}
+
+.markdown > h3 {
+  font-size: 1.3rem;
 }

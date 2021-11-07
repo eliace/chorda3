@@ -1,8 +1,9 @@
-import { Blueprint, HtmlBlueprint, InferBlueprint, iterable, mix, observable, patch } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, Infer, InferBlueprint, iterable, mix, observable, patch } from "@chorda/core"
 
 
 export type ColumnLayoutScope = {
     columns: (Blueprint<unknown>|ColumnProps<unknown>)[]
+    column: (Blueprint<unknown>|ColumnProps<unknown>)
 //    __it: HtmlBlueprint
 }
 
@@ -21,7 +22,7 @@ export const ColumnLayout = <T>(elements: (Blueprint<T>|ColumnProps<T>)[]) : Inf
         defaultItem: {
             css: 'column',
             reactions: {
-                columns: (v) => isColumn(v) ? patch({components: {content: v.content}, css: v.css}) : patch({components: {content: v}})
+                column: (v) => isColumn(v) ? {components: {content: v.content}, css: v.css} : {components: {content: v}}
             }
         },
         reactions: {
@@ -29,7 +30,7 @@ export const ColumnLayout = <T>(elements: (Blueprint<T>|ColumnProps<T>)[]) : Inf
         }
     }, {
         injections: {
-            columns: () => iterable(elements, 'columns')
+            columns: () => iterable(elements, 'column')
         }        
     })
 }

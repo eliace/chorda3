@@ -27,7 +27,7 @@ export const Select2 = <D, T extends Scope=unknown>(props: Select2Props<T&Select
         },
         reactions: {
             __it: (v) => patch({items: v}),
-            value: (v) => patch({dom: {defaultValue: v}})
+            value: (v) => ({dom: {defaultValue: v}})
         },
         events: {
             $dom: {
@@ -64,8 +64,8 @@ export const Option2 = <D, T=unknown>(props: Option2Props<T&Option2Scope<D>>) : 
             key: props.key$,
         },
         reactions: {
-            text: (v) => patch({text: v}),
-            key: (v) => patch({dom: {value: v}})
+            text: (v) => ({text: v}),
+            key: (v) => ({dom: {value: v}})
         }
     })
 }

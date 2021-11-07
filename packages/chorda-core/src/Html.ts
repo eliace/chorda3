@@ -15,7 +15,7 @@ export type HtmlScope = {
     $dom?: HTMLElement
 } & GearScope
 
-export type HtmlBlueprint<D=unknown, E=unknown, H=any> = HtmlOptions<D, E, H>|string|boolean|Function|Mixed<any>//<HtmlBlueprint>
+export type HtmlBlueprint<D=unknown, E=unknown, H=any> = HtmlOptions<D, E, H>|string|boolean|Function|Promise<any>|Mixed<any>//<HtmlBlueprint>
 
 export interface HtmlOptions<D, E, H, B=HtmlBlueprint<NoInfer<D>, NoInfer<E>, H>> extends GearOptions<D, E, B> {
     layout?: Function
@@ -77,8 +77,8 @@ export const passthruLayout = (factory: VNodeFactory, key: string, props: any, d
     return children && children.map(defaultRender)
 }
 
-export const defaultLayout = (factory: VNodeFactory, key: string, props: any, dom: Dom, children?: Renderable[]) : any => {
-    return factory.createVNode(key, props, dom, children && children.map(defaultRender))
+export const defaultLayout = (factory: VNodeFactory, key: string, props: any, dom: Dom, children?: Renderable[], changes?: any) : any => {
+    return factory.createVNode(key, props, dom, children && children.map(defaultRender), changes)
 }
 
 
@@ -88,6 +88,7 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
     vnode: any
     attached: boolean
     dirty: boolean
+    changes: any
 
 
 //    ext: HtmlProps
@@ -126,6 +127,57 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
         }
         if (optPatch.tag != null) {
             dom.tag = o.tag
+        }
+
+        if (!this.changes) {
+            this.changes = {}
+        }
+
+        // if (optPatch.items || optPatch.components || optPatch.templates || optPatch.defaultItem || optPatch.defaultComponent) {
+        //     this.changes.structure = true
+        // }
+        // if (optPatch.weight != null) {
+        //     if (this.parent) {
+        //         if (!this.parent.changes) {
+        //             this.parent.changes = {}
+        //         }
+        //         this.parent.changes.structure = true
+        //     }
+        // }
+
+        if (optPatch.tag) {
+            this.changes.tag = optPatch.tag
+        }
+        if (optPatch.html) {
+            this.changes.html = optPatch.html
+        }
+        if (optPatch.styles) {
+            this.changes.styles = {...this.changes.styles, ...optPatch.styles}
+        }
+        if (optPatch.classes) {
+            this.changes.classes = this.changes.classes || {}
+            for (let i in optPatch.classes) {
+                this.changes.classes[i] = this.options.classes[i]
+            }
+//            this.changes.classes = {...this.changes.classes, ...optPatch.classes}// buildClassName(this.changes.className, optPatch.classes)
+        }
+        if (optPatch.css) {
+            if (optPatch.css) {
+                this.changes.classes = this.changes.classes || {} as any;
+                if (Array.isArray(optPatch.css)) {
+                    optPatch.css.forEach(css => {
+                        css.split(' ').forEach(cn => {
+                            this.changes.classes[cn] = true
+                        })
+                    })    
+                }
+                else {
+                    optPatch.css.split(' ').forEach(cn => {
+                        this.changes.classes[cn] = true
+                    })
+                }
+            }
+            //this.changes.className = buildClassName(this.changes.className, optPatch.css)
         }
 
         // помечаем путь до корня "грязным"
@@ -216,15 +268,18 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
                     childrenAndText.splice(i, 0, text as any)
                 }
             }
-            this.vnode = layout(factory, key, this.options.dom, dom, childrenAndText)
+            this.vnode = layout(factory, key, this.options.dom, dom, childrenAndText, this.changes)
         }
         else {
-            this.vnode = layout(factory, key, this.options.dom, dom)
+            this.vnode = layout(factory, key, this.options.dom, dom, undefined, this.changes)
         }
 
 //        (dom as any).$applyEffects(this.scope.$renderer)
 
         this.dirty = false
+
+//        console.log('changes', this.changes)
+        this.changes = null
 
         return this.vnode 
     }

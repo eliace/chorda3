@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, Listener, mix, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, Injector, Listener, mix, observable } from "@chorda/core"
 import { RendererEvents } from "../utils"
 
 
@@ -31,6 +31,8 @@ type ButtonProps<T, E> = {
     active?: boolean
 }
 
+export type ButtonPropsType<T, E=unknown> = ButtonProps<T&ButtonScope, E>
+
 
 export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : HtmlBlueprint<T, E> => {
     return mix<ButtonScope, RendererEvents/*&{click?: () => any}*/>({
@@ -43,7 +45,7 @@ export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : HtmlBluepri
             content: {
                 tag: 'span',
                 reactions: {
-                    text: (v) => patch({text: v})
+                    text: (v) => ({text: v})
                 }
             },
             rightIcon: {
@@ -51,14 +53,14 @@ export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : HtmlBluepri
             }
         },
         reactions: {
-            color: (next, prev) => patch({
+            color: (next, prev) => ({
                 classes: {
                     [next]: true, 
                     [prev]: false
                 }
             }),
-            disabled: (v) => patch({dom: {disabled: v}}),
-            active: (v) => patch({
+            disabled: (v) => ({dom: {disabled: v}}),
+            active: (v) => ({
                 classes: {
                     'is-active': v
                 }

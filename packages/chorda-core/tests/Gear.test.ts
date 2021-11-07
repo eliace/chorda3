@@ -17,7 +17,7 @@ type TestEvents = {
 
 
 const createGear = <D>(o: Blueprint<D>) : Gear<D> => {
-    const s = new Gear<D>(o as GearOptions<D, unknown>, {$engine: createTestPatcher(), $defaultFactory: defaultGearFactory} as any)
+    const s = new Gear<D>(o as GearOptions<D, unknown>, {$patcher: createTestPatcher(), $defaultFactory: defaultGearFactory} as any)
     immediateTick()
     return s
 }
@@ -531,6 +531,24 @@ describe ('Gear', () => {
 
     })
 
+
+    // describe('Commands', () => {
+
+    //     it ('Should add commands', () => {
+
+    //         const g = createGear({
+    //             components: {
+    //                 a: {},
+    //                 b: {}
+    //             },
+    //             items: [{}, {}, {}]
+    //         })
+
+    //         console.log(g.commands)
+    //     })
+
+
+    // })
 
 })
 

@@ -557,13 +557,14 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
             }
             else {
                 if (i != removed._key) {
-                    console.warn('removed and changed key', i, removed._key, removed.$uid)//, removed)
+//                    console.warn('removed and changed key', i, removed._key, removed.$uid)//, removed)
                     //console.log(prevMap)
                 }
 
                 if (removed._subscriptions.length > 0) {
                     if (this._entries[String(removed._key)]) {
-                        debugger
+                        console.warn('Removed entry can not be restored', removed, this)
+                        //debugger
                     }
                     else {
                         this._entries[String(removed._key)] = removed
@@ -572,7 +573,7 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
                     continue
                 }
 
-                console.log('removed', removed._key, removed._memoValue)
+//                console.log('removed', removed._key, removed._memoValue)
             }
 
             const t = currentTransaction()

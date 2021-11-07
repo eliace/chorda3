@@ -1,22 +1,22 @@
-import { InferBlueprint, observable, patch } from "@chorda/core"
+import { InferBlueprint, observable } from "@chorda/core"
 import { Button } from "chorda-bulma"
 import { Paragraph, Text } from "../../helpers"
 import { withShowHide } from "./utils"
 
 
-export default () : InferBlueprint<{active: boolean}> => {
+export default () : InferBlueprint<{isActive: boolean}> => {
     return {
         injections: {
-            active: () => observable(true),
+            isActive: () => observable(true),
         },
         reactions: {
-            active: (v) => patch({components: {text: v}}),
+            isActive: (v) => ({components: {text: v}}),
         },
         templates: {
             button: Button({
                 text: 'Toggle slide',
-                onClick: (e, {active}) => {
-                    active.$value = !active.$value
+                onClick: (e, {isActive}) => {
+                    isActive.$value = !isActive.$value
                 },
             }),
             text: withShowHide(Paragraph({

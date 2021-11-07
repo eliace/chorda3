@@ -1,4 +1,4 @@
-import { computable, HtmlBlueprint, InferBlueprint, observable, patch } from "@chorda/core";
+import { computable, InferBlueprint, observable } from "@chorda/core";
 import { Box, Tab, Tabs } from "chorda-bulma";
 import { Custom } from "../../utils";
 import { Breeds } from "./Breeds";
@@ -32,7 +32,7 @@ export const CatApi = () : InferBlueprint<CatApiScope> => {
                         return selected == name
                     }),
                     onClick: (e, {selected, name}) => {
-                        debugger
+//                        debugger
                         selected.$value = name
                     }
                 })
@@ -46,7 +46,7 @@ export const CatApi = () : InferBlueprint<CatApiScope> => {
                     favourites: Favourites,
                 },
                 reactions: {
-                    selected: (v) => patch({components: {
+                    selected: (v) => ({components: {
                         vote: v == 'vote',
                         breeds: v == 'breeds',
                         search: v == 'search',

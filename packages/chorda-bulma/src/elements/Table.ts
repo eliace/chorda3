@@ -1,4 +1,4 @@
-import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, iterable, mix, observable } from "@chorda/core"
 
 
 
@@ -44,7 +44,7 @@ export const Table = <T>(props: TableProps<T&TableScope>) : InferBlueprint<T> =>
                 // bindings: {
                 //     hrows: (v: any, s: any) => {
                 //         console.log('rows', v)
-                //         patch({items: v})
+                //         ({items: v})
                 //     }
                 // }
             },
@@ -57,10 +57,7 @@ export const Table = <T>(props: TableProps<T&TableScope>) : InferBlueprint<T> =>
                     }
                 },
                 reactions: {
-                    rows: (next) => {
-//                        debugger
-                        patch({items: next})
-                    }
+                    rows: (next) => ({items: next})
                 },
                 injections: {
                     rows: $ => iterable($.data, 'data')
@@ -137,7 +134,7 @@ export const Row = <T>(props: RowPropsType<unknown, T>) : InferBlueprint<T> => {
         //     data: props.data$ || (() => props.data)
         // },
         // reactions: {
-        //     data: (v) => patch({items: v})
+        //     data: (v) => ({items: v})
         // }
     })
 }
@@ -164,7 +161,7 @@ export const Cell = <T>(props: CellProps<T>) : InferBlueprint<T> => {
     }, */props && {
 //        text: props.text,
         reactions: {
-            data: (v) => patch({text: (props.format || String)(v)})
+            data: (v) => ({text: (props.format || String)(v)}) //({text: (props.format || String)(v)})
         },
         injections: {
             data: props.data$ || (() => props.text)

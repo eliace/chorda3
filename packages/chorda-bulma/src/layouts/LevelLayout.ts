@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, iterable, Keyed, mix, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, Injector, iterable, Keyed, mix } from "@chorda/core"
 
 
 type LevelLayoutScope = {
@@ -29,7 +29,7 @@ export const LevelLayout = <T>(elements: [Keyed<HtmlBlueprint<T>>, Keyed<HtmlBlu
                     css: 'level-item',
                     reactions: {
                         level: (v) => {
-                            patch({components: {content: v}})
+                            return ({components: {content: v}})
                         }
                     },
                     injections: {
@@ -42,7 +42,7 @@ export const LevelLayout = <T>(elements: [Keyed<HtmlBlueprint<T>>, Keyed<HtmlBlu
                 reactions: {
                     left: (next) => {
 //                        console.log(next)
-                        patch({components: next})
+                        return ({components: next})
                     }
                 }
             },
@@ -53,7 +53,7 @@ export const LevelLayout = <T>(elements: [Keyed<HtmlBlueprint<T>>, Keyed<HtmlBlu
                     reactions: {
                         level: (v) => {
 //                            console.log(v)
-                            patch({components: {content: v}})
+                            return ({components: {content: v}})
                         }
                     },
                     injections: {
@@ -64,7 +64,7 @@ export const LevelLayout = <T>(elements: [Keyed<HtmlBlueprint<T>>, Keyed<HtmlBlu
                     }
                 },
                 reactions: {
-                    right: (next) => patch({components: next})
+                    right: (next) => ({components: next})
                 }
             }
         }

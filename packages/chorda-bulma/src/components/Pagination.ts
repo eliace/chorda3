@@ -39,8 +39,8 @@ export const Pagination = <T, E>(props: PaginationProps<T, E>) : InferBlueprint<
                             tag: 'a',
                             css: 'pagination-link',
                             reactions: {
-                                __item: v => patch({text: String(v)}),
-                                active: v => patch({classes: {'is-current': v}})
+                                __item: v => ({text: String(v)}),
+                                active: v => ({classes: {'is-current': v}})
                             },
                             events: {
                                 $dom: {

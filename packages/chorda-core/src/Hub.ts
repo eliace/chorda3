@@ -1,5 +1,5 @@
 import { Value, EventBus, Subscription, ObservableValue, Handler, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable, Thenable, isCallable, spySubscriptions, isValueSet, isLastValue } from './value'
-import { MixRules, mixin } from './mix'
+import { MixRules, mixin, Mixed } from './mix'
 import { ownTask, Pipe, Scheduler } from './pipe'
 
 
@@ -106,15 +106,22 @@ type AsyncListeners<D, R> = {
     fail?: Listener<D, any>
 }
 
-export type Listener<D, R> = (event: R, scope: EventScoped<D>) => boolean | unknown //) | AsyncListeners<D, R>
+type FlattenPromise<T> = T extends Promise<infer I> ? I : T
+
+export type Listener<D, R> = (event: FlattenPromise<R>, scope: EventScoped<D>) => boolean | unknown //) | AsyncListeners<D, R>
 
 // Scope bindings
 
-type Reactor<T> = (next: T, prev: T, helpers: ReactionHelpers) => void
+//type LR<T> = Reactors<T> | Reactor<T>// (T extends number|string|any[] ? any : Listeners<T, S>)// NestedListeners<T, D>// Listeners<T>
 
-type Reactors<T> = {
-    [P in keyof T]?: Reactor<NoInfer<T[P]>>
+type Reactor<T, R=any> = (next: T, prev: T) => R
+
+type Reactors<T, R> = {
+    [P in keyof NoInfer<T>]?: (Reactors<T[P], R> | Reactor<T[P], R>)
 }
+// type Reactors<T> = {
+//     [P in keyof T]?: Reactor<NoInfer<T[P]>>
+// }
 
 // Scope joints
 
@@ -131,8 +138,9 @@ type Joints<T> = {
     // }
 }
 
+export type HubBlueprint<D=unknown, E=unknown> = HubOptions<D, E>|string|boolean|Function|Promise<any>|Mixed<any>//<Blueprint<D, E>>
 
-export interface HubOptions<D, E> {
+export interface HubOptions<D, E, B extends HubBlueprint<D, E>=HubBlueprint<D, E>> {
     // инжекторы скоупа
     injections?: Injectors<D>
     // кастомизация скоупа
@@ -141,7 +149,7 @@ export interface HubOptions<D, E> {
     initials?: Injectors<D>
 
     // изменения скоупа
-    reactions?: Reactors<D>
+    reactions?: Reactors<D, B|void>
     // слушатели скоупа
     events?: Listeners<MethodsAndObjectsOf<E>, D>
 }
@@ -184,6 +192,7 @@ let _PatchingHub : Hub<unknown, any> = undefined
 
 export const patch = (o: any) => {
     _PatchingHub.scope.$patcher.publish(ownTask(_PatchingHub.patch, o, _PatchingHub))
+    console.warn('Explicit use of patch is obsolete')
     //_PatchingHub.scope.$pipe.push(ownTask(_PatchingHub.patch, o, _PatchingHub))
 }
 
@@ -203,7 +212,7 @@ interface MonitoredThenable extends Thenable {
     isFailed: boolean
 }
 
-const createMonitoredThenable = (thenable: Thenable) : Thenable => {
+const createMonitoredThenable = (thenable: Thenable) : MonitoredThenable => {
     const monitored = thenable.then((v: unknown) => {
         mt.isDone = true
         mt.isPending = false
@@ -241,21 +250,19 @@ const isMonitoredThenable = (v: any) : v is MonitoredThenable => {
 // }
 
 
-interface ReactionHelpers {
-    readonly isLast: boolean
-    readonly isFirst: boolean
-}
+// interface ReactionHelpers {
+//     readonly isLast: boolean
+//     readonly isFirst: boolean
+// }
 
-class DefaultReactionHelpers implements ReactionHelpers {
-    get isLast () {
-        return isLastValue(_PatchingHub.scope[String(_ScopeKey)])
-    }
-    get isFirst () {
-        return false
-    }
-}
-
-const __helpers = new DefaultReactionHelpers()
+// class DefaultReactionHelpers implements ReactionHelpers {
+//     get isLast () {
+//         return isLastValue(_PatchingHub.scope[String(_ScopeKey)])
+//     }
+//     get isFirst () {
+//         return false
+//     }
+// }
 
 
 
@@ -268,7 +275,15 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
     subscriptions: Subscription[]
     handlers: Handler<any>[]
-    joints: (MonitoredThenable|Function)[]
+    //joints: (MonitoredThenable|Function)[]
+
+    joints: {
+        [key: string]: {
+            disjoint?: MonitoredThenable|Function
+            subscriptions?: Subscription[]
+            handlers?: Handler<any>[]
+        }
+    }
 
     // TODO по сути здесь флаги
     bindings: {[key: string]: Function}
@@ -472,7 +487,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         this.events = {}
         this.bindings = {}
 
-        this.joints = []
+        this.joints = {}
 
         this.state = State.Initializing
 
@@ -531,24 +546,73 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         // Joints
         //TODO joints не должны обновляться динамически, но все равно нужно сделать обработку
         if (optPatch.joints) {
-            const subscriptions = spySubscriptions(() => {
-                noAutoTerminal(() => {
-                    for (let k in o.joints) {
-                        let joint = o.joints[k].call(this, this.scope)
-                        if (joint && (joint as Thenable).then) {
-                            joint = createMonitoredThenable(joint)
+
+            noAutoTerminal(() => {
+                for (let k in optPatch.joints) {
+                    let joint = this.joints[k]
+                    if (joint) {
+                        console.warn('Non initial joint update', k, optPatch)
+                        // удаляем старое подключение
+                        if (joint.disjoint) {
+                            if (typeof joint.disjoint === 'function') {
+                                joint.disjoint()
+                            }
                         }
-                        this.joints.push(joint)
-                        // for (let i in o.joints[k]) {
-                        //     if (o.joints[k][i]) {
-                        //         const joint = o.joints[k][i].call(this, this.scope[k], this.scope)
-                        //         this.joints.push(joint)    
-                        //     }
-                        // }
-                    }        
-                })
+                        // и старые подписки
+                        if (joint.subscriptions) {
+                            joint.subscriptions.forEach(sub => {
+                                sub.observable.$unsubscribe(sub)
+                                this.subscriptions = this.subscriptions.filter(s => s != sub)
+                            })
+                        }
+                        // joint.disjoint = null
+                        // joint.subscriptions = null
+                    }
+                    else {
+                        // создаем новое подключение
+                        joint = {}
+                        this.joints[k] = joint
+                    }
+
+
+                    let disjoint = null
+                    const subscriptions = spySubscriptions(() => {
+                        disjoint = o.joints[k].call(this, this.scope)
+                    })
+                    if (disjoint && (disjoint as Thenable).then) {
+                        disjoint = createMonitoredThenable(disjoint)
+                    }
+                    joint.disjoint = disjoint
+                    joint.subscriptions = subscriptions
+
+                    // дополняем список новых подписок для $touch
+                    newSubscriptions = newSubscriptions.concat(subscriptions)
+                }        
             })
-            newSubscriptions = newSubscriptions.concat(subscriptions)
+
+
+            // const subscriptions = spySubscriptions(() => {
+            //     noAutoTerminal(() => {
+            //         for (let k in optPatch.joints) {
+            //             if (this.joints[k]) {
+            //                 // удаляем старое подключение
+            //             }
+            //             // создаем новое подключение
+            //             let joint = o.joints[k].call(this, this.scope)
+            //             if (joint && (joint as Thenable).then) {
+            //                 joint = createMonitoredThenable(joint)
+            //             }
+            //             this.joints.push(joint)
+            //             // for (let i in o.joints[k]) {
+            //             //     if (o.joints[k][i]) {
+            //             //         const joint = o.joints[k][i].call(this, this.scope[k], this.scope)
+            //             //         this.joints.push(joint)    
+            //             //     }
+            //             // }
+            //         }        
+            //     })
+            // })
+            // newSubscriptions = newSubscriptions.concat(subscriptions)
         }
 
 
@@ -557,27 +621,39 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
             for (let k in o.reactions) {
                 if (o.reactions[k] && !this.bindings[k]) {
 
-                    this.bindings[k] = this.patchAware(o.reactions[k])//scopeKeyAware.bind(this, k, this.patchAware(o.reactions[k])) 
+                    this.changeReaction(k, o.reactions, this.scope, this.bindings, newSubscriptions)
 
-                    const entry = this.scope[k]
-                    const binding = this.bindings[k]
+                    // const reactions = o.reactions[k]
+                    // if (typeof reactions === 'function') {
+                    //     this.bindings[k] = this.patchAware(reactions)//scopeKeyAware.bind(this, k, this.patchAware(o.reactions[k])) 
 
-                    if (isObservable(entry)) {
-            
-                        const sub = entry.$subscribe((next: any, prev: any) => {
-                            autoTerminalAware(() => {
-                                scopeKeyAware(k, () => {
-                                    // здесь скоуп должен быть доступен только для чтения
-                                    binding(entry.$isTerminal ? next : entry, prev/*, this.scope*/)
-                                })    
-                            })
-                        })
+                    //     const entry = this.scope[k]
+                    //     const binding = this.bindings[k]
+    
+                    //     if (isObservable(entry)) {
+                
+                    //         const sub = entry.$subscribe((next: any, prev: any) => {
+                    //             autoTerminalAware(() => {
+                    //                 scopeKeyAware(k, () => {
+                    //                     // здесь скоуп должен быть доступен только для чтения
+                    //                     binding(entry.$isTerminal ? next : entry, prev/*, this.scope*/)
+                    //                 })    
+                    //             })
+                    //         })
+    
+                    //         newSubscriptions.push(sub)
+                    //     }
+                    //     else {
+                    //         binding(entry, undefined)
+                    //     }    
+                    // }
+                    // else if (typeof reactions === 'object') {
 
-                        newSubscriptions.push(sub)
-                    }
-                    else {
-                        binding(entry, undefined)
-                    }
+
+
+                    // }
+
+                    // FIXME
                 }
             }
         }
@@ -662,6 +738,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
                     sub.observable.$touch(sub.subscriber)
                 }
             }
+
 //        })
 
         // TODO предполагается, что повторов подписок нет
@@ -679,6 +756,57 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         // }
     }
 
+
+    changeReaction (k: string, reactions: any, entries: any, bindings: any, newSubscriptions: Subscription[]) {
+
+        const reaction = (reactions as any)[k]
+
+        if (typeof reaction === 'function') {
+            bindings[k] = this.patchAware(reaction)//scopeKeyAware.bind(this, k, this.patchAware(o.reactions[k])) 
+
+            const entry = entries[k]
+            const binding = bindings[k]
+
+            if (isObservable(entry)) {
+    
+                const sub = entry.$subscribe((next: any, prev: any) => {
+                    autoTerminalAware(() => {
+                        scopeKeyAware(k, () => {
+                            // здесь скоуп должен быть доступен только для чтения
+                            const patchOpts = binding(entry.$isTerminal ? next : entry, prev/*, this.scope*/)
+                            if (patchOpts) {
+                                this.scope.$patcher.publish(ownTask(this.patch, patchOpts, this))
+                                // this.patchAware(() => {
+                                //     patch(patchOpts)
+                                // })()
+                            }
+                        })    
+                    })
+                })
+
+                newSubscriptions.push(sub)
+            }
+            else {
+                const patchOpts = binding(entry, undefined)
+                if (patchOpts) {
+                    this.scope.$patcher.publish(ownTask(this.patch, patchOpts, this))
+                    // this.patchAware(() => {
+                    //     patch(patchOpts)
+                    // })()
+                }
+            }    
+        }
+        else {
+            for (let i in reaction) {
+                this.changeReaction(i, reactions[k], entries[k], bindings[k], newSubscriptions)
+            }
+        }
+
+    }
+
+
+
+
     destroy (deferred?: Function) {
 
         // исключаем повторное удаление
@@ -688,27 +816,52 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
         // обрабатываем хуки отключения скоупа
         let disjointPromise = null
-        if (this.joints.length > 0) {
-            const promises: Thenable[] = []
-            for (let disjoint of this.joints) {
-                if (disjoint) {
-                    if (isMonitoredThenable(disjoint)) {
-//                        debugger
-                        disjoint.isPending && promises.push(disjoint)
-                    }
-                    else if (typeof disjoint === 'function') {
-                        const eff = disjoint()
-                        if (eff && (eff as Thenable).then) {
-                            promises.push(eff)
-                        }    
-                    }
+        const promises: Thenable[] = []
+        for (let k in this.joints) {
+            const disjoint = this.joints[k].disjoint
+            if (disjoint) {
+                if (isMonitoredThenable(disjoint)) {
+                    disjoint.isPending && promises.push(disjoint)
+                }
+                else if (typeof disjoint === 'function') {
+                    const eff = disjoint()
+                    if (eff && (eff as Thenable).then) {
+                        promises.push(eff)
+                    }    
                 }
             }
-            this.joints = []
-            if (promises.length > 0) {
-                disjointPromise = Promise.all(promises)
-            }    
+            // const subscriptions = this.joints[k].subscriptions
+            // if (subscriptions) {
+            //     subscriptions.forEach(sub => {
+            //         sub.observable.$unsubscribe(sub)
+            //     })
+            // }
         }
+        this.joints = {}
+        if (promises.length > 0) {
+            disjointPromise = Promise.all(promises)
+        }    
+
+        // if (this.joints.length > 0) {
+        //     const promises: Thenable[] = []
+        //     for (let disjoint of this.joints) {
+        //         if (disjoint) {
+        //             if (isMonitoredThenable(disjoint)) {
+        //                 disjoint.isPending && promises.push(disjoint)
+        //             }
+        //             else if (typeof disjoint === 'function') {
+        //                 const eff = disjoint()
+        //                 if (eff && (eff as Thenable).then) {
+        //                     promises.push(eff)
+        //                 }    
+        //             }
+        //         }
+        //     }
+        //     this.joints = []
+        //     if (promises.length > 0) {
+        //         disjointPromise = Promise.all(promises)
+        //     }    
+        // }
 
         // удаляем подписки на изменения
         for (let sub of this.subscriptions) {
@@ -802,8 +955,9 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         return (...args: any[]) => {
             const prevPatchingTarget = _PatchingHub
             _PatchingHub = this
-            callback.apply(this, args)
-            _PatchingHub = prevPatchingTarget    
+            const result = callback.apply(this, args)
+            _PatchingHub = prevPatchingTarget
+            return result
         }
     }
 

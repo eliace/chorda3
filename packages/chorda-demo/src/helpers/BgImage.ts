@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, mix, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, Injector, mix, observable } from "@chorda/core"
 
 
 
@@ -23,11 +23,11 @@ export const BgImage = <T, E>(props: BgImageProps<T&BgImageScope, E>) : HtmlBlue
             content: {
                 css: 'bg-image-content',
                 reactions: {
-                    url: (v: any) => v && patch({
+                    url: (v: any) => v && {
                         styles: {
                             backgroundImage: `url(${v})`
                         }
-                    })
+                    }
                 }        
             }
         },

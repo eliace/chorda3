@@ -1,52 +1,73 @@
-import { HtmlBlueprint, HtmlScope, Injector, Listener, mix, observable, patch } from "@chorda/core";
-import { ReactDomEvents } from "@chorda/react";
+import { BasicDomEvents, Blueprint, callable, HtmlBlueprint, HtmlScope, Infer, Injector, Listener, mix, observable } from "@chorda/core";
 import { watch } from "../utils";
 
 
-type TextInputScope = {
+export type TextInputScope = {
     value: string
 }
 
-type TextInputProps<T> = {
+type TextInputActions = {
+    onInput: (e: InputEvent) => InputEvent,
+    onFocus: () => void,
+    onBlur: () => void,
+    onEsc: () => void,
+}
+
+type TextInputProps<T, E> = {
     type?: string
     value?: string
     value$?: Injector<T>
-    onInput?: Listener<T, string>
+    onInput?: Listener<T, InputEvent>
     onFocus?: Listener<T, void>
+    onBlur?: Listener<T, void>
     onEsc?: Listener<T, void>
     placeholder?: string
+    as?: Blueprint<T, E>
+//    autoFocus?: boolean
 }
 
-export const TextInput = <T>(props: TextInputProps<T&TextInputScope>) : HtmlBlueprint<T> => {
-    return mix<TextInputScope&HtmlScope, ReactDomEvents>({
+export const TextInput = <T, E>(props: TextInputProps<T&TextInputScope, E>) : Infer.Blueprint<T, E> => {
+    return mix<TextInputScope&HtmlScope&TextInputActions, BasicDomEvents&TextInputActions>({
         tag: 'input',
         css: 'input',
     },
+    props?.as,
     props && {
         events: {
             $dom: {
                 input: (e, scope) => {
                     scope.value.$value = (e.target as any).value
-                    props.onInput?.(scope.value, scope as any)
+                    scope.onInput(e)
                 },
                 focus: (e, scope) => {
-                    props.onFocus?.(null, scope as any)
+                    scope.onFocus()
                 },
-                keyDown: (e, scope) => {
+                blur: (e, scope) => {
+                    scope.onBlur()
+                },
+                keydown: (e, scope) => {
                     if (e.code == 'Escape') {
-                        props.onEsc?.(null, scope as any)
+                        scope.onEsc()
                     }
                 }    
-            }
+            },
+            onInput: props.onInput,
+            onFocus: props.onFocus,
+            onBlur: props.onBlur,
+            onEsc: props.onEsc,
         },
         initials: {
             value: () => observable(props.value || ''),
+            onInput: () => callable(null),
+            onFocus: () => callable(null),
+            onBlur: () => callable(null),
+            onEsc: () => callable(null),
         },
         injections: {
             value: props.value$
         },
         reactions: {
-            value: (v) => patch({dom: {defaultValue: v || ''}})
+            value: (v) => ({dom: {defaultValue: v || ''}})
         },
         joints: {
             domValue: ({value, $dom}) => {
@@ -74,6 +95,13 @@ export const TextInput = <T>(props: TextInputProps<T&TextInputScope>) : HtmlBlue
                 // $dom.$subscribe(changeValue)
 
             },
+            // autoFocus: props.autoFocus && (({$dom}) => {
+            //     watch(() => {
+            //         if ($dom.$value) {
+            //             $dom.$value.focus()
+            //         }
+            //     }, [$dom])
+            // })
         },
         dom: {
             placeholder: props.placeholder,

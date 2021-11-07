@@ -1,4 +1,4 @@
-import { computable, HtmlBlueprint, iterable, observable, patch } from "@chorda/core"
+import { computable, HtmlBlueprint, iterable, iterator, observable } from "@chorda/core"
 import { Box, Image } from "chorda-bulma"
 import { Coerced } from "../../utils"
 import { User, USERS } from "../../data"
@@ -25,10 +25,10 @@ export default () : HtmlBlueprint => {
                 })
             }),
             reactions: {
-                data: (v) => patch({items: v})
+                data: (v) => ({items: iterator(v, 'data')})
             },
-            injections: {
-                data: () => iterable(users, 'data')
+            initials: {
+                data: () => users// iterable(users, 'data')
             }
         })
     }) 

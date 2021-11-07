@@ -1,7 +1,7 @@
 import { Blueprint, computable, InferBlueprint, Injector, mix, observable, patch } from "@chorda/core";
 import * as dayjs from "dayjs";
 import { Article } from "../api";
-import { Img, Link, Text } from "../elements";
+import { Img, Link, Span, Text } from "../elements";
 
 
 
@@ -36,7 +36,7 @@ export const ArticleMeta = <T, E>(props: ArticleMetaPropsType<T, E>) : InferBlue
                         text$: $ => $.article.author.username,
                     }),
                     date: Text({
-                        as: { tag: 'span' },
+                        as: Span,
                         css: 'date',
                         text$: $ => computable(() => {
                             return dayjs($.article?.createdAt).format('MMMM D, YYYY')

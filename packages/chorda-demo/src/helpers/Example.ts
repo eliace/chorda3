@@ -1,10 +1,17 @@
-import { computable, HtmlBlueprint, Injector, mix, observable, patch } from "@chorda/core"
-import { Card, LevelLayout, Tab, Tabs, Title } from "chorda-bulma"
+import { Blueprint, computable, HtmlBlueprint, Infer, Injector, mix, observable } from "@chorda/core"
+import { faExternalLinkAlt } from "@fortawesome/free-solid-svg-icons"
+import { Card, LevelLayout, Link, Tab, Tabs, Title } from "chorda-bulma"
 import { Selected } from "../App"
 import { Custom, withHtml } from "../utils"
 import { Action } from "./Action"
 import { CodeBox } from "./CodeBox"
+import { FaIcon } from "./FaIcon"
 
+
+
+const withSelectedComponents = <T>(props: Blueprint<T&{selected: {[key: string]: any}}>) : Infer.Blueprint<T> => {
+    return props
+}
 
 
 
@@ -21,6 +28,7 @@ type ExampleBoxProps<T> = {
     description?: string
     code?: string
     files?: ExampleFile[]
+    link?: string
 }
 
 type ExampleFile = {
@@ -50,7 +58,19 @@ export const Example = <T>(props: ExampleBoxProps<T&ExampleBoxScope>) : HtmlBlue
                     title: Title({
                         css: 'example-box-title',
                         size: 'is-6',
-                        text$: (scope) => scope.title
+                        text$: (scope) => scope.title,
+                        as: {
+                            templates: {
+                                externalLink: props.link && FaIcon({
+                                    icon: faExternalLinkAlt,
+                                    as: Link({
+                                        link: props.link,
+                                        text$: () => null,
+                                        target: '_blank'
+                                    })
+                                })
+                            }
+                        }
                     })
                 }, {
                     tools: {
@@ -84,7 +104,7 @@ export const Example = <T>(props: ExampleBoxProps<T&ExampleBoxScope>) : HtmlBlue
                 weight: -5,
                 css: 'code-panel example-box-code',
                 templates: {
-                    content: Selected({
+                    content: withSelectedComponents({
                         templates: files?.reduce((acc, file) => {
                             acc[file.name] = CodeBox({
                                 code: file.code
@@ -92,7 +112,7 @@ export const Example = <T>(props: ExampleBoxProps<T&ExampleBoxScope>) : HtmlBlue
                             return acc
                         }, {} as any),
                         reactions: {
-                            selected: (v) => patch({components: v})
+                            selected: (v) => ({components: v})
                         },
                         injections: {
                             selected: (ctx) => computable(() => {
@@ -122,7 +142,7 @@ export const Example = <T>(props: ExampleBoxProps<T&ExampleBoxScope>) : HtmlBlue
             }        
         },
         reactions: {
-            isShowCode: (v) => patch({components: {code: v}})
+            isShowCode: (v) => ({components: {code: v}})
         },
         injections: {
             title: props.title$ || (() => observable(props.title)),

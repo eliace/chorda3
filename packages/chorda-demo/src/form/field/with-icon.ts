@@ -1,4 +1,4 @@
-import { Blueprint, InferBlueprint, mix, patch } from "@chorda/core";
+import { Blueprint, Infer, InferBlueprint, mix } from "@chorda/core";
 import { IconDefinition } from "@fortawesome/fontawesome-common-types";
 
 
@@ -25,7 +25,7 @@ export const withFieldIcons = <T, E>(props: Blueprint<T&FieldIconsScope, E>) : I
                             }
                         },
                         reactions: {
-                            leftIcon: (v) => patch({
+                            leftIcon: (v) => ({
                                 components: {
                                     content: v
                                 }
@@ -43,7 +43,7 @@ export const withFieldIcons = <T, E>(props: Blueprint<T&FieldIconsScope, E>) : I
                             }
                         },
                         reactions: {
-                            rightIcon: (v) => patch({
+                            rightIcon: (v) => ({
                                 components: {
                                     content: v
                                 }
@@ -52,7 +52,7 @@ export const withFieldIcons = <T, E>(props: Blueprint<T&FieldIconsScope, E>) : I
                     },
                 },      
                 reactions: {
-                    leftIcon: (v) => patch({
+                    leftIcon: (v) => ({
                         components: {
                             iconLeft: !!v
                         },
@@ -60,7 +60,7 @@ export const withFieldIcons = <T, E>(props: Blueprint<T&FieldIconsScope, E>) : I
                             'has-icons-left': !!v
                         }
                     }),
-                    rightIcon: (v) => patch({
+                    rightIcon: (v) => ({
                         components: {
                             iconRight: !!v
                         },
@@ -72,4 +72,22 @@ export const withFieldIcons = <T, E>(props: Blueprint<T&FieldIconsScope, E>) : I
             }
         }
     }, props)
+}
+
+
+
+
+type FieldIconProps<T, E> = {
+    leftIcon?: Blueprint<T, E>
+    rightIcon?: Blueprint<T, E>
+}
+
+
+export const FieldIcons = <T, E>(props: FieldIconProps<T&FieldIconsScope, E>) : Infer.Blueprint<T, E> => {
+    return mix(withFieldIcons({
+        injections: {
+            leftIcon: () => props.leftIcon,
+            rightIcon: () => props.rightIcon
+        }
+    }))
 }

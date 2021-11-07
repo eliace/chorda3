@@ -19,6 +19,7 @@ import { ListExample } from "./sandbox/list";
 import { InfernoExample } from "./sandbox/inferno";
 import { TransitionsExample } from "./sandbox/transitions";
 import { NasaExample } from "./sandbox/nasa";
+import { HabrExample } from "./sandbox/habr";
 
 let _network: vis.Network = null
 const _nodes = new visds.DataSet<vis.Node>([])
@@ -42,6 +43,7 @@ export const routes: Route[] = [
     {name: 'inferno', path: '/sandbox/inferno'},
     {name: 'transitions', path: '/sandbox/transitions'},
     {name: 'nasa', path: '/sandbox/nasa'},
+    {name: 'habr', path: '/habr/mdn'},
 ]
 
 
@@ -109,6 +111,7 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                         MenuItem({text: 'Renderer', name: 'inferno', link: '/#/sandbox/inferno'}),        
                                         MenuItem({text: 'Transitions', name: 'transitions', link: '/#/sandbox/transitions'}),        
                                         MenuItem({text: 'Nasa', name: 'nasa', link: '/#/sandbox/nasa'}),        
+                                        MenuItem({text: 'Habr', name: 'habr', link: '/#/habr/mdn'}),        
                                     ],
                                     defaultItem: MenuItem({
                                         active$: (scope) => computable(() => {
@@ -126,7 +129,7 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                 selected: (scope) => scope.router.route.name
                             },
                             reactions: {
-                                selected: (v) => patch({
+                                selected: (v) => ({
                                     components: {
                                         elements: v == 'elements',
                                         form: v == 'form',
@@ -143,6 +146,7 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                         inferno: v == 'inferno',
                                         transitions: v == 'transitions',
                                         nasa: v == 'nasa',
+                                        habr: v == 'habr',
                                     }
                                 })
                             },
@@ -163,6 +167,7 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                 inferno: InfernoExample,
                                 transitions: TransitionsExample,
                                 nasa: NasaExample,
+                                habr: HabrExample,
                             }
                         })
                     },

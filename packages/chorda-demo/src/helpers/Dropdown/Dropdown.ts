@@ -1,13 +1,12 @@
-import { callable, computable, HtmlScope, Injector, mix, reactive, patch, Scope, Blueprint, HtmlBlueprint, InferBlueprint, HtmlEvents, observable } from "@chorda/core"
+import { callable, computable, HtmlScope, Injector, mix, reactive, patch, Scope, Blueprint, HtmlBlueprint, InferBlueprint, HtmlEvents, observable, BasicDomEvents } from "@chorda/core"
 import { faAngleDown, faAngleUp, faCircleNotch } from "@fortawesome/free-solid-svg-icons"
-import { Button } from "chorda-bulma"
+import { Button, ButtonPropsType } from "chorda-bulma"
 import { FaIcon } from "../FaIcon"
 import { DropdownMenu } from "./DropdownMenu"
 import { DropdownTrigger } from "./DropdownTrigger"
 import { MenuItem } from "./utils"
-import { watch, withBlueprint, withBounds, withIterableItems, withOuterClick, withPreventDefaultMouseDown, withStopMouseDown } from '../../utils'
+import { watch, withBlueprint, withBounds, withIterableItems, withOuterClick, withOuterKeydown, withPreventDefaultMouseDown, withStopMouseDown } from '../../utils'
 import { DropdownItem } from "./DropdownItem"
-import { ReactDomEvents } from "@chorda/react"
 
 
 
@@ -37,7 +36,7 @@ export type DropdownProps<T, I, V=any, E=unknown> = {
     items$?: Injector<T>
     active$?: Injector<T>
     active?: boolean
-    defaultItem?: Blueprint<T, E>
+    itemAs?: Blueprint<T, E>
     text$?: Injector<T>
     value$?: Injector<T>
     trigger?: Blueprint<T, E>
@@ -50,7 +49,7 @@ export type DropdownProps<T, I, V=any, E=unknown> = {
     up?: boolean
 }
 
-export type DropdownPropsType<I, T=unknown> = DropdownProps<T&DropdownScope<I>, I>
+export type DropdownPropsType<I, T=unknown, V=any> = DropdownProps<T&DropdownScope<I>, I, V>
 
 //export type DropdownEvents<I extends MenuItem> = Pick<DropdownScope<I>, 'selectItem'|'cancelSelect'>
 
@@ -61,11 +60,11 @@ export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&
     const value2key: ((v: any) => any) = props.valueToKey || ((v) => v)
     const item2value = props.itemToValue || ((itm) => (itm as any).id)
     
-    return mix<DropdownScope<any>&HtmlScope, ReactDomEvents>({
+    return mix<DropdownScope<any>&HtmlScope, BasicDomEvents>({
         css: 'dropdown',
         templates: {
             trigger: DropdownTrigger({
-                content: Button({
+                content: Button(<ButtonPropsType<DropdownScope<any>&HtmlScope&{isDropdownActive: boolean}>>{
                     rightIcon: FaIcon({
                         icon$: ({loading, up}) => computable(() => {
                             return loading.$value ? [faCircleNotch, 'spin'] : (up.$value ? faAngleUp : faAngleDown)
@@ -75,14 +74,17 @@ export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&
                     disabled$: (scope) => computable(() => scope.loading == true),
                     onClick: (e, {toggleActive}) => toggleActive(),
                     as: {
+                        injections: {
+                            isDropdownActive: $ => $.$context.active,
+                        },
                         joints: {
-                            autoFocus: ({$dom, active}) => {
+                            autoFocus: ({$dom, isDropdownActive}) => {
 
-                                watch(() => {
-                                    if ($dom.$value && active.$value) {
-                                        $dom.$value.focus()
+                                watch(([el, isActive]) => {
+                                    if (el && isActive) {
+                                        el.focus()
                                     }
-                                }, [$dom, active])
+                                }, [$dom, isDropdownActive])
 
                             },
                         }
@@ -140,12 +142,12 @@ export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&
             }))))
         },
         reactions: {
-            active: (v) => patch({classes: {'is-active': v}}),
-            up: (v) => patch({classes: {'is-up': v}}),
+            active: (v) => ({classes: {'is-active': v}}),
+            up: (v) => ({classes: {'is-up': v}}),
         }
     },
     props?.as,
-    props && withStopMouseDown(withBounds({
+    props && withStopMouseDown(withBounds(withOuterKeydown({
         initials: {
             value: () => observable(null),
             selected: () => observable(null),
@@ -194,6 +196,7 @@ export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&
             initDropdown: ({value, $dom, items, selected, active, current}) => {
 
                 watch(() => {
+//                    console.log('watch value and items', value.$value)
                     items.forEach(itm => {
                         if (itm.id == value2key(value.$value)) {
                             selected.$value = itm
@@ -210,38 +213,59 @@ export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&
             },
         },
         events: {
-            $dom: {
-                keyDown: (e, {active, nextCurrent, prevCurrent, selectItem, current, cancelActive}) => {
-                    if (active.$value) {
-                        if (e.code == 'ArrowDown') {
-                            nextCurrent()
-                        }
-                        else if (e.code == 'ArrowUp') {
-                            prevCurrent()
-                        }
-                        else if (e.code == 'Enter' || e.code == 'Space') {
-                            selectItem(current)
-                        }
-                        else if (e.code == 'Escape') {
-                            cancelActive()
-                        }
-                        else {
-                            return
-                        }
-                        e.preventDefault()
-                        return false    
+            onOuterKeyDown: (e, {active, nextCurrent, prevCurrent, selectItem, current, cancelActive}) => {
+                if (active.$value) {
+                    if (e.code == 'ArrowDown') {
+                        nextCurrent()
                     }
-                    
+                    else if (e.code == 'ArrowUp') {
+                        prevCurrent()
+                    }
+                    else if (e.code == 'Enter' || e.code == 'Space') {
+                        selectItem(current)
+                    }
+                    else if (e.code == 'Escape') {
+                        cancelActive()
+                    }
+                    else {
+                        return
+                    }
+                    e.preventDefault()
+                    return false    
                 }
-            }
+            },
+            // $dom: {
+            //     keydown: (e, {active, nextCurrent, prevCurrent, selectItem, current, cancelActive}) => {
+            //         if (active.$value) {
+            //             if (e.code == 'ArrowDown') {
+            //                 nextCurrent()
+            //             }
+            //             else if (e.code == 'ArrowUp') {
+            //                 prevCurrent()
+            //             }
+            //             else if (e.code == 'Enter' || e.code == 'Space') {
+            //                 selectItem(current)
+            //             }
+            //             else if (e.code == 'Escape') {
+            //                 cancelActive()
+            //             }
+            //             else {
+            //                 return
+            //             }
+            //             e.preventDefault()
+            //             return false    
+            //         }
+                    
+            //     }
+            // }
         },
         templates: {
             trigger: props.trigger,
             menu: DropdownMenu({
                 content: {
-                    defaultItem: props.defaultItem
+                    defaultItem: props.itemAs
                 }
             })
         }
-    })))
+    }))))
 }

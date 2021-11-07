@@ -1,4 +1,4 @@
-import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, Listener, mix, patch } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, Listener, mix, patch, Scope } from "@chorda/core"
 import { ItemScope, List, ListProps, ListPropsType, ListScope, Text, TextPropsType } from "../elements"
 
 
@@ -11,15 +11,15 @@ import { ItemScope, List, ListProps, ListPropsType, ListScope, Text, TextPropsTy
 //     item: string
 // }
 
-type TagListProps<T, E> = ListPropsType<string, T, E> 
+type TagListPropsType<T, E> = ListPropsType<string, T, E> 
 
 //type Overwrite<T1, T2> = Pick<T1, Exclude<keyof T1, keyof T2>> & T2
 
-export const TagList = <T, E>(props: TagListProps<T, E>) : InferBlueprint<T, E> => {
-    return mix(List(props), {
+export const TagList = <T, E>(props: TagListPropsType<T, E>) : InferBlueprint<T, E> => {
+    return mix<Scope>(List(props), {
         css: 'tag-list',
 //        tag: 'div',
-        defaultItem: Text(<TextPropsType<ItemScope<string>, unknown>>{
+        defaultItem: Text(<TextPropsType<ItemScope<string>>>{
             text$: $ => $.item
         })
     })

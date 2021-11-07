@@ -1,4 +1,4 @@
-import { computable, InferBlueprint, observable, patch } from "@chorda/core"
+import { computable, InferBlueprint, observable } from "@chorda/core"
 import { Box, Tab, Tabs } from "chorda-bulma"
 import { withAs } from "../../utils"
 import { Apod } from "./apod"
@@ -40,7 +40,7 @@ export const NasaExample = () : InferBlueprint<{selected: string}> => {
                     images: Images,
                 },
                 reactions: {
-                    selected: v => patch({components: {
+                    selected: v => ({components: {
                         apod: v == 'apod',
                         mars: v == 'mars',
                         images: v == 'images',

@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, Listener, mix, observable, patch, Scope } from "@chorda/core"
+import { HtmlBlueprint, Injector, Listener, mix, Scope } from "@chorda/core"
 import { Link, List, ListScope } from "../simple"
 
 
@@ -33,7 +33,7 @@ export const Tab = <T>(props: TabProps<T&TabScope>) : HtmlBlueprint<T> => {
             content: Link
         },
         reactions: {
-            active: (v) => patch({classes: {'is-active': v}})
+            active: (v) => ({classes: {'is-active': v}})
         },
     }, {
         injections: {

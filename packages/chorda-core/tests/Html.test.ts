@@ -1,15 +1,17 @@
 import { expect } from "chai"
-import { defaultHtmlFactory, defaultLayout, EventBus, Gear, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, observable, patch, Value } from "../src"
+import { defaultHtmlFactory, defaultLayout, EventBus, Gear, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, iterable, observable, patch, pipe, render, Value } from "../src"
 import { attachRoot, createTestPatcher, createTestRenderer, immediateRender, immediateTick } from "./utils"
 
 
 
 
 const createHtml = <D, E=unknown, H=any>(o: HtmlOptions<D&HtmlScope, E, H>) : Html<D, E> => {
+    const patcher = createTestPatcher()
+    const renderer = createTestRenderer()
     const s = new Html<D, E>(o, {
-        $patcher: createTestPatcher(), 
-        $renderer: createTestRenderer(),
-        $pipe: null,
+        $patcher: patcher, 
+        $renderer: renderer,
+        $pipe: pipe(patcher, renderer),
         $defaultFactory: defaultHtmlFactory,
         $defaultLayout: defaultLayout,
 //        $vnodeFactory: defaultVNodeFactory
@@ -32,16 +34,16 @@ const createHtml = <D, E=unknown, H=any>(o: HtmlOptions<D&HtmlScope, E, H>) : Ht
 
 describe ('Html', () => {
 
-    it ('Should render empty nodes', (done) => {
+    it ('Should render empty nodes', () => {
 
         const html = createHtml({
             items: []
         })
 
-        setTimeout(() => {
+//        setTimeout(() => {
             expect(html.children.length).to.eq(0)
-            done()
-        }, 20)
+        //     done()
+        // }, 20)
     })
 
     it ('Should render child nodes', () => {
@@ -270,6 +272,41 @@ describe ('Html', () => {
         //     console.log(html.vnode)
         //     done()
         // }, 20)
+
+    })
+
+
+
+    describe ('Render', () => {
+
+        it ('Should render new nodes', () => {
+
+            const html = createHtml<{data: any[], __it: any[]}>({
+                injections: {
+                    data: () => observable([]),
+                    __it: $ => iterable($.data),
+                },
+                reactions: {
+                    __it: v => patch({items: v})
+                }
+            })
+
+            html.scope.data.$value = [{id: 1}, {id: 2}, {id: 3}]
+            immediateTick()
+
+            // let commands = [] as any[]
+            // render(html, {children: html.children}, commands)
+            // console.log(commands)
+
+            // html.scope.data.$value = [{id: 2}, {id: 1}, {id: 3}]
+            // immediateTick()
+
+            // commands = []
+            // render(html, {children: html.children}, commands)
+            // console.log(commands)
+
+        })
+
 
     })
 

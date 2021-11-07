@@ -1,4 +1,4 @@
-import { HtmlBlueprint, InferBlueprint, Injector, mix, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, InferBlueprint, Injector, mix, observable } from "@chorda/core"
 import { IconDefinition } from "@fortawesome/free-solid-svg-icons"
 
 
@@ -39,7 +39,7 @@ export const FaSvgIcon = <T, E>(props: FaSvgIconProps<T&FaSvgIconScope>) : Infer
                         //     d: props.icon.icon[4]
                         // },
                         reactions: {
-                            data: (v) => patch({
+                            data: (v) => ({
                                 dom: {
                                     d: v.icon[4]
                                 }
@@ -49,7 +49,7 @@ export const FaSvgIcon = <T, E>(props: FaSvgIconProps<T&FaSvgIconScope>) : Infer
                 },
                 reactions: {
                     data: (v) => {
-                         patch({
+                         return ({
                             dom: {
                                 'data-icon': v.iconName,
                                 'data-prefix': v.prefix,
@@ -61,7 +61,7 @@ export const FaSvgIcon = <T, E>(props: FaSvgIconProps<T&FaSvgIconScope>) : Infer
             }
         },
         reactions: {
-            tooltip: (v) => patch({dom: {title: v}})
+            tooltip: (v) => ({dom: {title: v}})
         }
     }, props && {
         initials: {

@@ -1,4 +1,4 @@
-import { Blueprint, InferBlueprint, Injector, mix, observable, patch } from "@chorda/core"
+import { Blueprint, InferBlueprint, Injector, mix, observable } from "@chorda/core"
 import { Delete } from "../elements"
 import { RendererEvents } from "../utils"
 
@@ -50,7 +50,7 @@ export const Modal = <T, E>(props: ModalProps<T&ModalScope, E>) : InferBlueprint
             })
         },
         reactions: {
-            active: (v) => patch({classes: {'is-active': v}})
+            active: (v) => ({classes: {'is-active': v}})
         },
     }, props && {
         components: {

@@ -1,4 +1,4 @@
-import { autoTerminalAware, Blueprint, callable, Callable, buildHtmlContext, buildHtmlOptions, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, ownTask, patch, pipe, PublishFunc, Scope, spyGetters, Value } from "@chorda/core"
+import { autoTerminalAware, Blueprint, callable, Callable, buildHtmlContext, buildHtmlOptions, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, ownTask, patch, pipe, PublishFunc, Scope, spyGetters, Value, createBasicRenderer } from "@chorda/core"
 import { createReactRenderer, ReactDomEvents } from "@chorda/react"
 import * as vis from "vis-network"
 import { App, routes } from "./App"
@@ -28,7 +28,7 @@ export const createAppScope = () : HtmlScope => {
 //         router: null
 //     }
 
-    const context: HtmlScope&RouterScope = {router: null, ...buildHtmlContext(createReactRenderer())}
+    const context: HtmlScope&RouterScope = {router: null, ...buildHtmlContext(createBasicRenderer())}
 
     useRouter(context, (router) => {
         router.setOption('defaultRoute', 'home')
@@ -95,6 +95,7 @@ export const withAs = withBlueprint
 export const withHtmlBlueprint = <T, E=unknown>(props: CustomProps<T&HtmlScope, E&HtmlEvents&ReactDomEvents>) : InferBlueprint<T, E> => {
     return mix(props.as, props)
 }
+
 
 
 export type DataScope<T> = {
@@ -173,14 +174,21 @@ export const createValueEffect = <T, F extends Function>(bus: EventBus<any>&Valu
 }
 
 
+type FlattenObservable<T> = T extends Observable<infer I> ? I : T
 
+type WatchArrType1 = <T>(f: (next: [FlattenObservable<T>]) => void, objects: [T]) => void
+type WatchArrType2 = <T, T2>(f: (next: [FlattenObservable<T>, FlattenObservable<T2>]) => void, objects: [T, T2]) => void
+type WatchArrType3 = <T, T2, T3>(f: (next: [T, T2, T3]) => void, objects: [T, T2, T3]) => void
+type WatchArrType4 = <T, T2, T3, T4>(f: (next: [T, T2, T3, T4]) => void, objects: [T, T2, T3, T4]) => void
 
-export const watch = <T>(f: PublishFunc<T>, objects: any[]) => {
+type WatchArrType = WatchArrType1&WatchArrType2&WatchArrType3&WatchArrType4
+
+export const watch : WatchArrType = <T>(f: PublishFunc<T>, objects: any[]) => {
     for (let obj of objects) {
         if (obj == null) {
             throw Error('Watched object is null')
         }
-        (obj as Observable<unknown>).$subscribe(() => f.apply(this, objects.map(o => o.$value)))
+        (obj as Observable<unknown>).$subscribe(() => f.apply(this, [objects.map(o => o.$value)]))
 //        (obj as Observable<unknown>).$subscribe(() => autoTerminalAware(f))
     }
 }
@@ -221,7 +229,7 @@ type DynamicListProps<I, T, E> = {
 export const DynamicList = <A extends any[], S=unknown, T=unknown, E=unknown, I=ItemOf<A>>(props: DynamicListProps<I, T&S&DynamicListScope<A>, E>) : HtmlBlueprint<T, E> => {
     return mix<DynamicListScope<A>&IteratorScope<A>>({
         reactions: {
-            __it: (v) => patch({items: v}),
+            __it: (v) => ({items: v}),
         },
         injections: {
             __it: (scope) => {
@@ -257,7 +265,7 @@ type diProps<T, I> = Omit<HtmlOptions<T, unknown, any>, 'defaultItem'> & {
 export const withIterableItems = <A extends any[], T=unknown, I=ItemOf<A>>(props: diProps<T&DynamicListScope<A>, DynamicItemScope<I>>) : HtmlBlueprint<T> => {
     return mix<DynamicListScope<any[]>&IteratorScope<any[]>>({
         reactions: {
-            __it: (v) => patch({items: v}),
+            __it: (v) => ({items: v}),
         },
         injections: {
             __it: (scope) => {
@@ -293,7 +301,7 @@ export const withList = <T extends Scope, E> (props: ListBlueprint<unknown, T&{i
             $items: ($) => iterable($.items, '$item')
         },
         reactions: {
-            $items: (v) => patch({items: v})
+            $items: (v) => ({items: v})
         },
         defaultItem: {
             injections: {
@@ -439,23 +447,45 @@ export const withBounds = <T, E>(props: Blueprint<T&BoundsScope, E>) : InferBlue
 
 
 
-export const withMix = <T, E>(...args: Blueprint<T, E>[]) : InferBlueprint<T, E> => {
+export const withMix = <T, E>(...args: InferBlueprint<T, E>[]) : InferBlueprint<T, E> => {
     return mix.apply(this, args)
 }
 
 
 
-export const debounced = <T extends () => void>(timeout: number, fn: T) : any => {
-
-    let t : any = null
-
-    return () => {
-        if (t) {
-            clearTimeout(t)
-        }
-        t = setTimeout(() => {
-            t = null
-            fn()
-        }, timeout)
-    }
+export type KeydownActions = {
+    onOuterKeyDown: () => KeyboardEvent
 }
+
+
+export const withOuterKeydown = <T, E>(props: Blueprint<T&KeydownActions, E&KeydownActions>) : InferBlueprint<T, E> => {
+    return mix<KeydownActions>({
+        initials: {
+            onOuterKeyDown: () => callable(null)
+        },
+        joints: {
+            initGlobalKeyDown: ({onOuterKeyDown}) => {
+                document.addEventListener('keydown', onOuterKeyDown)
+                return () => {
+                    document.removeEventListener('keydown', onOuterKeyDown)
+                }
+            }
+        }
+    }, props)
+}
+
+
+// export const debounced = <T extends () => void>(timeout: number, fn: T) : any => {
+
+//     let t : any = null
+
+//     return () => {
+//         if (t) {
+//             clearTimeout(t)
+//         }
+//         t = setTimeout(() => {
+//             t = null
+//             fn()
+//         }, timeout)
+//     }
+// }

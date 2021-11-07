@@ -1,4 +1,4 @@
-import { HtmlBlueprint, HtmlEvents, Injector, isObservable, mix, observable, patch } from "@chorda/core"
+import { HtmlBlueprint, HtmlEvents, Injector, isObservable, mix, observable } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import { faCircleNotch, IconDefinition } from "@fortawesome/free-solid-svg-icons"
 import { Icon } from "chorda-bulma"
@@ -62,7 +62,7 @@ export const FaIcon = <T>(props: FaIconProps<T&DataScope<string>, ReactDomEvents
 //                        console.log('icon', classes)
                         // next = next ? (prefix+'-'+next) : next
                         // prev = prev ? (prefix+'-'+prev) : prev
-                        patch({classes})//: {[next]: true, [prev]: false}})
+                        return {classes}//: {[next]: true, [prev]: false}})
                     }
                 }
             }

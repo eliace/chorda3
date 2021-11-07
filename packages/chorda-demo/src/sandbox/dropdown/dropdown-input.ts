@@ -1,8 +1,8 @@
-import { callable, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, Injector, Listener, mix, observable, patch, Scope } from "@chorda/core";
+import { computable, InferBlueprint, observable, Scope } from "@chorda/core";
 import { Column, ColumnLayout, RowLayout } from "chorda-bulma";
-import { Custom, watch, withMix } from "../../utils";
+import { watch, withMix } from "../../utils";
 import { COUNTRIES, Country } from "../../data";
-import { Paragraph, Text, Dropdown, DropdownTrigger, TextInput, DropdownProps, DropdownScope, DropdownPropsType } from "../../helpers";
+import { Paragraph, Text, Dropdown, DropdownTrigger, TextInput, DropdownPropsType } from "../../helpers";
 
 type CountryRecord = Country & {id: any}
 
@@ -192,7 +192,7 @@ export default () : HtmlBlueprint => {
                                 value: (scope) => scope.filter
                             },
                             reactions: {
-                                value: (v) => patch({dom: {defaultValue: v || ''}})
+                                value: (v) => ({dom: {defaultValue: v || ''}})
                             },
                             joints: {
                                 domValue: ({value, $dom}) => {

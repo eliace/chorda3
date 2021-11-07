@@ -5,6 +5,11 @@ import { Dom, Renderer } from "./utils";
 
 
 
+// window.addEventListener('keydown', (e: KeyboardEvent) => {
+//     e.preventDefault()
+//     console.log('keydown', e.code, e.type)
+// })
+
 
 //export type DomEvents = GlobalEventHandlersEventMap
 
@@ -18,7 +23,7 @@ import { Dom, Renderer } from "./utils";
 // }
 
 
-export class DomNode<T=unknown, E=unknown> extends PubSub<T, E> implements Dom {
+export class DomNode<T=unknown, E=unknown> extends PubSub<T, E> implements Dom, EventListenerObject {
 
     _ref: Function
     _el: T
@@ -30,6 +35,10 @@ export class DomNode<T=unknown, E=unknown> extends PubSub<T, E> implements Dom {
 
 //        this._subscriptions = []
         this._effects = []
+    }
+
+    handleEvent(object: Event) {
+        this.$emit(object.type, object)
     }
 
 

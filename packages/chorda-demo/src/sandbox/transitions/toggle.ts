@@ -1,24 +1,25 @@
-import { InferBlueprint, observable, patch } from "@chorda/core"
+import { callable, InferBlueprint, observable } from "@chorda/core"
 import { Button } from "chorda-bulma"
 import { Text } from "../../helpers"
 import { withShowHide } from "./utils"
 
 
-export default () : InferBlueprint<{active: boolean}> => {
+export default () : InferBlueprint<{active: boolean, toggle: Function}> => {
     return {
         injections: {
             active: () => observable(true),
+            toggle: $ => callable(() => {
+                $.active.$value = !$.active.$value
+            })
         },
         reactions: {
-            active: (v) => patch({components: {text: v}}),
+            active: (v) => ({components: {text: v}}),
         },
         templates: {
             button: Button({
                 text: 'Toggle',
                 css: 'mr-4',
-                onClick: (e, {active}) => {
-                    active.$value = !active.$value
-                },
+                onClick: (e, {toggle}) => toggle(),
             }),
             text: withShowHide(Text({
                 text: 'Hello'

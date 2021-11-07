@@ -1,4 +1,4 @@
-import { computable, HtmlBlueprint, iterable, Keyed, mix, observable, patch } from "@chorda/core"
+import { computable, HtmlBlueprint, iterable, Keyed, mix, observable } from "@chorda/core"
 import { ContentLayout, LevelLayout, Tab, Tabs, TabScope, TabsScope } from "chorda-bulma"
 import { AppScope, Coerced, Custom } from "../utils"
 
@@ -48,14 +48,14 @@ export const ExamplePanel = <T>(props: ExamplePanelProps<T&ExampleScope>) : Html
                         as: ContentLayout([{
                             tag: 'h4',
                             reactions: {
-                                title: (v) => patch({text: v})
+                                title: (v) => ({text: v})
                             }
                         }])
                         // templates: {
                         //     content: {
                         //         tag: 'h4',
                         //         reactions: {
-                        //             title: (v) => patch({text: v})
+                        //             title: (v) => ({text: v})
                         //         }
                         //     }
                         // }
@@ -88,10 +88,10 @@ export const ExamplePanel = <T>(props: ExamplePanelProps<T&ExampleScope>) : Html
                             acc[tab.name] = tab.example
                             return acc
                         }, {} as Keyed<HtmlBlueprint>)
-                        patch({templates})
+                        return {templates}
                     },
                     components: (v) => {
-                        patch({components: v})
+                        return {components: v}
                     }
                 }
             }

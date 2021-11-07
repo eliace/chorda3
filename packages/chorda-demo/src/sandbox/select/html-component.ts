@@ -1,11 +1,11 @@
-import { HtmlBlueprint, InferBlueprint, iterable, mix, observable, patch } from "@chorda/core"
+import { Infer } from "@chorda/core"
 import { RowLayout } from "chorda-bulma"
 import { Coerced, DataScope, ItemBlueprint, ListBlueprint, withItem, withIterableItems, withList } from "../../utils"
 import { COUNTRIES, Country } from "../../data"
 import { Option, Select } from "./common/select"
 
 
-export default () : InferBlueprint<unknown> => {
+export default () : Infer.Blueprint<unknown> => {
     return RowLayout([
         Select({
             options: [
@@ -25,7 +25,7 @@ export default () : InferBlueprint<unknown> => {
         Select({
             optionAs: withItem(<ItemBlueprint<Country>>{
                 reactions: {
-                    item: (v) => patch({text: v.name})
+                    item: (v) => ({text: v.name})
                 }                    
             }),
             as: withList(<ListBlueprint<Country>>{

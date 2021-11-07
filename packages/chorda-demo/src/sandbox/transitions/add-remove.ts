@@ -1,4 +1,4 @@
-import { InferBlueprint, iterable, observable, patch } from "@chorda/core"
+import { InferBlueprint, iterable, observable } from "@chorda/core"
 import { Button, Buttons, List, ListItem } from "chorda-bulma"
 import { Text } from "../../helpers"
 import { withShowHide } from "./utils"

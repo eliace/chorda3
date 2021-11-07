@@ -1,4 +1,4 @@
-import { Blueprint, callable, HtmlScope, InferBlueprint, Injector, Listener, mix, observable, passthruLayout, patch, Scope } from "@chorda/core"
+import { Blueprint, callable, HtmlScope, InferBlueprint, Injector, Listener, mix, observable, passthruLayout } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 
 import "bulma-checkradio/dist/css/bulma-checkradio.min.css"
@@ -29,11 +29,11 @@ export const Radio = <T, E>(props: RadioProps<T&RadioScope, E>) : InferBlueprint
                     type: 'radio'
                 },
                 reactions: {
-//                     value: v => patch({dom: {
+//                     value: v => ({dom: {
 //                         value: v && 'checked', 
 // //                        defaultChecked: v && 'checked'
 //                     }}),
-                    name: v => patch({dom: {id: v}}),
+                    name: v => ({dom: {id: v}}),
                 },
                 joints: {
                     setValue: ({value, $dom}) => {
@@ -50,7 +50,7 @@ export const Radio = <T, E>(props: RadioProps<T&RadioScope, E>) : InferBlueprint
             label: {
                 tag: 'label',
                 reactions: {
-                    name: v => patch({dom: {htmlFor: v}})
+                    name: v => ({dom: {htmlFor: v}})
                 }
             }
         }

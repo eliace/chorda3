@@ -51,7 +51,8 @@ class CallableNode<T extends Function, E=any> extends Function implements Value<
 
     $call(thisArg: any, args: any[]) {
         if (this._memoValue == null) {
-            console.warn('Possible uninitialized callable', args)
+            // TODO
+            //console.warn('Possible uninitialized callable', args)
         }
         let result = this._memoValue != null ? this._memoValue.apply(thisArg, args) : args[0]
         if (isValueSet(result)) {
@@ -61,6 +62,7 @@ class CallableNode<T extends Function, E=any> extends Function implements Value<
             this.$emit('wait')
             result = result.then((response: any) => {
                 this.$emit('done', response)
+//                this._value.$value = response
 //                this.$publish(response)
                 return response
             }, (fail: any) => {
@@ -70,6 +72,7 @@ class CallableNode<T extends Function, E=any> extends Function implements Value<
         }
         else {
             this.$emit('done', result)
+//            this._value.$value = result
 //            this.$publish(result)
         }
         return result

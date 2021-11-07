@@ -31,7 +31,7 @@ export interface Renderable {
 }
 
 export interface VNodeFactory {
-    createVNode <P, O>(key: string, vnodeProps: P, htmlProps: O&Dom, children?: any[]) : VNode
+    createVNode <P, O>(key: string, vnodeProps: P, htmlProps: O&Dom, children?: any[], changes?: any) : VNode
 }
 //export type VNodeFactory = <P, O>(key: string, vnodeProps: P, htmlProps: O&Dom, children?: any[]) => VNode
 

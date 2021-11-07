@@ -1,4 +1,4 @@
-import { HtmlBlueprint, HtmlOptions, HtmlScope, Injector, iterable, Joint, mix, Mixed, NoInfer, observable, patch, Scope } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, HtmlScope, Infer, mix, observable } from "@chorda/core"
 import { Coerced, ItemScope, IteratorScope } from "../../../utils"
 
 
@@ -22,7 +22,7 @@ export type BoundsScope = {
 }
 
 
-export const withDetectListBounds = <T>(props?: HtmlBlueprint<T&BoundsScope>) : HtmlBlueprint<T> => {
+export const withDetectListBounds = <T>(props?: Blueprint<T&BoundsScope>) : Infer.Blueprint<T> => {
     return mix<BoundsScope&HtmlScope&IteratorScope<any>>({
         initials: {
             bounds: () => observable(null),

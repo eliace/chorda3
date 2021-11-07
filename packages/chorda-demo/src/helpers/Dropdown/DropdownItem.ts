@@ -1,4 +1,4 @@
-import { HtmlBlueprint, HtmlScope, Injector, Listener, observable, patch, mix, InferBlueprint, Blueprint } from "@chorda/core"
+import { HtmlBlueprint, HtmlScope, Injector, Listener, observable, mix, InferBlueprint, Blueprint } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import { watch } from "../../utils"
 import { MenuItem } from "./utils"
@@ -34,9 +34,9 @@ export const DropdownItem = <T, E>(props: DropdownItemPropsType<any, T>) : Infer
         css: 'dropdown-item',
         tag: 'a',
         reactions: {
-            text: (v) => patch({text: v}),
-            isSelected: (v) => patch({classes: {'is-active': v}}),
-            isCurrent: (v) => patch({classes: {'is-current': v}}),
+            text: (v) => ({text: v}),
+            isSelected: (v) => ({classes: {'is-active': v}}),
+            isCurrent: (v) => ({classes: {'is-current': v}}),
         }
     }, {
         initials: {

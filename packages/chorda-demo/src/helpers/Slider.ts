@@ -1,6 +1,4 @@
-import { Blueprint, InferBlueprint, Injector, Listener, mix, observable, passthruLayout, patch } from "@chorda/core"
-import { ReactDomEvents } from "@chorda/react"
-
+import { BasicDomEvents, Blueprint, InferBlueprint, Injector, Listener, mix, observable, passthruLayout } from "@chorda/core"
 import "bulma-slider/dist/css/bulma-slider.min.css"
 
 type SliderScope = {
@@ -24,7 +22,7 @@ type SliderProps<T, E> = {
 }
 
 export const Slider = <T, E>(props: SliderProps<T&SliderScope, E>) : InferBlueprint<T, E> => {
-    return mix<SliderScope, ReactDomEvents>({
+    return mix<SliderScope, BasicDomEvents>({
         layout: passthruLayout,
         templates: {
             input: {
@@ -34,10 +32,10 @@ export const Slider = <T, E>(props: SliderProps<T&SliderScope, E>) : InferBluepr
                     type: 'range'
                 },
                 reactions: {
-                    value: v => patch({dom: {value: v}}),
-                    min: v => patch({dom: {min: v}}),
-                    max: v => patch({dom: {max: v}}),
-                    name: v => patch({dom: {id: v}}),
+                    value: v => ({dom: {value: v}}),
+                    min: v => ({dom: {min: v}}),
+                    max: v => ({dom: {max: v}}),
+                    name: v => ({dom: {id: v}}),
                 },
                 events: {
                     $dom: {
@@ -50,8 +48,8 @@ export const Slider = <T, E>(props: SliderProps<T&SliderScope, E>) : InferBluepr
             output: {
                 tag: 'output',
                 reactions: {
-                    name: v => patch({dom: {htmlFor: v}}),
-                    value: v => patch({text: v})
+                    name: v => ({dom: {htmlFor: v}}),
+                    value: v => ({text: String(v)})
                 }
             }
         }

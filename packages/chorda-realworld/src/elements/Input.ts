@@ -1,5 +1,5 @@
 import { Injector, HtmlBlueprint, mix, patch, observable, HtmlScope, InferBlueprint } from "@chorda/core"
-import { DomEvents } from "@chorda/react"
+import { ReactDomEvents } from "@chorda/react"
 import { watch } from "../utils"
 
 
@@ -16,7 +16,7 @@ export type InputProps<T> = {
 }
 
 export const Input = <T, E>(props: InputProps<T&InputScope>) : InferBlueprint<T, E> => {
-    return mix<InputScope&HtmlScope, DomEvents>({
+    return mix<InputScope&HtmlScope, ReactDomEvents>({
         tag: 'input',
         reactions: {
             value: (v) => patch({dom: {defaultValue: v}})
@@ -42,13 +42,15 @@ export const Input = <T, E>(props: InputProps<T&InputScope>) : InferBlueprint<T,
         },
         joints: {
             autoFocus: ({$dom, $renderer}) => {
-                watch([$dom], () => {
+                
+                watch(() => {
                     if ($dom.$value && props.autoFocus) {
                         $renderer.publish($renderer.task(() => {
                             $dom.$value.focus()
                         }))
                     }
-                })
+                }, [$dom])
+                
             },
         }
     })

@@ -13,3 +13,4 @@ export * from './TextInput'
 export * from './SvgImagePlaceholder'
 export * from "./Radio"
 export * from "./Slider"
+export * from './DropdownInput'

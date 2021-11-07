@@ -193,7 +193,7 @@ class ComputableNode<T> extends ObservableNode<T> implements Computable {
 
 //const _computeQue: ComputableNode<any>[] = []
 
-export const computable = <T>(compute: Computor<T>, initValue?: T, entryUidFunc?: UidFunc) : ObservableValueSet<T>&T => {
+export const computable = <T>(compute: Computor<T>, initValue?: T, entryUidFunc?: UidFunc<any>) : ObservableValueSet<T>&T => {
     let c = proxify(null, new ComputableNode<T>(compute, initValue, entryUidFunc))
     // TODO переделать в compute engine?
     // if (_computeQue.length == 0) {

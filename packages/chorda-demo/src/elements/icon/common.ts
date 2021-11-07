@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, mix, patch } from "@chorda/core"
+import { HtmlBlueprint, Injector, mix } from "@chorda/core"
 import { Icon } from "chorda-bulma"
 import { DataScope } from "../../utils"
 
@@ -13,7 +13,7 @@ export const FaIcon = <T>(props: FaIconProps<T&DataScope<string>>): HtmlBlueprin
             icon: {
                 css: 'fas',
                 reactions: {
-                    data: (next, prev) => patch({classes: {[next]: true, [prev]: false}})
+                    data: (next, prev) => ({classes: {[next]: true, [prev]: false}})
                 }
             }
         }

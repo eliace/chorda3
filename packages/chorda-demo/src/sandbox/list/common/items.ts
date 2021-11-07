@@ -1,4 +1,4 @@
-import { computable, HtmlBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core";
+import { computable, HtmlBlueprint, Injector, iterable, mix, observable } from "@chorda/core";
 import { MediaLayout, Image, Tags, ContentLayout, LevelLayout } from "chorda-bulma";
 import { Tmdb } from "../../../api";
 import { Coerced, DynamicList, IteratorScope } from "../../../utils";

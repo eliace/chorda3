@@ -1,4 +1,4 @@
-import { Blueprint, computable, InferBlueprint, Injector, iterable, mix, observable, patch } from "@chorda/core"
+import { Blueprint, computable, InferBlueprint, Injector, iterable, mix, observable } from "@chorda/core"
 
 
 
@@ -28,12 +28,12 @@ export const Breadcrumb = <T, E>(props: BreadcrumbProps) : InferBlueprint<T, E> 
                     href: props.link
                 },
                 reactions: {
-                    text: v => patch({text: v}),
+                    text: v => ({text: v}),
                 }
             }
         },
         reactions: {
-            active: v => patch({classes: {'is-active': v}}),
+            active: v => ({classes: {'is-active': v}}),
         }
     })
 }
@@ -69,7 +69,7 @@ export const Breadcrumbs = <T, E>(props: BreadcrumbsProps<T&BreadcrumbsScope, E>
                         content: {
                             tag: 'a',
                             reactions: {
-                                // data: (v: any) => patch({
+                                // data: (v: any) => ({
                                 //     text: v && v.text,
                                 //     dom: {
                                 //         href: v && v.link
@@ -81,7 +81,7 @@ export const Breadcrumbs = <T, E>(props: BreadcrumbsProps<T&BreadcrumbsScope, E>
 //                     reactions: {
 //                         item: (v, next, {isLast}) => {
 // //                            if (v) {
-//                                 patch({
+//                                 ({
 //                                     classes: {'is-active': isLast}
 //                                 })
 // //                            }
@@ -90,8 +90,8 @@ export const Breadcrumbs = <T, E>(props: BreadcrumbsProps<T&BreadcrumbsScope, E>
 
                 },
                 reactions: {
-                    items: v => patch({items: v}),
-                    __it: v => patch({items: v}),
+                    items: v => ({items: v}),
+                    __it: v => ({items: v}),
                 },
                 injections: {
                     __it: $ => $.items2 && iterable($.items3, null)

@@ -94,3 +94,8 @@ export const iterable = <T>(source: ObservableValueSet<T>|T, key: string = '__it
 export const isIterable = (v: any) : v is IterableValue<any> => {
     return v != null && typeof (v as IterableValue<any>).$each === 'function'
 }
+
+
+export const iterator = <T>(source: ObservableValueSet<T>|T, key: string = '__it') : IterableValue<T> => {
+    return iterable(source, key)
+}

@@ -107,6 +107,13 @@ main {
 .example-box-title {
   text-transform: uppercase;
   color: #ccc;
+  a {
+    color: #ccc;
+    margin-left: 0.4rem;
+    &:hover {
+      color: #bbb;
+    }
+  }
 }
 .example-box-header.card-header {
   padding: 1rem;
@@ -419,4 +426,11 @@ input[type=range].slider:not([orient=vertical]).has-output+output {
   bottom: 1rem;
   color: #fff;
   opacity: 0.6;  
+}
+
+
+.dropdown-menu-auto {
+  .dropdown-content {
+    max-height: initial;
+  }
 }

@@ -5,6 +5,11 @@ const avgTimeInterval = (t0: number, t1: number, total: number) => {
     return Number((Math.round(t1 - t0)/total).toFixed(5))
 }
 
+const log = (msg: string, ...data: any) => {
+    console.log.apply(this, ['%c'+msg, 'color: blue', ...data])
+}
+
+
 
 export class AsyncEngine<T extends Task = Task> implements Scheduler<T> {
 
@@ -83,7 +88,7 @@ export class AsyncEngine<T extends Task = Task> implements Scheduler<T> {
             this.processing = false
 
             const t1 = performance.now()
-            console.log(`[${this.name}] patch end`, tasks.length, Math.round(t1 - t0), avgTimeInterval(t0, t1, tasks.length)/*, deleted ? '-'+deleted : ''*/)
+            log(`[${this.name}] patch end`, tasks.length, Math.round(t1 - t0), avgTimeInterval(t0, t1, tasks.length)/*, deleted ? '-'+deleted : ''*/)
         })
     }
 

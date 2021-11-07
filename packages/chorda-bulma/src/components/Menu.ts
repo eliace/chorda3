@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, mix, observable, passthruLayout, patch } from "@chorda/core"
+import { HtmlBlueprint, Injector, mix, observable, passthruLayout } from "@chorda/core"
 
 
 // Menu
@@ -82,9 +82,9 @@ export const MenuItem = <T>(props: MenuItemProps<T&MenuItemScope>) : HtmlBluepri
             content: {
                 tag: 'a',
                 reactions: {
-                    text: (v) => patch({text: v}),
-                    active: (v) => patch({classes: {'is-active': v}}),
-                    link: (v) => patch({dom: {href: v}})
+                    text: (v) => ({text: v}),
+                    active: (v) => ({classes: {'is-active': v}}),
+                    link: (v) => ({dom: {href: v}})
                 }
             },
             list: {

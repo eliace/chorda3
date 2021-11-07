@@ -29,7 +29,7 @@ export default <T>() : InferBlueprint<T> => {
                 as: CountryMultiDropdown({
                     value$: () => value1,
                     items$: () => computable(() => countries.map(c => {return {...c, id: c.alpha2Code}})),
-                    defaultItem: DropdownItem({
+                    itemAs: DropdownItem({
                         isSelected$: ({selected, item}) => computable(() => {
                             return selected.filter(s => s.id == item.id).length > 0
                         }),

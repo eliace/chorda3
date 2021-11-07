@@ -1,5 +1,5 @@
 import { Blueprint, InferBlueprint, Injector, Listener, mix, observable, patch, Scope } from "@chorda/core"
-import { DomEvents } from "@chorda/react"
+import { ReactDomEvents } from "@chorda/react"
 import * as React from "react"
 
 type NavLinkScope = {
@@ -27,7 +27,7 @@ type NavLinkProps<T, E> = {
 
 
 export const NavLink = <T, E>(props: NavLinkProps<T&NavLinkScope, E>) : InferBlueprint<T, E> => {
-    return mix<NavLinkScope, DomEvents>({
+    return mix<NavLinkScope, ReactDomEvents>({
         templates: {
             content: {
                 tag: 'a',

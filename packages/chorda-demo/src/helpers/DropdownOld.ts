@@ -1,4 +1,4 @@
-import { computable, DomNode, HtmlBlueprint, HtmlScope, Injector, iterable, Joint, Listener, mix, observable, patch, Value } from "@chorda/core";
+import { computable, DomNode, HtmlBlueprint, HtmlScope, Injector, iterable, Joint, Listener, mix, observable, Value } from "@chorda/core";
 import { ReactDomEvents } from "@chorda/react";
 import { faAngleDown, faAngleUp, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "chorda-bulma";
@@ -147,9 +147,9 @@ export const DropdownOld = <I, V=I, T=unknown>(props: DropdownOldProps<T&Dropdow
                             __it: (scope) => iterable(scope.items)
                         },
                         reactions: {
-                            __it: (v) => patch({items: v}),
+                            __it: (v) => ({items: v}),
                             // activeOffset: (v) => {
-                            //     patch({}) // FIXME еще один дурацкий хак
+                            //     ({}) // FIXME еще один дурацкий хак
                             // }
                         },
                         joints: {
@@ -239,12 +239,8 @@ export const DropdownOld = <I, V=I, T=unknown>(props: DropdownOldProps<T&Dropdow
             },
         },
         reactions: {
-            active: (v) => {
-                patch({classes: {'is-active': v}})
-            },
-            up: (v) => {
-                patch({classes: {'is-up': v}})
-            }
+            active: (v) => ({classes: {'is-active': v}}),
+            up: (v) => ({classes: {'is-up': v}}),
         },
     },
     props?.as, 
@@ -442,15 +438,13 @@ export const DropdownOldItem = <I, V=I, T=DropdownOldScope<I, V>>(props: Dropdow
         tag: 'a',
         reactions: {
             text: (v) => {
-//                console.log('patch text')
-                patch({text: v})
+                return ({text: v})
             },
             active: (v) => {
-//                console.log('patch active')
-                patch({classes: {'is-active': v}})
+                return ({classes: {'is-active': v}})
             },
             current: (v) => {
-                patch({classes: {'is-current': v}})
+                return ({classes: {'is-current': v}})
             }
         }
     }, {

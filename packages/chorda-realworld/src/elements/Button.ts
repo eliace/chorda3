@@ -1,5 +1,5 @@
 import { HtmlBlueprint, mix, Injector, patch, Listener, Blueprint, InferBlueprint, observable } from "@chorda/core"
-import { DomEvents } from "@chorda/react"
+import { ReactDomEvents } from "@chorda/react"
 import { flags } from "../utils"
 
 
@@ -21,7 +21,7 @@ type ButtonProps<T, E> = {
 }
 
 export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : InferBlueprint<T, E> => {
-    return mix<ButtonScope, DomEvents>({
+    return mix<ButtonScope, ReactDomEvents>({
         tag: 'button',
         css: 'btn',
         reactions: {

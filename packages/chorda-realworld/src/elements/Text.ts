@@ -14,9 +14,9 @@ type TextProps<T, E> = {
     id?: string
 }
 
-export type TextPropsType<T, E> = TextProps<T&TextScope, E>
+export type TextPropsType<T, E=unknown> = TextProps<T&TextScope, E>
 
-export const Text = <T, E>(props: TextProps<T&TextScope, E>) : InferBlueprint<T, E> => {
+export const Text = <T, E>(props: TextPropsType<T, E>) : InferBlueprint<T, E> => {
     return mix<TextScope>(
         props && props.as,
         props && {

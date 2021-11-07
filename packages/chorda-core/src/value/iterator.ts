@@ -5,7 +5,7 @@ import { NextValue, Value, ValueIterator } from "./utils";
 
 
 
-export class ObservableValueIterator<T> implements ValueIterator<T> {
+class ObservableValueIterator<T> implements ValueIterator<T> {
 
     source: ValueSet<any>
     keys: ValueKey[]

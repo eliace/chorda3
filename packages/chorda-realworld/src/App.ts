@@ -18,15 +18,11 @@ export type AppScope = {
         settings: boolean
         profile: boolean
     }
-    login: (login: string, password: string) => Promise<User>
-    register: (username: string, login: string, password: string) => Promise<User>
-    logout: () => void
 }
 
 
-type ActionEventsOf<E> = {
-    [P in keyof E]?: (E[P] extends (...args: any) => Promise<infer R> ? CallableEvents<R> : never)
-}
+
+
 
 // type Action<E extends (...args: any) => any> = CallableEvents<ReturnType<E>>
 
@@ -35,7 +31,7 @@ type ActionEventsOf<E> = {
 //     login: Action<AppScope['login']>
 // }
 
-type AppEvents = ActionEventsOf<AppScope>
+//type AppEvents = ActionEventsOf<AppActions>
 
 
 const routes: Route<Record<string, any>>[] = [
@@ -49,12 +45,12 @@ const routes: Route<Record<string, any>>[] = [
 ]
 
 
-export default () : InferBlueprint<AppScope, AppEvents> => {
+export default () : InferBlueprint<AppScope> => {
     return withAuth(withRouter({
         joints: {
             init: ({isAuth, navigate, login, register, pages, user, logout}) => {
 
-                watch([isAuth], () => {
+                watch(() => {
                     // при потере аутентификации переходим на страницу логина
                     if (!isAuth.$value) {
                         const p = pages.$value
@@ -62,39 +58,9 @@ export default () : InferBlueprint<AppScope, AppEvents> => {
                             navigate(Pages.SignIn)
                         }
                     }
-                })
-
-                login.$value = (email, password) => {
-                    return api.login(email, password)
-                }
-
-                register.$value = (username, email, password) => {
-                    return api.register(username, email, password)
-                }
-
-                logout.$value = () => {
-                    api.logout()
-                    user.$value = {} as User
-                }
+                }, [isAuth])
 
             }
-        },
-        events: {
-            login: {
-                done: (u, {user}) => {
-                    user.$value = u
-                },
-            },
-            register: {
-                done: (u, {user}) => {
-                    user.$value = u
-                }
-            }
-        },
-        initials: {
-            login: () => callable(null),
-            register: () => callable(null),
-            logout: () => callable(null),
         },
         injections: {
             pages: ($) => computable(() => {

@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+      "outDir": "./lib/",
+      "noImplicitAny": true,
+      "module": "commonjs",
+      "lib": [ "es2015", "dom" ],
+      "target": "es5",
+      "allowJs": true,
+      "moduleResolution": "node",
+      "declaration": true,
+//      "esModuleInterop": true,
+      // "baseUrl": "../",
+      // "paths": {
+      //   "@chorda/core": ["chorda-core/src"],
+      // }
+    },
+    "exclude": [
+      "node_modules",
+      "dist",
+      "webpack.config.js",
+      "lib",
+      "lib-umd",
+      "umd"
+    ]
+}

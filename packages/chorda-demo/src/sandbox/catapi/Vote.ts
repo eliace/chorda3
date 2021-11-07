@@ -1,4 +1,4 @@
-import { HtmlBlueprint, HtmlScope, InferBlueprint, mix, observable, ownTask, patch } from "@chorda/core"
+import { HtmlBlueprint, HtmlScope, InferBlueprint, mix, observable } from "@chorda/core"
 import { faThumbsDown, faThumbsUp } from "@fortawesome/free-solid-svg-icons"
 import { Button, Buttons, Card } from "chorda-bulma"
 import { IMAGE_BASE64 } from "../../data"
@@ -112,7 +112,7 @@ export const Vote = () : InferBlueprint<VoteScope&HtmlScope> => {
                                             }
                                         },
                                         // reactions: {
-                                        //     imageLoading: (v) => patch({classes: {'blurry-placeholder': v}})
+                                        //     imageLoading: (v) => ({classes: {'blurry-placeholder': v}})
                                         // },
                                     }
                                 }

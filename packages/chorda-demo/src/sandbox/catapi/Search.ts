@@ -1,4 +1,4 @@
-import { Blueprint, callable, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, Injector, iterable, Listener, mix, observable, patch, Scope } from "@chorda/core"
+import { Blueprint, callable, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, Injector, iterable, Listener, mix, observable } from "@chorda/core"
 import { Button, Field, Fields } from "chorda-bulma"
 import { Coerced, createAppScope, IteratorScope, ListBlueprint, watch, withList } from "../../utils"
 import { BgImage, BgImagePropsType, Dropdown, DropdownItem, DropdownItemPropsType, DropdownOld, DropdownOldItem, DropdownPropsType, FaIcon, SvgImagePlaceholder } from "../../helpers"
@@ -137,7 +137,7 @@ const FavouriteButton = <T, E>(props: FavouriteButtonProps<T&FavouriteScope, E>)
             favourite: props.isFavourite$
         },
         reactions: {
-            favourite: (v) => patch({classes: {'is-favourited': v}})
+            favourite: (v) => ({classes: {'is-favourited': v}})
         },
         events: {
             $dom: {

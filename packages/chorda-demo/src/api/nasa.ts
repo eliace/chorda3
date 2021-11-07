@@ -23,7 +23,8 @@ export namespace Nasa {
     export enum Rovers {
         Curiosity = 'curiosity',
         Opportunity = 'opportunity',
-        Spirit = 'spirit'
+        Spirit = 'spirit',
+        Perseverance = 'perseverance'
     }
 
     export type Camera = {

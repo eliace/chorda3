@@ -1,4 +1,4 @@
-import { Blueprint, HtmlBlueprint, Keyed, mix, passthruLayout } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, Infer, Keyed, mix, passthruLayout } from "@chorda/core"
 
 
 export type FieldScope = {
@@ -11,22 +11,22 @@ export enum Color {
 }
 
 
-export type FieldProps<T> = {
+export type FieldProps<T, E> = {
     label?: string
-    control?: HtmlBlueprint<T>
+    control?: Blueprint<T, E>
     help?: string
-    addons?: Keyed<Blueprint<T>>
+    addons?: Keyed<Blueprint<T, E>>
     expanded?: boolean
     color?: Color
-    as?: Blueprint<T>
-    addonAs?: Blueprint<T>
+    as?: Blueprint<T, E>
+    addonAs?: Blueprint<T, E>
     horizontal?: boolean
 }
 
 
 
 
-export const Field = <T>(props: FieldProps<T&FieldScope>): HtmlBlueprint<T> => {
+export const Field = <T, E>(props: FieldProps<T&FieldScope, E>): Infer.Blueprint<T, E> => {
     
     const isLabel = props.label != null
     const isHelp = !!props.help

@@ -1,4 +1,4 @@
-import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, Listener, mix, patch } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, Listener, mix } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 
 
@@ -24,7 +24,7 @@ export const Text = <T>(props: TextProps<T&TextScope>) : InferBlueprint<T> => {
         reactions: {
             text: (v) => {
 //                console.log('s', v)
-                patch({text: String(v)})
+                return ({text: String(v)})
             }
         },
     }, {

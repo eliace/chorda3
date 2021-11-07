@@ -1,6 +1,5 @@
-import { Blueprint, computable, HtmlBlueprint, InferBlueprint, Observable, observable, patch } from "@chorda/core";
+import { computable, Infer, observable } from "@chorda/core";
 import { ColumnLayout, RowLayout } from "chorda-bulma";
-import { Custom, withBlueprint } from "../../utils";
 import { COUNTRIES, Country, FRUITS } from "../../data";
 import { Paragraph, Text, Dropdown } from "../../helpers";
 
@@ -16,19 +15,20 @@ const value3: Country = observable({id: COUNTRIES[30].alpha2Code, ...COUNTRIES[3
 
 
 
-export default <T>() : InferBlueprint<T> => {
+export default <T>() : Infer.Blueprint<T> => {
     return ColumnLayout([
         RowLayout([
             Text({
                 as: Paragraph,
                 text$: () => value1
             }),
-            withBlueprint({
-                css: 'mb-140px',
-                as: Dropdown({
-                    value$: () => value1,
-                    items$: () => computable(() => countries.map(c => {return {...c, id: c.alpha2Code}}))
-                })
+            // в качестве значения используем поле элемента списка
+            Dropdown({
+                value$: () => value1,
+                items$: () => computable(() => countries.map(c => {return {...c, id: c.alpha2Code}})),
+                as: {
+                    css: 'mb-140px'
+                }
             }),
         ]),
         RowLayout([
@@ -36,12 +36,10 @@ export default <T>() : InferBlueprint<T> => {
                 as: Paragraph,
                 text$: () => value2
             }),
-            withBlueprint({
-                css: 'mb-140px',
-                as: Dropdown({
-                    value$: () => value2,
-                    items$: () => computable(() => fruits.map(c => {return {id: c, name: c}}))
-                })
+            // в качестве значения используем элемент списка (строка)
+            Dropdown({
+                value$: () => value2,
+                items$: () => computable(() => fruits.map(c => {return {id: c, name: c}}))
             })
         ]),
         RowLayout([
@@ -49,14 +47,12 @@ export default <T>() : InferBlueprint<T> => {
                 as: Paragraph,
                 text$: () => computable(() => `[${value3.alpha2Code}] ${value3.name}`)
             }),
-            withBlueprint({
-                css: 'mb-140px',
-                as: Dropdown({
-                    value$: () => value3,
-                    items$: () => computable(() => countries.map(c => {return {...c, id: c.alpha2Code}})),
-                    valueToKey: (v) => v.id,
-                    itemToValue: (itm) => itm,
-                })
+            // в качестве значения используем элемент списка (объект)
+            Dropdown({
+                value$: () => value3,
+                items$: () => computable(() => countries.map(c => {return {...c, id: c.alpha2Code}})),
+                valueToKey: (v) => v.id,
+                itemToValue: (itm) => itm,
             })
         ])
     ])

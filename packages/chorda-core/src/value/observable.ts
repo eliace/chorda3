@@ -1,4 +1,3 @@
-import { ObservableValueIterator } from './iterator'
 import { Node, UidFunc, ValueSet, ValueKey, ObservableValueSet, HasCheck, IsCheck, ObservableValue} from './node'
 import { EventBus, Observable, ValueIterator } from './utils'
 

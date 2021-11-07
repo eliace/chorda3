@@ -1,4 +1,4 @@
-import { HtmlBlueprint, InferBlueprint, mix, patch } from "@chorda/core"
+import { HtmlBlueprint, InferBlueprint, mix } from "@chorda/core"
 
 
 
@@ -74,7 +74,7 @@ export const Card = <T>(props: CardProps<T&CardScope>) : InferBlueprint<T> => {
                     }
                 },
                 reactions: {
-                    model: (v) => v && patch({
+                    model: (v) => v && ({
                         components: {title: v.title, icon: v.titleIcon}
                     })
                 }
@@ -98,7 +98,7 @@ export const Card = <T>(props: CardProps<T&CardScope>) : InferBlueprint<T> => {
             }
         },
         // bindings: {
-        //     model: (v: any) => patch({components: v})
+        //     model: (v: any) => ({components: v})
         // }
     },
     props?.as, 

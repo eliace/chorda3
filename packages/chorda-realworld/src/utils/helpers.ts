@@ -1,5 +1,10 @@
-import { Blueprint, InferBlueprint, isValueSet, mix, Observable, PublishFunc } from "@chorda/core"
-import { DomEvents } from "@chorda/react"
+import { Blueprint, CallableEvents, InferBlueprint, isValueSet, mix, Observable, PublishFunc } from "@chorda/core"
+import { ReactDomEvents } from "@chorda/react"
+
+
+export type ActionEventsOf<E> = {
+    [P in keyof E]?: (E[P] extends (...args: any) => Promise<infer R> ? CallableEvents<R> : never)
+}
 
 
 
@@ -8,7 +13,7 @@ export const isNull = (v: any) : boolean => {
 }
 
 
-export const watch = <T>(objects: any[], f: PublishFunc<T>) => {
+export const watch = <T>(f: PublishFunc<T>, objects: any[]) => {
     for (let obj of objects) {
         if (obj == null) {
             throw Error('Watched object is null')

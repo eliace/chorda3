@@ -1,4 +1,4 @@
-import { Blueprint, InferBlueprint, mix, observable, patch } from "@chorda/core"
+import { Blueprint, InferBlueprint, mix, observable } from "@chorda/core"
 
 
 
@@ -16,7 +16,7 @@ export const withPortal = <T, E>(props: Blueprint<T&PortalScope, E>) : InferBlue
             portal: {
                 css: 'portal-host',
                 reactions: {
-                    portal: (v) => patch({components: {content: v}})
+                    portal: (v) => ({components: {content: v}})
                 }
             },
             content: props

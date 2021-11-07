@@ -48,7 +48,7 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : InferBluepr
                     templates: {
                         content: Coerced<CarouselSlideScope, CarouselScope>({
                             reactions: {
-                                slide: (v) => {v && patch({
+                                slide: (v) => v && {
                                     styles: {
                                         backgroundImage: `url(${v.url})`
                                     },
@@ -58,7 +58,7 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : InferBluepr
                                     dom: {
                                         key: v.url//.valueOf()
                                     }
-                                })}                                
+                                }
                             }
                         }),
                     }
@@ -73,11 +73,11 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : InferBluepr
                 defaultItem: Coerced<CarouselSlideScope, CarouselScope&ReactDomEvents>({
                     tag: 'li',
                     reactions: {
-                        slide: (v) => {v && patch({
+                        slide: (v) => v && {
                             classes: {
                                 'active': !v.hidden//.valueOf()
                             }
-                        })}
+                        }
                     },
                     events: {
                         $dom: {

@@ -1,4 +1,4 @@
-import { HtmlBlueprint, Injector, mix, patch } from "@chorda/core"
+import { HtmlBlueprint, Injector, mix } from "@chorda/core"
 
 
 
@@ -20,7 +20,7 @@ export const Image = <T>(props: ImageProps<T>) : HtmlBlueprint<T> => {
             image: {
                 tag: 'img',
                 reactions: {
-                    url: (v) => patch({dom: {src: v}})
+                    url: (v) => ({dom: {src: v}})
                 }
             }
         }    

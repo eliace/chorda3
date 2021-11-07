@@ -1,5 +1,5 @@
 import { Blueprint, InferBlueprint, Injector, Listener, mix, patch } from "@chorda/core"
-import { DomEvents } from "@chorda/react"
+import { ReactDomEvents } from "@chorda/react"
 import * as React from "react"
 
 
@@ -22,7 +22,7 @@ type TagProps<T> = {
 }
 
 export const Tag = <T>(props: TagProps<T&TagScope>) : InferBlueprint<T> => {
-    return mix<TagScope, DomEvents>(props.as, {
+    return mix<TagScope, ReactDomEvents>(props.as, {
         templates: {
             icon: {
                 weight: -10

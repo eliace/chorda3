@@ -1,4 +1,4 @@
-import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, mix, observable, patch } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, mix, observable } from "@chorda/core"
 import { Image } from "chorda-bulma";
 import { Custom } from "../../utils";
 
@@ -60,13 +60,13 @@ export const ListBoxItem = <T>(props: ListBoxItemProps<T&ListBoxItemScope>) : In
                         css: 'list-box-item__subtitle',
                         weight: 10,
                         reactions: {
-                            subtitle: (v) => patch({text: v})
+                            subtitle: (v) => ({text: v})
                         }
                     }
                 },
                 reactions: {
-                    text: (v) => patch({text: v}),
-                    subtitle: (v) => patch({components: {subtitle: !!v}})
+                    text: (v) => ({text: v}),
+                    subtitle: (v) => ({components: {subtitle: !!v}})
                 }
             },
             image: Custom({

@@ -1,7 +1,7 @@
 import { Blueprint, computable, InferBlueprint, mix, patch } from "@chorda/core";
 import { TagList } from ".";
 import { Article } from "../api";
-import { Button, Icon, Link, Tag, Text, UL } from "../elements";
+import { Button, H1, Icon, Link, Paragraph, Span, Tag, Text, UL } from "../elements";
 import { Icons } from "../utils";
 import { ArticleMeta } from "./ArticleMeta";
 
@@ -43,7 +43,7 @@ export const ArticlePreview = <T, E>(props: ArticlePropsType<T, E>) : InferBluep
                         }
                     })
                 },
-                article$: $ => $
+                article$: $ => $ // FIXME scope is not reactive
             }),
             previewLink: Link({
                 css: 'preview-link',
@@ -53,15 +53,15 @@ export const ArticlePreview = <T, E>(props: ArticlePropsType<T, E>) : InferBluep
                 as: {
                     templates: {
                         title: Text({
-                            as: { tag: 'h1' },
+                            as: H1,
                             text$: $ => $.title
                         }),
                         description: Text({
-                            as: { tag: 'p' },
+                            as: Paragraph,
                             text$: $ => $.description
                         }),
                         more: Text({
-                            as: { tag: 'span' },
+                            as: Span,
                             text: 'Read more...'
                         }),
                         tags: TagList({

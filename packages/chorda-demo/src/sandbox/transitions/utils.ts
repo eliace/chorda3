@@ -45,7 +45,7 @@ export const withShowHide = <T, E>(props: Blueprint<T, E>, showName: string = 'f
                     const name = hideName
                     const el = $dom.$value
 
-                    console.log('show prepare')
+                    console.log('show prepare', el)
 
                     el.classList.add(name+'-enter-active', name+'-enter')
                     

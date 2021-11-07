@@ -1,10 +1,10 @@
-import { computable, InferBlueprint, observable, patch, PublishFunc } from "@chorda/core"
+import { computable, InferBlueprint, observable } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import { faCamera } from "@fortawesome/free-solid-svg-icons"
 import { Link, Modal, Image, Field, Button, Addon, Fields, Pagination } from "chorda-bulma"
 import { Nasa } from "../../api"
 import { BgImage, FaIcon, FaSvgIcon, Text, Radio, Slider, Dropdown, DropdownPropsType, DropdownItem, DropdownItemPropsType, DropdownTrigger } from "../../helpers"
-import { debounced, ListBlueprint, watch, withAs, withHtml, withHtmlBlueprint, withList } from "../../utils"
+import { ListBlueprint, watch, withAs, withHtml, withHtmlBlueprint, withList } from "../../utils"
 import Chart from "chart.js/auto"
 import _ from "lodash"
 
@@ -64,6 +64,10 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                                         paddingTop: '0.375rem',
                                     },
                                     items: [
+                                        Radio({
+                                            name: Nasa.Rovers.Perseverance,
+                                            label: 'Perseverance',
+                                        }),
                                         Radio({
                                             name: Nasa.Rovers.Curiosity,
                                             label: 'Curiosity',
@@ -259,12 +263,17 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                                                             }
                                                         },
                                                         joints: {
-                                                            deferredChange: ({value, day, mission}) => {
+                                                            deferredChange: ({value, day, max}) => {
 
                                                                 watch(_.debounce(() => {
                                                                     day.$value = value
                                                                 }, 400), [value])
 
+                                                                watch(() => {
+                                                                    if (max > 0 && max < value) {
+                                                                        value.$value = max
+                                                                    }
+                                                                }, [max])
                                                             }
                                                         }
                                                     }

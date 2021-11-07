@@ -1,8 +1,8 @@
-import { Blueprint, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, mix, observable, patch, Scope } from "@chorda/core"
+import { Blueprint, computable, Infer, observable } from "@chorda/core"
 import { ColumnLayout, MenuItem, RowLayout } from "chorda-bulma"
 import { Dropdown } from "../../helpers"
 import { COUNTRIES, Country } from "../../data"
-import { Coerced, watch, withHtml, withBounds } from "../../utils"
+import { watch, withHtml, withBounds } from "../../utils"
 import { withPortal } from "./common/with-portal"
 import { withParentScrollTop } from "./common/with-parent-scroll-top"
 
@@ -11,7 +11,7 @@ type CountryRecord = Country & {id: any}
 const countries: CountryRecord[] = observable(COUNTRIES.slice(0, 50).map(country => ({...country, id: country.alpha2Code})))
 
 
-export default <T>() : InferBlueprint<T> => {
+export default <T>() : Infer.Blueprint<T> => {
     return withPortal(ColumnLayout([
         RowLayout([
             Dropdown({
@@ -56,7 +56,7 @@ export default <T>() : InferBlueprint<T> => {
                                 }
                             },
                             reactions: {
-                                active: (v) => patch({
+                                active: (v) => ({
                                     styles: {display: v ? 'block' : 'none'}
                                 })
                             }
@@ -76,7 +76,7 @@ export default <T>() : InferBlueprint<T> => {
                             // также можно подписаться window resize
                             watch(() => {
                                 if (menuBounds.height > 0) {
-                                    const menuBottom = dropdownBounds.bottom - parentScrollTop + (menuBounds.height)
+                                    const menuBottom = dropdownBounds.bottom - parentScrollTop + menuBounds.height
                                     if (menuBottom > window.visualViewport.height) {
                                         up.$value = true
                                     }
@@ -182,7 +182,7 @@ export default <T>() : InferBlueprint<T> => {
                     },
                     reactions: {
                         active: (v) => {
-                            patch({classes: {'is-active': v}, components: {menu: v}})
+                            ({classes: {'is-active': v}, components: {menu: v}})
                         },
                     },
                     initials: {

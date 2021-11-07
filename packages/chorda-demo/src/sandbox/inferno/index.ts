@@ -7,6 +7,17 @@ import { Example } from "../../helpers"
 export const InfernoExample = () : InferBlueprint<unknown> => {
     return RowLayout([
         Example({
+            title: 'React',
+            content: require('./react').default,
+            files: [{
+                name: 'index.ts',
+                code: require('!raw-loader!./react').default
+            }, {
+                name: 'with-react.ts',
+                code: require('!raw-loader!./with-react').default
+            }]
+        }),
+        Example({
             title: 'Inferno',
             content: require('./basic').default,
             files: [{
