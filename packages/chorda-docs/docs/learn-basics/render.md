@@ -106,8 +106,3 @@ export default () => {
 
 
 
-
-### Уплощение (flattening)
-
-Достигается за счет использования компоновки passthruLayout
-
