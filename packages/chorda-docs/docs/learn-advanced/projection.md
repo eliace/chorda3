@@ -14,10 +14,10 @@ export default () => {
             }
         },
         injections: {
-            data: () => iterable([{title: 'Hello'}])
+            data: () => observable([{title: 'Hello'}])
         },
         reactions: {
-            data: (v) => patch({items: v})
+            data: (v) => ({items: iterator(v)})
         }
     }
 }
@@ -34,10 +34,10 @@ export default () => {
             }
         },
         injections: {
-            data: () => iterable([{title: 'Hello'}], '__item') // указываем канальную переменную
+            data: () => observable([{title: 'Hello'}])
         },
         reactions: {
-            data: (v) => patch({items: v})
+            data: (v) => ({items: iterator(v, '__item')}) // указываем канальную переменную
         }
     }
 }
@@ -50,20 +50,20 @@ export default () => {
     return {
         defaultItem: {
             reactions: {
-                data: v => patch({text: v.title})
+                data: v => ({text: v.title})
             }
         },
         injections: {
-            data: () => iterable([{title: 'Hello'}], 'data') // переменная будет иметь то же имя, что и родительская
+            data: () => observable([{title: 'Hello'}])
         },
         reactions: {
-            data: (v) => patch({items: v})
+            data: (v) => ({items: iterator(v, 'data')}) // переменная будет иметь то же имя, что и родительская
         }
     }
 }
 ```
 
-Каждый компонент теперь имеет переменную data, в которой лежает именно его данные. Если вы используете дизайн-функции, то для связывания модели с данными достаточно указать ключ в data в виде пропса и не прибегать к инжекторам
+Каждый компонент теперь имеет переменную data, в которой лежат именно его данные. Если вы используете дизайн-функции, то для связывания модели с данными достаточно указать ключ в data в виде пропса и не прибегать к инжекторам
 
 :::info
 У каналирования этого есть еще одно следствие - данные становятся хорошо изолированными, т.к. каналы сложно перепутать в отличие от набора свойств скоупа

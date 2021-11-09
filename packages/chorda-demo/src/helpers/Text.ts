@@ -19,7 +19,7 @@ type TextProps<T> = {
 
 
 export const Text = <T>(props: TextProps<T&TextScope>) : InferBlueprint<T> => {
-    return mix<TextScope, ReactDomEvents>(props.as || {tag: 'span'}, {
+    return mix<TextScope, ReactDomEvents>(props?.as || {tag: 'span'}, {
 //        tag: 'span',
         reactions: {
             text: (v) => {
@@ -27,7 +27,7 @@ export const Text = <T>(props: TextProps<T&TextScope>) : InferBlueprint<T> => {
                 return ({text: String(v)})
             }
         },
-    }, {
+    }, props && {
         css: props.css,
         initials: {
             text: () => props.text

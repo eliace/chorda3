@@ -302,7 +302,7 @@ export default (showButton) => {
             other: {tag: 'div'},
         },
         reactions: {
-            // реакция патчит компоненты, используя их в качетве переключателей
+            // реакция патчит компоненты, используя их в качестве переключателей
             isShowButton: v => ({
                 components: {
                     button: v,

@@ -68,11 +68,13 @@ class UpdateEngine {
     _sessions: UpdateSession[]
     _commiting: boolean
     _commitedNodes: Map<unknown, any>
+//    _commitedSeq: any[]
 //    _commitedSubscriptions: Set<Subscription>
 
     constructor () {
         this._sessions = []
         this._commitedNodes = new Map<any, unknown>()
+//        this._commitedSeq = []
 //        this._commitedSubscriptions = new Set<Subscription>()
     }
 
@@ -117,6 +119,7 @@ class UpdateEngine {
                         sub.subscriber.$publish(upd.next, upd.prev, EMPTY)
                     })
                     this._commitedNodes.set(upd.node, upd.next)
+//                    this._commitedSeq.push(upd)
                 })
                 // lastUpdateMap.forEach((upd, sub) => {
                 //     sub.$publish(upd.next, upd.prev, EMPTY)
@@ -143,8 +146,10 @@ class UpdateEngine {
 //                console.log('commit')
             }
             else {
+                // console.log('Commit end [set]', this._commitedNodes.values())
+                // console.log('Commit end [seq]', this._commitedSeq.map(itm => itm.next))
                 this._commitedNodes.clear()
-//                console.log('Commit end')
+//                this._commitedSeq = []
             }
         }
     }

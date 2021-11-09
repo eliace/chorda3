@@ -37,5 +37,16 @@ export const HabrExample = () : HtmlBlueprint => {
                 },
             ]
         }),
+        Example({
+            title: 'Изучаем и реализуем алгоритм работы правильного observer паттерна для react компонентов',
+            content: require('./cell/index').default,
+            link: 'https://habr.com/ru/post/349022/',
+            files: [
+                {
+                    name: 'index.ts',
+                    code: require('!raw-loader!./cell/index').default
+                },
+            ]
+        }),
     ])
 }
