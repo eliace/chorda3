@@ -18,11 +18,20 @@ module.exports = {
         filename: 'app.js'
       },
         module: {
-        rules: [{
-            test: /\.ts$/,
-            exclude: /(node_modules)/,
-            use: 'ts-loader'
-        }]
+        rules: [
+            {
+                test: /\.ts$/,
+                exclude: /(node_modules)/,
+                use: 'ts-loader'
+            },
+            {
+                test: /\.css$/i,
+                use: [
+                  'style-loader',
+                  'css-loader',
+                ]
+            }
+        ]
     },
     resolve: {
         extensions: ['.ts', '.js'],

@@ -2,6 +2,9 @@ import { Blueprint, computable, HtmlScope, Infer, iterator, observable, ownTask,
 import { ReactDomEvents } from "@chorda/react"
 import * as director from 'director'
 
+import 'todomvc-common/base.css'
+import 'todomvc-app-css/index.css'
+
 type Todo = {
     id: number
     text: string
