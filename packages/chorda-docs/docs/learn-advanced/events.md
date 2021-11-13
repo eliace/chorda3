@@ -29,7 +29,7 @@ setTimeout(() => timer.$emit('tick'), 100)
 
 export default () => {
     return {
-        initials: {
+        defaults: {
             data: () => timer
         },
         events: {

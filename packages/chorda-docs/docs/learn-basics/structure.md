@@ -310,7 +310,7 @@ export default (showButton) => {
                 }
             })
         },
-        initials: {
+        defaults: {
             // создаем источник сигналов
             isShowButton: () => observable(showButton)
         }
@@ -364,7 +364,7 @@ export default (names) => {
 ```javascript
 export default () => {
     return {
-        initials: {
+        defaults: {
             data: () => observable([{/* значение 1 */}, {/* значение 2 */}])
         },
         reactions: {
