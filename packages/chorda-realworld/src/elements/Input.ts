@@ -1,4 +1,4 @@
-import { Injector, HtmlBlueprint, mix, patch, observable, HtmlScope, InferBlueprint } from "@chorda/core"
+import { Injector, mix, observable, HtmlScope, InferBlueprint } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import { watch } from "../utils"
 
@@ -19,7 +19,7 @@ export const Input = <T, E>(props: InputProps<T&InputScope>) : InferBlueprint<T,
     return mix<InputScope&HtmlScope, ReactDomEvents>({
         tag: 'input',
         reactions: {
-            value: (v) => patch({dom: {defaultValue: v}})
+            value: (v) => ({dom: {defaultValue: v}})
         },
     }, props && {
         css: props.css,

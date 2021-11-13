@@ -152,7 +152,7 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
                     // if (this.components[k]) {
                     //     this.updateComponent(k, o.components[k] as B)
                     // }
-//                    console.log('template component', k, o.components[k])
+                    // console.log('template component', k, components[k])
                     if (components[k] === undefined) {
                         this.addKeyed(k, null)
                     }
@@ -184,7 +184,9 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
                     // FIXME optPatch.components может быть boolean
                     const patchedComponents = {} as any
                     for (let k in optPatch.components as any) {
-                        patchedComponents[k] = components[k]
+//                        if (components[k] !== undefined) {
+                            patchedComponents[k] = components[k]
+//                        }
                     }
                     this.syncKeyed(patchedComponents)
                 }

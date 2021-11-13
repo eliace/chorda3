@@ -1,4 +1,4 @@
-import { Value, EventBus, Subscription, ObservableValue, Handler, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable, Thenable, isCallable, spySubscriptions, isValueSet, isLastValue } from './value'
+import { Value, EventBus, Subscription, ObservableValue, Handler, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable, Thenable, isCallable, spySubscriptions, isValueSet, isLastValue, isDestroyedValue } from './value'
 import { MixRules, mixin, Mixed } from './mix'
 import { ownTask, Pipe, Scheduler } from './pipe'
 
@@ -31,6 +31,8 @@ type Injectors<D> = {
 }
 
 export type Injector<D, R=any> = (scope: Scoped<D>&{$context?: Scoped<D>}) => R
+
+type InjectorsFunc<D> = () => {[P in keyof NoInfer<D>]?: D[P]}
 
 
 // Scope listeners
@@ -147,6 +149,8 @@ export interface HubOptions<D, E, B extends HubBlueprint<D, E>=HubBlueprint<D, E
     joints?: Joints<D>
     // инжекторы по умолчанию
     initials?: Injectors<D>
+    // инициализация скоупа
+    init?: () => {[P in keyof D]?: D[P]}
 
     // изменения скоупа
     reactions?: Reactors<D, B|void>
@@ -266,6 +270,8 @@ const isMonitoredThenable = (v: any) : v is MonitoredThenable => {
 
 
 
+
+
 export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E> = HubOptions<D, E>> implements Stateable {
 
     options: O
@@ -313,11 +319,13 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
         enum PropState {
             None,
-            Injector,
             Initial,
+            Injector,
             Default,
             Context
         }
+
+        let _initials : any = null
 
         // injector -> initial -> default -> context
 
@@ -335,8 +343,8 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
                 let isInjected = false
 
                 let prop = _InjectProps[String(p)] || PropState.None
-                const prevPropState = _InjectProps[String(p)]
-                const prevProp = target[p]
+                // const prevPropState = _InjectProps[String(p)]
+                // const prevProp = target[p]
 
 //                if () {
 
@@ -356,48 +364,63 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
                     // }
 
 
-                    if (!isInjected && prop < PropState.Injector && this.options.injections) {
-                        const injector: Injector<any, any> = (this.options.injections as any)[p]
-                        if (injector !== undefined) {
-                            if (typeof injector === 'function') {
-                                _InjectProps[String(p)] = PropState.Injector
-                                scopeKeyAware(p, () => {
-                                    noAutoTerminal(() => {
-                                        // const entry = injector(this.scope)
-                                        // if (entry !== undefined) {
-                                        //     target[p] = entry
-                                        // }
-                                        target[p] = injector(this.scope)
-                                    })    
-                                })
-                            }
-                            else if (injector != null) {
-                                console.warn('Injector must be a function', p, injector)
-                                return
-                            }
-        
-                            isInjected = true
-//                            return target[p]
-                        }
-                    }    
 //                }
 
 
-                if (!isInjected && prop < PropState.Initial && initScope) {
+                if (!isInjected && prop < PropState.Initial && (initScope || this.options.init)) {
 //                    console.log('--- check initial ---', p)
                     let hasProp = false
-                    if (isValueSet(initScope)) {
-                        hasProp = initScope.$has(p) && initScope.$at(p).$value != null
+                    if (initScope) {
+                        if (isValueSet(initScope)) {
+                            hasProp = !isDestroyedValue(initScope) && initScope.$has(p) && initScope.$at(p).$value != null
+                        }
+                        else if (initScope[p] != null) {
+                            hasProp = true
+                        }    
                     }
-                    else if (initScope[p] != null) {
-                        hasProp = true
-                    }
+
                     if (hasProp) {
                         _InjectProps[String(p)] = PropState.Initial
                         target[p] = initScope[p]
                         isInjected = true
                     }
+                    else if (this.options.init) {
+                        if (!_initials) {
+                            _initials = this.options.init()
+                        }
+                        if (_initials[p] != null) {
+                            _InjectProps[String(p)] = PropState.Initial
+                            target[p] = _initials[p]
+                            isInjected = true    
+                        }
+                    }
                 }
+
+
+                if (!isInjected && prop < PropState.Injector && this.options.injections) {
+                    const injector: Injector<any, any> = (this.options.injections as any)[p]
+                    if (injector !== undefined) {
+                        if (typeof injector === 'function') {
+                            _InjectProps[String(p)] = PropState.Injector
+                            scopeKeyAware(p, () => {
+                                noAutoTerminal(() => {
+                                    // const entry = injector(this.scope)
+                                    // if (entry !== undefined) {
+                                    //     target[p] = entry
+                                    // }
+                                    target[p] = injector(this.scope)
+                                })    
+                            })
+                        }
+                        else if (injector != null) {
+                            console.warn('Injector must be a function', p, injector)
+                            return
+                        }
+    
+                        isInjected = true
+//                            return target[p]
+                    }
+                }    
 
 
                 if (!isInjected && prop < PropState.Default && this.options.initials) {
@@ -419,7 +442,28 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
                         isInjected = true
 //                        return target[p]
                     }
+                    // else if ((this.options.initials as any).$injectors) {
+                    //     if (!_initials) {
+                    //         _initials = (this.options.initials as any).$injectors()
+                    //     }
+                    //     if (p in _initials) {
+                    //         _InjectProps[String(p)] = PropState.Default
+                    //         target[p] = _initials[p]
+                    //         isInjected = true
+                    //     }
+                    // }
                 }
+
+                // if (!isInjected && prop < PropState.Default && this.options.init) {
+                //     if (!_initials) {
+                //         _initials = this.options.init() || {}
+                //     }
+                //     if (_initials[p]) {
+                //         _InjectProps[String(p)] = PropState.Default
+                //         target[p] = _initials[p]
+                //         isInjected = true
+                //     }
+                // }
 
                 if (!isInjected && prop < PropState.Context) {
                     _InjectProps[String(p)] = PropState.Context
@@ -541,7 +585,6 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         //     // }
         //     // this._Injectors = null
         // }
-
 
         // Joints
         //TODO joints не должны обновляться динамически, но все равно нужно сделать обработку
@@ -692,7 +735,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
 
                             const handler = bus.$on('done', (...args: any[]) => {
                                 noAutoTerminal(() => {
-                                    callback.apply(null, [...args, this.scope])
+                                    callback.apply(null, [args[0], this.scope])
                                 })
                             }, this)
 
@@ -711,7 +754,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
     
                                 const handler = bus.$on(k, (...args: any[]) => {
                                     noAutoTerminal(() => {
-                                        callback.apply(null, [...args, this.scope])
+                                        callback.apply(null, [args[0], this.scope])
                                     })
                                 }, this)
     

@@ -1,4 +1,4 @@
-import { callable, CallableEvents, computable, InferBlueprint, MethodsOf, patch } from "@chorda/core";
+import { callable, CallableEvents, computable, InferBlueprint } from "@chorda/core";
 import { Route } from "router5";
 import { api, User } from "./api";
 import { withAuth } from "./auth";
@@ -9,7 +9,7 @@ import { isNull, watch } from "./utils";
 
 
 export type AppScope = {
-    pages: {
+    pages: Partial<{
         home: boolean
         signIn: boolean
         signUp: boolean
@@ -17,7 +17,7 @@ export type AppScope = {
         editor: boolean
         settings: boolean
         profile: boolean
-    }
+    }>
 }
 
 
@@ -48,24 +48,30 @@ const routes: Route<Record<string, any>>[] = [
 export default () : InferBlueprint<AppScope> => {
     return withAuth(withRouter({
         joints: {
-            init: ({isAuth, navigate, login, register, pages, user, logout}) => {
+            init: ({isAuth, navigate, pages, isAuthChecking}) => {
 
                 watch(() => {
                     // при потере аутентификации переходим на страницу логина
-                    if (!isAuth.$value) {
+                    if (!isAuth.$value && !isAuthChecking.$value) {
                         const p = pages.$value
                         if (!(p.home || p.signIn || p.signUp || p.article)) {
                             navigate(Pages.SignIn)
                         }
                     }
-                }, [isAuth])
+                }, [isAuth, isAuthChecking])
 
             }
         },
         injections: {
             pages: ($) => computable(() => {
+                if ($.isAuthChecking) {
+                    return {
+                        header: false
+                    }
+                }
                 const route = $.route.route.name
                 return {
+                    header: true,
                     home: route == Pages.Home,
                     signIn: route == Pages.SignIn,
                     signUp: route == Pages.SignUp,
@@ -77,7 +83,7 @@ export default () : InferBlueprint<AppScope> => {
             })
         },
         reactions: {
-            pages: (v) => patch({components: v})
+            pages: (v) => ({components: v})
         },
         templates: {
             header: Header,

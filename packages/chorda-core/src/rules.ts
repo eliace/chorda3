@@ -2,11 +2,11 @@ import { Mixin } from './mix'
 
 const Option = (x: any, y: any) => {
     return new Mixin(x, y)
-  }
+}
   
   //const State = (x, y) => {return new State(x, y)}
   
-  const OptionCollection = (x: {[key: string]: any}, y: {[key: string]: any} | boolean) => {
+const OptionCollection = (x: {[key: string]: any}, y: {[key: string]: any} | boolean) => {
   
     if (y === false) {
       return false
@@ -34,14 +34,18 @@ const Option = (x: any, y: any) => {
     if (x != null) {
       kv = kv || {}
       for (let i in x) {
-        kv[i] = new Mixin(x[i])
+        if (x[i] !== undefined) {
+          kv[i] = new Mixin(x[i])
+        }
       }
     }
     if (y != null) {
       kv = kv || {}
 //      console.log('y', y)
       for (let i in y) {
-        kv[i] = kv[i] ? (kv[i] as Mixin).mix(y[i]) : new Mixin(y[i])
+        if (y[i] !== undefined) {
+          kv[i] = kv[i] ? (kv[i] as Mixin).mix(y[i]) : new Mixin(y[i])
+        }
       }
     }
   //  console.log(kv)

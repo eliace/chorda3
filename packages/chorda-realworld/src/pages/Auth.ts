@@ -1,10 +1,11 @@
-import { computable, InferBlueprint, observable } from "@chorda/core"
+import { computable, Infer, InferBlueprint, observable, passthruLayout } from "@chorda/core"
 import { Errors, User } from "../api"
 import { AppScope } from "../App"
+import { AuthActions } from "../auth"
 import { ErrorList } from "../components"
 import { Button, Column, Columns, Container, Fieldset, Form, FormGroup, Input, Link, Text } from "../elements"
 import { Pages, RouterScope } from "../router"
-import { componentList } from "../utils"
+import { ActionEventsOf, componentList } from "../utils"
 
 
 type AuthScope = {
@@ -19,7 +20,7 @@ type AuthScope = {
 
 
 
-export const AuthPage = () : InferBlueprint<AuthScope&AppScope&RouterScope> => {
+export const AuthPage = () : Infer.Blueprint<AuthScope&AuthActions&AppScope&RouterScope, ActionEventsOf<AuthActions>> => {
     return {
         initials: {
             email: () => observable(''),
@@ -43,23 +44,38 @@ export const AuthPage = () : InferBlueprint<AuthScope&AppScope&RouterScope> => {
         joints: {
             init: ({login, errors, isFetching, register, navigate}) => {
 
-                login.$on('wait', (fail: Errors) => {
-                    isFetching.$value = true
-                })
+                // login.$on('wait', (fail: Errors) => {
+                //     isFetching.$value = true
+                // })
 
-                login.$on('fail', (fail: Errors) => {
-                    isFetching.$value = false
-                    errors.$value = fail
-                })
+                // login.$on('fail', (fail: Errors) => {
+                //     isFetching.$value = false
+                //     errors.$value = fail
+                // })
 
-                login.$on('done', () => {
-                    isFetching.$value = false
-                    navigate(Pages.Home)
-                })
+                // login.$on('done', () => {
+                //     isFetching.$value = false
+                //     navigate(Pages.Home)
+                // })
 
                 register.$on('done', (user: User) => {
 
                 })
+            }
+        },
+        events: {
+            login: {
+                wait: (e, {isFetching}) => {
+                    isFetching.$value = true
+                },
+                fail: (fail, {isFetching, errors}) => {
+                    isFetching.$value = false
+                    errors.$value = fail
+                },
+                done: (u, {isFetching, navigate}) => {
+                    isFetching.$value = false
+                    navigate(Pages.Home)
+                }
             }
         },
         css: 'auth-page',
@@ -70,6 +86,7 @@ export const AuthPage = () : InferBlueprint<AuthScope&AppScope&RouterScope> => {
                     Column({
                         css: 'col-md-6 offset-md-3 col-xs-12',
                         content: {
+                            layout: passthruLayout, // ?
                             templates: {
                                 title: Text({
                                     as: {
@@ -131,7 +148,7 @@ export const AuthPage = () : InferBlueprint<AuthScope&AppScope&RouterScope> => {
                                         as: FormGroup({
                                             control: Input({
                                                 css: 'form-control-lg',
-                                                type: 'text',
+                                                type: 'email',
                                                 placeholder: 'Email',
                                                 value$: $ => $.email
                                             })

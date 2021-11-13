@@ -1,4 +1,4 @@
-import { Injector, HtmlBlueprint, patch, mix, InferBlueprint } from "@chorda/core"
+import { Infer, Injector, mix } from "@chorda/core"
 
 
 
@@ -14,11 +14,11 @@ type ImgProps<T> = {
 
 
 
-export const Img = <T>(props: ImgProps<T&ImgScope>) : InferBlueprint<T> => {
+export const Img = <T>(props: ImgProps<T&ImgScope>) : Infer.Blueprint<T> => {
     return mix<ImgScope>({
         tag: 'img',
         reactions: {
-            src: (v) => patch({dom: {src: v}})
+            src: (v) => ({dom: {src: v}})
         },
     }, props && {
         css: props.css,

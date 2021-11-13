@@ -1,4 +1,6 @@
+import { SubscriptionProvider } from "."
 import { EventNode } from "./bus"
+import { closeTransaction, commitEngine, currentTransaction, openTransaction, Transaction } from "./engine"
 import { ObservableValueSet, ValueSet, Node } from "./node"
 import { isValueSet, proxify } from "./observable"
 import { EventBus, Handler, Observable, PublishFunc, Subscriber, Subscription, Thenable, Value } from "./utils"
@@ -20,17 +22,22 @@ class _Node<T, E> extends Node<T, E> {
 }
 
 
-class CallableNode<T extends Function, E=any> extends Function implements Value<T>, EventBus<E>, Observable<T>, Callable {
+class CallableNode<T extends Function, E=any> extends Function implements Value<T>, EventBus<E>, Observable<T>, Callable, SubscriptionProvider {
     
     _memoValue: T
 //    _events: EventNode<E>
     _value: _Node<T, E>
+    _dirty: boolean
 
     constructor (initValue: T) {
         super()
         this._memoValue = initValue
         this._value = new _Node()
         //this._events = new EventNode()
+    }
+    
+    get $subscriptions () : Subscription[] {
+        return this._value.$subscriptions
     }
     
     $subscribe(subscriber: Subscriber<T> | PublishFunc<T>): Subscription {
@@ -50,32 +57,56 @@ class CallableNode<T extends Function, E=any> extends Function implements Value<
     }
 
     $call(thisArg: any, args: any[]) {
-        if (this._memoValue == null) {
-            // TODO
-            //console.warn('Possible uninitialized callable', args)
+
+        // if (this._dirty) {
+        //     return
+        // }
+
+        const t = openTransaction()
+ 
+        const sess = currentTransaction()
+        sess.called.push({func: this._memoValue || (() => {}), call: () => {
+
+            if (this._memoValue == null) {
+                // TODO
+                //console.warn('Possible uninitialized callable', args)
+            }
+            let result = this._memoValue != null ? this._memoValue.apply(thisArg, args) : args[0]
+            if (isValueSet(result)) {
+                result = result.$value
+            }
+            if (result && (result as Thenable).then) {
+                this.$emit('wait')
+                result = result.then((response: any) => {
+                    this.$emit('done', response)
+    //                this._value.$value = response
+    //                this.$publish(response)
+                    return response
+                }, (fail: any) => {
+                    this.$emit('fail', fail)
+                    return fail
+                })
+            }
+            else {
+                this.$emit('done', result)
+    //            this._value.$value = result
+    //            this.$publish(result)
+            }
+    
+            return result
+        }})
+
+
+
+
+        closeTransaction(t)
+        // // this._t = null
+
+        if (!t.joined) {
+            commitEngine().commit()
         }
-        let result = this._memoValue != null ? this._memoValue.apply(thisArg, args) : args[0]
-        if (isValueSet(result)) {
-            result = result.$value
-        }
-        if (result && (result as Thenable).then) {
-            this.$emit('wait')
-            result = result.then((response: any) => {
-                this.$emit('done', response)
-//                this._value.$value = response
-//                this.$publish(response)
-                return response
-            }, (fail: any) => {
-                this.$emit('fail', fail)
-                return fail
-            })
-        }
-        else {
-            this.$emit('done', result)
-//            this._value.$value = result
-//            this.$publish(result)
-        }
-        return result
+
+        // return result
     }
 
     $emit(name: string, ...args: any[]): void {

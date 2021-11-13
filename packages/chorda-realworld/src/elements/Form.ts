@@ -1,11 +1,11 @@
-import { Blueprint, callable, HtmlBlueprint, InferBlueprint, Injector, Listener, mix, patch } from "@chorda/core"
+import { Blueprint, callable, HtmlBlueprint, InferBlueprint, Injector, Listener, mix } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import * as React from "react"
 import { flags } from "../utils"
 
 
 type FormScope = {
-    items: Blueprint<unknown>
+    items: {[key: string]: Blueprint<unknown>}
 }
 
 type FormProps<T, E> = {
@@ -21,7 +21,7 @@ export const Form = <T, E>(props: FormProps<T, E>) : InferBlueprint<T, E> => {
     return mix<FormScope, ReactDomEvents>({
         tag: 'form',
         reactions: {
-            items: (v) => patch({components: v})
+            items: (v) => ({components: v})
         }
     }, props && {
         templates: {

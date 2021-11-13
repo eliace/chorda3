@@ -1,4 +1,4 @@
-import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, Listener, mix, patch, Scope } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, Listener, mix, Scope } from "@chorda/core"
 import { ItemScope, List, ListProps, ListPropsType, ListScope, Text, TextPropsType } from "../elements"
 
 
@@ -28,11 +28,11 @@ export const TagList = <T, E>(props: TagListPropsType<T, E>) : InferBlueprint<T,
 //         defaultItem: {
 // //            tag: 'span',
 //             bindings: {
-//                 item: (v) => patch({text: v})
+//                 item: (v) => ({text: v})
 //             }
 //         },
 //         bindings: {
-//             items: (v) => patch({items: iterator(v, 'item')})
+//             items: (v) => ({items: iterator(v, 'item')})
 //         }
 //     }, {
 //         defaultItem: props.item,

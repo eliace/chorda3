@@ -1,4 +1,4 @@
-import { Blueprint, InferBlueprint, Injector, Listener, mix, patch } from "@chorda/core"
+import { Blueprint, InferBlueprint, Injector, Listener, mix } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import * as React from "react"
 
@@ -29,7 +29,7 @@ export const Tag = <T>(props: TagProps<T&TagScope>) : InferBlueprint<T> => {
             }
         },
         reactions: {
-            text: (v) => patch({text: v})
+            text: (v) => ({text: v})
         }
     }, {
         css: props.css,

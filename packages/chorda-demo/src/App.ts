@@ -20,6 +20,7 @@ import { InfernoExample } from "./sandbox/inferno";
 import { TransitionsExample } from "./sandbox/transitions";
 import { NasaExample } from "./sandbox/nasa";
 import { HabrExample } from "./sandbox/habr";
+import { WebComponentsExample } from "./sandbox/webcomponents";
 
 let _network: vis.Network = null
 const _nodes = new visds.DataSet<vis.Node>([])
@@ -44,6 +45,7 @@ export const routes: Route[] = [
     {name: 'transitions', path: '/sandbox/transitions'},
     {name: 'nasa', path: '/sandbox/nasa'},
     {name: 'habr', path: '/habr/mdn'},
+    {name: 'webcomponents', path: '/webcomponents/basic'},
 ]
 
 
@@ -112,6 +114,7 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                         MenuItem({text: 'Transitions', name: 'transitions', link: '/#/sandbox/transitions'}),        
                                         MenuItem({text: 'Nasa', name: 'nasa', link: '/#/sandbox/nasa'}),        
                                         MenuItem({text: 'Habr', name: 'habr', link: '/#/habr/mdn'}),        
+                                        MenuItem({text: 'WebComponents', name: 'webcomponents', link: '/#/webcomponents/basic'}),        
                                     ],
                                     defaultItem: MenuItem({
                                         active$: (scope) => computable(() => {
@@ -147,6 +150,7 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                         transitions: v == 'transitions',
                                         nasa: v == 'nasa',
                                         habr: v == 'habr',
+                                        webcomponents: v == 'webcomponents',
                                     }
                                 })
                             },
@@ -168,6 +172,7 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                 transitions: TransitionsExample,
                                 nasa: NasaExample,
                                 habr: HabrExample,
+                                webcomponents: WebComponentsExample,
                             }
                         })
                     },

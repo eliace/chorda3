@@ -1,11 +1,12 @@
-import { HtmlBlueprint, mix, Injector, patch, Listener, Blueprint, InferBlueprint, observable } from "@chorda/core"
+import { HtmlBlueprint, mix, Injector, Listener, Blueprint, InferBlueprint, observable } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import { flags } from "../utils"
 
 
 type ButtonScope = {
     text: string
-    addons: HtmlBlueprint[]
+    addons: {[key: string]: HtmlBlueprint}
+    disabled: boolean
 }
 
 type ButtonProps<T, E> = {
@@ -18,6 +19,7 @@ type ButtonProps<T, E> = {
     order?: number
     addons?: {[key: string]: Blueprint<T, E>}
     addons$?: Injector<T>
+    disabled$?: Injector<T>
 }
 
 export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : InferBlueprint<T, E> => {
@@ -25,8 +27,9 @@ export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : InferBluepr
         tag: 'button',
         css: 'btn',
         reactions: {
-            text: (v) => patch({text: v}),
-            addons: (v) => patch({components: v}),
+            text: (v) => ({text: v}),
+            addons: (v) => ({components: v}),
+            disabled: (v) => ({dom: {disabled: v}})
         },
         templates: {
             icon: {
@@ -42,10 +45,12 @@ export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : InferBluepr
         weight: props.order,
         initials: {
             addons: () => observable(null),
+            disabled: () => observable(null),
         },
         injections: {
             text: props.text$,
-            addons: props.addons$
+            addons: props.addons$,
+            disabled: props.disabled$,
         },
         components: {
             icon: props.icon,

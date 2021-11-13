@@ -6,6 +6,7 @@ import { ActionEventsOf, isNull } from "./utils";
 export type AuthScope = {
     user: User
     isAuth: boolean
+    isAuthChecking: boolean
 }
 
 export type AuthActions = {
@@ -21,13 +22,18 @@ export const withAuth = <T, E>(props: Blueprint<T&AuthScope&AuthActions, E>) : I
             login: () => callable(null),
             register: () => callable(null),
             logout: () => callable(null),
+            user: () => observable({} as User),
+            isAuthChecking: () => observable(false),
         },
         injections: {
-            user: () => observable({} as User),
             isAuth: $ => computable(() => $.user.username != null)
         },
         joints: {
-            authOnLoad: async ({user}) => {
+            authOnLoad: async ({user, isAuthChecking: isAuthChecking}) => {
+
+                console.log(user.$value)
+
+                isAuthChecking.$value = true
 
                 try {
                     user.$value = await api.getUser()
@@ -36,15 +42,23 @@ export const withAuth = <T, E>(props: Blueprint<T&AuthScope&AuthActions, E>) : I
                     user.$value = {} as any
                 }
 
+                isAuthChecking.$value = false
+
             },
-            init: ({login, register, logout, user}) => {
+            authInit: ({login, register, logout, user}) => {
 
                 login.$value = (email, password) => {
-                    return api.login(email, password)
+                    return api.login(email, password).then(u => {
+                        user.$value = u
+                        return u
+                    })
                 }
 
                 register.$value = (username, email, password) => {
-                    return api.register(username, email, password)
+                    return api.register(username, email, password).then(u => {
+                        user.$value = u
+                        return u
+                    })
                 }
 
                 logout.$value = () => {
@@ -52,18 +66,6 @@ export const withAuth = <T, E>(props: Blueprint<T&AuthScope&AuthActions, E>) : I
                     user.$value = {} as User
                 }
 
-            }
-        },
-        events: {
-            login: {
-                done: (u, {user}) => {
-                    user.$value = u
-                },
-            },
-            register: {
-                done: (u, {user}) => {
-                    user.$value = u
-                }
             }
         },
     }, props)

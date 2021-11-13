@@ -1,10 +1,11 @@
-import { computable, InferBlueprint, observable, passthruLayout, patch } from "@chorda/core"
-import { api, Article } from "../api"
+import { callable, computable, InferBlueprint, observable, passthruLayout, Value, ValueSet } from "@chorda/core"
+import { api, Article, Articles } from "../api"
+import { ApiResponse } from "../api/rest"
 import { AppScope } from "../App"
 import { AuthScope } from "../auth"
 import { TagList, ArticlePreview } from "../components"
 import { Block, Column, Columns, Container, Link, List, Nav, NavLink, Tag, Text } from "../elements"
-import { componentList } from "../utils"
+import { componentList, watch, whenDone, whenWait } from "../utils"
 
 
 enum Feeds {
@@ -32,8 +33,15 @@ type HomeScope = {
     //isFetchingArticles: boolean
 }
 
+type HomeActions = {
+    loadFeed: () => void
+    loadGlobal: () => void
+    loadSelected: () => void
+    favorite: (slug: string&Value<string>) => void
+}
 
-export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
+
+export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope&HomeActions> => {
     return {
         css: 'home-page',
         templates: {
@@ -75,6 +83,9 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
                                                 active$: $ => computable(() => {
                                                     return $.selectedGroup == $.name
                                                 }),
+                                                onClick: (e, {name, selectedGroup}) => {
+                                                    selectedGroup.$value = name
+                                                }
                                             }),
                                             templates: componentList([{
                                                 name: Feeds.Your,
@@ -116,7 +127,11 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
                                             layout: passthruLayout
                                         },
                                         items$: $ => $.articles.list,
-                                        itemAs: ArticlePreview,
+                                        itemAs: ArticlePreview({
+                                            onFavorite: (e, {favorite, slug}) => {
+                                                favorite(slug)
+                                            }
+                                        }),
                                     }),
                                     loading: ArticlePreview({
                                         meta: false,
@@ -130,7 +145,7 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
                                     })
                                 },
                                 reactions: {
-                                    articles: (v) => patch({
+                                    articles: (v) => ({
                                         components: {
                                             loading: v.fetching,
                                             noArticles: v.list.length == 0 && !v.fetching
@@ -153,8 +168,9 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
                                             as: Link,
                                             href: '',
                                             css: 'tag-default tag-pill',
-                                            onClick: (e, {}) => {
+                                            onClick: (e, {item, selectedTag}) => {
                                                 e.preventDefault()
+                                                selectedTag.$value = item
                                             }
                                         }),
                                         items$: $ => $.tags.list
@@ -171,7 +187,7 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
                                     preview: false,
                                 },
                                 reactions: {
-                                    hasTags: (v) => patch({components: {
+                                    hasTags: (v) => ({components: {
                                         preview: !v
                                     }})
                                 }
@@ -193,6 +209,11 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
                 fetching: false
             }),
             selectedGroup: () => observable(null),
+            loadFeed: () => callable(null),
+            loadGlobal: () => callable(null),
+            loadSelected: () => callable(null),
+            selectedTag: () => observable(null),
+            favorite: () => callable(null),
         },
         injections: {
             hasTags: $ => computable(() => {
@@ -200,7 +221,7 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
             })
         },
         joints: {
-            autoLoad: ({tags, articles, isAuth: isAuthenticated, selectedGroup}) => {
+            autoLoad: ({tags, articles, isAuth, selectedGroup, selectedTag, loadFeed, loadGlobal, loadSelected, favorite}) => {
 
                 const pageSize = 10
                 const pageNo = articles.page
@@ -212,18 +233,71 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope> => {
                         tags.list.$value = data.tags
                     })
 
-
-
-                articles.fetching.$value = true
-                api.getAllArticles({offset: (pageNo-1)*pageSize, limit: pageSize})
-                    .then(data => {
-                        articles.fetching.$value = false
+                loadFeed.$value = () => {
+                    articles.list.$value = []
+                    return api.getFeed({offset: (pageNo-1)*pageSize, limit: pageSize}).then(data => {
                         articles.list.$value = data.articles
                         articles.total.$value = data.articlesCount
                     })
+                }
+
+                loadSelected.$value = () => {
+                    articles.list.$value = []
+                    return api.getArticlesByTag(selectedTag, {offset: (pageNo-1)*pageSize, limit: pageSize}).then(data => {
+                        articles.list.$value = data.articles
+                        articles.total.$value = data.articlesCount
+                    })
+                }
+
+                loadGlobal.$value = () => {
+                    articles.list.$value = []
+                    return api.getAllArticles({offset: (pageNo-1)*pageSize, limit: pageSize}).then(data => {
+                        articles.list.$value = data.articles
+                        articles.total.$value = data.articlesCount
+                    })
+                }
+
+                favorite.$value = (slug) => {
+                    const article = articles.list.find(a => a.slug === slug.$value)
+                    return article.favorited ? api.unfavorite(slug) : api.favorite(slug)
+                }
 
 
-                selectedGroup.$value = isAuthenticated.$value ? Feeds.Your : Feeds.Global
+                const loadArticles = callable(() => {
+
+                    if (selectedGroup.$value == Feeds.Your) {
+                        loadFeed()
+                    }
+                    else if (selectedGroup.$value == Feeds.Global) {
+                        loadGlobal()
+                    }
+                    else if (selectedGroup.$value == Feeds.Selected) {
+                        loadSelected()
+                    }
+                })
+
+                watch(() => {
+                    loadArticles()
+                }, [selectedGroup, selectedTag])
+
+                watch(() => {
+                    if (selectedTag.$value) {
+                        selectedGroup.$value = Feeds.Selected
+                    }
+                }, [selectedTag])
+
+                selectedGroup.$value = isAuth.$value ? Feeds.Your : Feeds.Global
+            },
+            fetchingArticles: ({loadFeed, loadGlobal, loadSelected, articles}) => {
+
+                whenWait(() => {
+                    articles.fetching.$value = true
+                }, [loadFeed, loadGlobal, loadSelected])
+
+                whenDone(() => {
+                    articles.fetching.$value = false
+                }, [loadFeed, loadGlobal, loadSelected])
+
             }
         }
     }

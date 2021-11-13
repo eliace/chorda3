@@ -1,9 +1,9 @@
-import { Blueprint, InferBlueprint, Injector, mix, patch } from "@chorda/core";
+import { Blueprint, InferBlueprint, Injector, mix } from "@chorda/core";
 import { BlueprintGroup, componentGroups } from "../utils";
 
 
 type NavScope = {
-    components: Blueprint<unknown>
+    components: {[key: string]: Blueprint<unknown>}
 } 
 
 type NavProps<T, E> = {
@@ -36,7 +36,7 @@ export const Nav = <T, E>(props: NavProps<T&NavScope, E>) : InferBlueprint<T, E>
             components: props.components$
         },
         reactions: {
-            components: (v) => patch({components: v})
+            components: (v) => ({components: v})
         }
     }, 
     props && {

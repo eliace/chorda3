@@ -1,5 +1,5 @@
-import { SubscriptionProvider } from "."
-import { EMPTY, LifecycleProvider } from "./utils"
+import { isSubscriptionProvider } from "."
+import { EMPTY, LifecycleProvider, Subscription, SubscriptionProvider } from "./utils"
 
 
 export type Transaction = {
@@ -17,6 +17,10 @@ type UpdateSession = {
     head: any
     deleted: (SubscriptionProvider&LifecycleProvider)[]
     updated: NodeUpdate[]
+    called: {
+        func: Function
+        call: Function
+    }[]
 }
 
 
@@ -32,7 +36,8 @@ export const openTransaction = () : Transaction => {
             nodes: new Set(),
             head: this,
             deleted: [],
-            updated: []
+            updated: [],
+            called: []
         }
         t.joined = false
     }
@@ -44,7 +49,7 @@ export const openTransaction = () : Transaction => {
 
 export const closeTransaction = (t: Transaction) => {
     if (!t.joined) {
-        if (_Session.updated.length > 0 || _Session.deleted.length > 0) {
+        if (_Session.updated.length > 0 || _Session.deleted.length > 0  || _Session.called.length > 0) {
             _engine.addSession(_Session)
         }
         _Session = null    
@@ -69,13 +74,15 @@ class UpdateEngine {
     _commiting: boolean
     _commitedNodes: Map<unknown, any>
 //    _commitedSeq: any[]
-//    _commitedSubscriptions: Set<Subscription>
+    _commitedSubscribers: Map<any, any>
+    _commitedCalls: Map<any, any>
 
     constructor () {
         this._sessions = []
         this._commitedNodes = new Map<any, unknown>()
 //        this._commitedSeq = []
-//        this._commitedSubscriptions = new Set<Subscription>()
+        this._commitedSubscribers = new Map<any, any>()
+        this._commitedCalls = new Map<any, any>()
     }
 
     addSession(session: UpdateSession) {
@@ -115,12 +122,27 @@ class UpdateEngine {
 //                        return
                     }
                     upd.node.$subscriptions.forEach(sub => {
+                        // if (!isSubscriptionProvider(sub.subscriber)) {
+                        //     if (this._commitedSubscribers.has(sub.subscriber)) {
+                        //         console.warn('glitch detected', [upd.next, upd.prev], this._commitedSubscribers.get(sub.subscriber))
+                        //     }
+                        //     this._commitedSubscribers.set(sub.subscriber, [upd.next, upd.prev])    
+                        // }
+                        // else {
+                            sub.subscriber.$publish(upd.next, upd.prev, EMPTY)
+
+//                            console.log('publish', upd)
+                        // }
 //                        console.log('publish to subscriber', upd.next)
-                        sub.subscriber.$publish(upd.next, upd.prev, EMPTY)
                     })
                     this._commitedNodes.set(upd.node, upd.next)
 //                    this._commitedSeq.push(upd)
                 })
+
+                session.called.forEach(call => {
+                    this._commitedCalls.set(call.func, call.call)
+                })
+
                 // lastUpdateMap.forEach((upd, sub) => {
                 //     sub.$publish(upd.next, upd.prev, EMPTY)
                 // })
@@ -146,9 +168,36 @@ class UpdateEngine {
 //                console.log('commit')
             }
             else {
+
+                const calls = this._commitedCalls
+                this._commitedCalls = new Map<any, any>()
+
+                calls.forEach((func) => {
+                    func()
+                })
+
+                calls.clear()
+
+//                console.log('commit end')
+
                 // console.log('Commit end [set]', this._commitedNodes.values())
                 // console.log('Commit end [seq]', this._commitedSeq.map(itm => itm.next))
-                this._commitedNodes.clear()
+
+//                 const subs = this._commitedSubscribers
+//                 this._commitedSubscribers = new Map<any, any>()
+
+//                 subs.forEach(([next, prev], sub) => {
+//                     sub.$publish(next, prev, EMPTY)
+//                 })
+
+// //                this._commitedSubscribers.clear()
+
+                if (this._sessions.length > 0) {
+                    this.commit()
+                }
+                else {
+                    this._commitedNodes.clear()
+                }
 //                this._commitedSeq = []
             }
         }

@@ -1,4 +1,4 @@
-import { HtmlBlueprint, mix, Injector, patch, Blueprint, InferBlueprint } from "@chorda/core";
+import { mix, Injector, Blueprint, InferBlueprint } from "@chorda/core";
 
 
 type LinkScope = {
@@ -35,8 +35,8 @@ export const Link = <T, E>(props: LinkProps<T&LinkScope, E>) : InferBlueprint<T,
             href: props.href$
         },
         reactions: {
-            text: (v) => patch({text: v}),
-            href: (v) => patch({dom: {href: v}})
+            text: (v) => ({text: v}),
+            href: (v) => ({dom: {href: v}})
         }
     })
 }

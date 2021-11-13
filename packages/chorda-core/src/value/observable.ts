@@ -1,4 +1,4 @@
-import { Node, UidFunc, ValueSet, ValueKey, ObservableValueSet, HasCheck, IsCheck, ObservableValue} from './node'
+import { Node, UidFunc, ValueSet, ValueKey, ObservableValueSet, HasCheck, IsCheck, ObservableValue, MethodDescriptor} from './node'
 import { EventBus, Observable, ValueIterator } from './utils'
 
 
@@ -32,6 +32,10 @@ export const isAutoTerminal = () => _AutoTerminal
 
 
 
+const MUTABLE_METHODS: Map<any, any> = new Map()
+MUTABLE_METHODS.set(Array, {splice: true, copyWithin: true, pop: true, push: true, shift: true, unshift: true, reverse: true, sort: true})
+
+
 
 export class ObservableNode<T, K extends keyof T=keyof T> extends Node<T> implements ValueSet<T> {
 
@@ -63,12 +67,15 @@ export class ObservableNode<T, K extends keyof T=keyof T> extends Node<T> implem
         return false
     }
 
-    $is (check: IsCheck) : boolean {
-        if (check == IsCheck.ARRAY && Array.isArray(this._memoValue)) {
-            return true
-        }
-        return false
+    $is (ctor: Function) : boolean {
+        return ctor == this._memoValue.constructor
+        // if (check == IsCheck.ARRAY && Array.isArray(this._memoValue)) {
+        //     return true
+        // }
+        // return false
     }
+
+
 
     $ownKeys () : (string|symbol)[] {
         const v = this.$value
@@ -192,21 +199,31 @@ export const proxify = <T>(obj: T, node: ValueSet<T>) : ValueSet<T>&T => {
 //                 return (target.$value as any)[name]
 //             }
 
-            if (target.$is(IsCheck.ARRAY)) {
-                if (name == 'splice') {
-                    const v = target.$value as any
-                    return (...args: any) => {
-//                        debugger
-                        const out = v[name].apply(v, args)
-                        target.$value = v
-                        return out
-                    }
-                }
-            }
+//             if (target.$is(IsCheck.ARRAY)) {
+//                 console.log(target.$value.constructor)
+//                 if (name == 'splice') {
+//                     const v = target.$value as any
+//                     return (...args: any) => {
+// //                        debugger
+//                         const out = v[name].apply(v, args)
+//                         target.$value = v
+//                         return out
+//                     }
+//                 }
+//             }
 
 
             if (target.$has(name, HasCheck.METHOD)) {
                 const v = target.$value as any
+                if (MUTABLE_METHODS.has(v.constructor)) {
+                    if (MUTABLE_METHODS.get(v.constructor)[name]) {
+                        return (...args: any) => {
+                            const out = v[name].apply(v, args)
+                            target.$value = v
+                            return out
+                        }
+                    }
+                }
                 return v[name].bind(v)//proxy)
             }
 

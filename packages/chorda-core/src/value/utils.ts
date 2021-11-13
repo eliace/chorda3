@@ -37,6 +37,7 @@ export interface SubscriptionProvider {
 
 export interface LifecycleProvider {
     $destroy () : void
+    $isDestroyed : boolean
 }
 
 
@@ -131,4 +132,9 @@ export const defaultUidFunc = (v: any) : string => {
 
 export const isEventBus = (v: any) : v is EventBus<any> => {
     return v != null && (v as EventBus<any>).$hasEvent != undefined
+}
+
+
+export const isSubscriptionProvider = (v: any) : v is SubscriptionProvider => {
+    return (v as SubscriptionProvider).$subscriptions != null
 }

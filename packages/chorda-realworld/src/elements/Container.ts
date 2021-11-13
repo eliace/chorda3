@@ -1,4 +1,4 @@
-import { Blueprint, InferBlueprint, Injector, mix, patch } from "@chorda/core"
+import { Blueprint, InferBlueprint, Injector, mix } from "@chorda/core"
 
 type ContainerScope = {
     components: {[key: string]: Blueprint<unknown>}
@@ -16,7 +16,7 @@ export const Container = <T, E>(props: ContainerProps<T&ContainerScope, E>) : In
     return mix<ContainerScope>({
         css: 'container',
         reactions: {
-            components: (v) => patch({components: v})
+            components: (v) => ({components: v})
         }
     }, {
         css: props.css,

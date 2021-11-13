@@ -107,6 +107,7 @@ export const Navbar = <T>(props: NavbarProps<T>) : HtmlBlueprint<T> => {
         css: 'navbar',
         templates: {
             brand: {
+                weight: -10,
                 css: 'navbar-brand',
                 defaultItem: {
                     css: 'navbar-item'

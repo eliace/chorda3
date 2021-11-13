@@ -1,4 +1,4 @@
-import { Injector, HtmlBlueprint, mix, patch, InferBlueprint } from "@chorda/core"
+import { Injector, mix, InferBlueprint, Infer } from "@chorda/core"
 import { List, ListProps, ListPropsType, ListScope } from "../elements"
 
 
@@ -14,7 +14,7 @@ import { List, ListProps, ListPropsType, ListScope } from "../elements"
 type ErrorListProps<T, E> = ListPropsType<string, T, E>
 
 
-export const ErrorList = <T, E>(props: ErrorListProps<T, E>) : InferBlueprint<T, E> => {
+export const ErrorList = <T, E>(props: ErrorListProps<T, E>) : Infer.Blueprint<T, E> => {
     return mix({
         css: 'error-messages',
     }, List(props))
@@ -25,14 +25,14 @@ export const ErrorList = <T, E>(props: ErrorListProps<T, E>) : InferBlueprint<T,
 //         css: 'error-messages',
 //         defaultItem: {
 //             bindings: {
-//                 item: (v) => patch({text: v})
+//                 item: (v) => ({text: v})
 //             }
 //         },
 //         scope: {
 //             items: props.items$
 //         },
 //         bindings: {
-//             items: (v) => patch({items: iterator(v, 'item')})
+//             items: (v) => ({items: iterator(v, 'item')})
 //         }
 //     })
 // }

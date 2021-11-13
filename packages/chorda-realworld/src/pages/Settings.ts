@@ -1,6 +1,6 @@
 import { InferBlueprint, observable } from "@chorda/core"
 import { AppScope } from "../App"
-import { AuthScope } from "../auth"
+import { AuthActions, AuthScope } from "../auth"
 import { Block, Button, Column, Columns, Container, Fieldset, Form, FormGroup, H1, Input, Text, Textarea } from "../elements"
 import { watch } from "../utils"
 
@@ -18,7 +18,7 @@ type SettingsScope = {
 }
 
 
-export const SettingsPage = () : InferBlueprint<SettingsScope&AppScope&AuthScope> => {
+export const SettingsPage = () : InferBlueprint<SettingsScope&AppScope&AuthScope&AuthActions> => {
     return {
         css: 'settings-page',
         templates: {
@@ -105,7 +105,7 @@ export const SettingsPage = () : InferBlueprint<SettingsScope&AppScope&AuthScope
         joints: {
             init: ({settings, user}) => {
                 
-                watch([user], () => {
+                watch(() => {
                     // ?
                     const u = user.$value
                     settings.$value = {
@@ -113,8 +113,8 @@ export const SettingsPage = () : InferBlueprint<SettingsScope&AppScope&AuthScope
                         username: u.username,
                         bio: u.bio,
                         email: u.email
-                }
-                })
+                    }
+                }, [user])
 
             }
         }

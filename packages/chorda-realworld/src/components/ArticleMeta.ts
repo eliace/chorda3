@@ -1,4 +1,4 @@
-import { Blueprint, computable, InferBlueprint, Injector, mix, observable, patch } from "@chorda/core";
+import { Blueprint, computable, InferBlueprint, Injector, mix, observable } from "@chorda/core";
 import * as dayjs from "dayjs";
 import { Article } from "../api";
 import { Img, Link, Span, Text } from "../elements";
@@ -50,7 +50,7 @@ export const ArticleMeta = <T, E>(props: ArticleMetaPropsType<T, E>) : InferBlue
             info: true
         },
         reactions: {
-            addons: (v) => patch({components: v})
+            addons: (v) => ({components: v})
         }
     },
     props && {

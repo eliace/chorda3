@@ -1,6 +1,6 @@
 import { AxiosResponse } from "axios"
 import { Article, ArticlesQuery, Profile } from "."
-import { ApiResponse, get, post, post_no_auth, saveToken } from "./rest"
+import { ApiResponse, del, get, post, post_no_auth, put, saveToken } from "./rest"
 import { Articles, Tags, User, Comment } from "./types"
 
 
@@ -42,5 +42,26 @@ export const api = {
     },
     getProfile: (username: string) : Promise<Profile> => {
         return get(`/profiles/${encodeURIComponent(username)}`).then(response => response.profile)
-    }
+    },
+    postArticle: (article: Partial<Article>) : Promise<Article> => {
+        return post('/articles', {article}).then(response => response.article)
+    },
+    updateArticle: (slug: string, article: Partial<Article>) : Promise<Article> => {
+        return put(`/articles/${slug}`, {article}).then(response => response.article)
+    },
+    deleteArticle: (slug: string) : Promise<Article> => {
+        return del(`/articles/${slug}`).then(response => response.article)
+    },
+    getFeed: (query?: ArticlesQuery) : Promise<Articles> => {
+        return get('/articles/feed', query)
+    },
+    getArticlesByTag: (tag: string, query?: ArticlesQuery) : Promise<Articles> => {
+        return get('/articles', {tag, ...query})
+    },
+    favorite: (slug: string) : Promise<Article> => {
+        return post('/articles/'+encodeURIComponent(slug)+'/favorite').then(response => response.article)
+    },
+    unfavorite: (slug: string) : Promise<Article> => {
+        return del('/articles/'+encodeURIComponent(slug)+'/favorite').then(response => response.article)
+    },
 }

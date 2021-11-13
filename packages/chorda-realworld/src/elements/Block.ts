@@ -1,4 +1,4 @@
-import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, iterable, Listener, mix, observable, patch } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, Injector, iterable, Listener, mix, observable } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import { IteratorScope } from "../utils"
 import { ItemScope, ListScope } from "./List"
@@ -28,8 +28,8 @@ type BlockPropsType<I, T> = BlockProps<ItemScope<I>, T&ListScope<I>&BlockScope>
 export const Block = <T>(props: BlockPropsType<unknown, T>) : InferBlueprint<T> => {
     return mix<BlockScope&ListScope<unknown>&IteratorScope, ReactDomEvents>({
         reactions: {
-            items: (v) => patch({items: v}),
-            addons: (v) => patch({components: v})
+            items: (v) => ({items: v}),
+            addons: (v) => ({components: v})
         }
     }, 
         props && props.as,

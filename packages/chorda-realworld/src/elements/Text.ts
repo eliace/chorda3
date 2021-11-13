@@ -1,4 +1,4 @@
-import { Blueprint, InferBlueprint, Injector, mix, patch } from "@chorda/core"
+import { Blueprint, InferBlueprint, Injector, mix } from "@chorda/core"
 
 
 
@@ -26,7 +26,7 @@ export const Text = <T, E>(props: TextPropsType<T, E>) : InferBlueprint<T, E> =>
                 id: props.id
             },
             reactions: {
-                text: (v) => patch({text: v})
+                text: (v) => ({text: v})
             },
             injections: {
                 text: props.text$

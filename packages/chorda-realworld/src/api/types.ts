@@ -60,6 +60,7 @@ export type Comment = {
 }
 
 export type ArticlesQuery = {
+    tag?: string
     offset?: number
     limit?: number
 }

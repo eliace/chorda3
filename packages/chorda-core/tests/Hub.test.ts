@@ -1,5 +1,5 @@
 import { expect } from 'chai'
-import { Hub, State, HubOptions, observable, EventBus, computable, ObservableValueIterator } from '../src'
+import { Hub, State, HubOptions, observable, EventBus, computable } from '../src'
 import { createTestPatcher, immediateTick } from './utils'
 
 

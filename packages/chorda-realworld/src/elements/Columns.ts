@@ -1,4 +1,4 @@
-import { Blueprint, InferBlueprint, Injector, mix, patch } from "@chorda/core"
+import { Blueprint, InferBlueprint, Injector, mix } from "@chorda/core"
 
 
 
@@ -61,8 +61,8 @@ export const Column = <T>(props: ColumnProps<T&ColumnScope>) : InferBlueprint<T>
         items: props.items,
         defaultItem: props.item,
         reactions: {
-            addons: (v) => patch({components: v}),
-            items: (v) => patch({items: iterator(v, 'item')}),
+            addons: (v) => ({components: v}),
+            items: (v) => ({items: iterator(v, 'item')}),
 //            ...props.bindings
         },
         injections: {

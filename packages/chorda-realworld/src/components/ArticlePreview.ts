@@ -1,4 +1,4 @@
-import { Blueprint, computable, InferBlueprint, mix, patch } from "@chorda/core";
+import { Blueprint, callable, computable, InferBlueprint, Listener, mix } from "@chorda/core";
 import { TagList } from ".";
 import { Article } from "../api";
 import { Button, H1, Icon, Link, Paragraph, Span, Tag, Text, UL } from "../elements";
@@ -9,16 +9,21 @@ import { ArticleMeta } from "./ArticleMeta";
 
 type ArticleScope = Article
 
+type ArticleActions = {
+    onFavorite: () => void
+}
+
 type ArticleProps<T, E> = {
     meta?: Blueprint<T, E>
     previewLink?: Blueprint<T, E>
     text?: string
+    onFavorite?: Listener<T, void>
 }
 
-export type ArticlePropsType<T, E> = ArticleProps<T&ArticleScope, E>
+export type ArticlePropsType<T, E> = ArticleProps<T&ArticleScope&ArticleActions, E>
 
 export const ArticlePreview = <T, E>(props: ArticlePropsType<T, E>) : InferBlueprint<T, E> => {
-    return mix<ArticleScope>({
+    return mix<ArticleScope&ArticleActions, ArticleActions>({
         css: 'article-preview',
         templates: {
             meta: ArticleMeta({
@@ -33,14 +38,15 @@ export const ArticlePreview = <T, E>(props: ArticlePropsType<T, E>) : InferBluep
                         }),
                         as: {
                             reactions: {
-                                favorited: (v) => patch({
+                                favorited: (v) => ({
                                     classes: {
                                         'btn-outline-primary': !v,
-                                        'btn-primary': v
+                                        'btn-primary': v,
                                     }
                                 })
                             }
-                        }
+                        },
+                        onClick: (e, {onFavorite}) => onFavorite(),
                     })
                 },
                 article$: $ => $ // FIXME scope is not reactive
@@ -78,9 +84,15 @@ export const ArticlePreview = <T, E>(props: ArticlePropsType<T, E>) : InferBluep
     }, 
     props && {
         components: {
-            meta: !!props.meta,
-            previewLink: !!props.previewLink,
+            meta: props.meta,
+            previewLink: props.previewLink,
         },
-        text: props.text
+        text: props.text,
+        events: {
+            onFavorite: props.onFavorite
+        },
+        initials: {
+            onFavorite: () => callable(null),
+        }
     })
 }

@@ -165,14 +165,14 @@ export const ProfilePage = () : InferBlueprint<ProfileScope&AuthScope> => {
                     return Promise.resolve([])
                 }
 
-                watch([profile, selectedGroup], () => {
+                watch(() => {
                     if (profile.$value) {
                         loadArticles(selectedGroup)
                             .then(data => {
                                 articles.$value = data
                             })
                     }
-                })
+                }, [profile, selectedGroup])
             }
         }
     }

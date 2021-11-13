@@ -1,4 +1,4 @@
-import { Injector, mix, patch, InferBlueprint } from "@chorda/core"
+import { Injector, mix, InferBlueprint } from "@chorda/core"
 
 
 
@@ -14,7 +14,7 @@ export const Fieldset = <T>(props: FieldsetProps<T&FieldsetScope>) : InferBluepr
     return mix<FieldsetScope>({
         tag: 'fieldset',
         reactions: {
-            disabled: (v) => patch({dom: {disabled: v}})
+            disabled: (v) => ({dom: {disabled: v}})
         },
     }, props && {
         injections: {

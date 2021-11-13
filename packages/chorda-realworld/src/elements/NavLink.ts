@@ -1,4 +1,4 @@
-import { Blueprint, InferBlueprint, Injector, Listener, mix, observable, patch, Scope } from "@chorda/core"
+import { Blueprint, InferBlueprint, Injector, Listener, mix, observable } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import * as React from "react"
 
@@ -7,7 +7,7 @@ type NavLinkScope = {
     href: string
     active: boolean
     name: string
-    image: string
+    image: Blueprint<unknown>
     icon: string
 }
 
@@ -37,7 +37,7 @@ export const NavLink = <T, E>(props: NavLinkProps<T&NavLinkScope, E>) : InferBlu
                         tag: 'i',
                         weight: -10,
                         reactions: {
-                            icon: (v) => patch({classes: {[v]: !!v}})
+                            icon: (v) => ({classes: {[v]: !!v}})
                         }
                     },
                     image: {
@@ -46,10 +46,11 @@ export const NavLink = <T, E>(props: NavLinkProps<T&NavLinkScope, E>) : InferBlu
                     }
                 },
                 reactions: {
-                    active: (v) => patch({classes: {'active': v == true}}),
-                    text: (v) => patch({text: v}),
-                    href: (v) => patch({dom: {href: v}}),
-                    icon: (v) => patch({components: {icon: !!v}})
+                    active: (v) => ({classes: {'active': v == true}}),
+                    text: (v) => ({text: v}),
+                    href: (v) => ({dom: {href: v}}),
+                    icon: (v) => ({components: {icon: !!v}}),
+                    image: (v) => ({components: {image: v}}),
                 },
                 components: {
                     icon: false,
@@ -65,6 +66,7 @@ export const NavLink = <T, E>(props: NavLinkProps<T&NavLinkScope, E>) : InferBlu
             href: () => observable(props.href || '#'),
             name: () => props.name,
             icon: () => props.icon,
+            image: () => props.image,
         },
         injections: {
             active: props.active$,

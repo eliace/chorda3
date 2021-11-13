@@ -1,4 +1,4 @@
-import { Blueprint, CallableEvents, InferBlueprint, isValueSet, mix, Observable, PublishFunc } from "@chorda/core"
+import { Blueprint, CallableEvents, computable, EventBus, InferBlueprint, isValueSet, mix, Observable, PublishFunc, spySetters } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 
 
@@ -14,13 +14,37 @@ export const isNull = (v: any) : boolean => {
 
 
 export const watch = <T>(f: PublishFunc<T>, objects: any[]) => {
-    for (let obj of objects) {
-        if (obj == null) {
-            throw Error('Watched object is null')
-        }
-        (obj as Observable<unknown>).$subscribe(() => f.apply(this, objects.map(o => o.$value)))
-//        (obj as Observable<unknown>).$subscribe(() => autoTerminalAware(f))
-    }
+
+
+    const all = computable(() => objects.map(o => o.$value))
+//    all.$touch({$publish: () => {}})
+    all.$subscribe(f as any)
+    
+    // const sub = {
+    //     subscribers: new Set<Observable<any>>(),
+    //     $publish: () => {
+    //         const setters = spySetters(() => {
+    //             f.apply(this, objects.map(o => o.$value))
+    //         })
+    //         setters.forEach(s => sub.subscribers.add(s))
+    //     },
+    //     get $subscriptions (): any[] {
+    //         const subscriptions = [] as any[]
+    //         sub.subscribers.forEach(subscriber => {
+    //             subscriptions.push({subscriber})
+    //         })
+    //         console.log('watch subscriptions', subscriptions)
+    //         return subscriptions
+    //     }
+    // }
+    
+//     for (let obj of objects) {
+//         if (obj == null) {
+//             throw Error('Watched object is null')
+//         }
+//         (obj as Observable<unknown>).$subscribe(sub)
+// //        (obj as Observable<unknown>).$subscribe(() => autoTerminalAware(f))
+//     }
 }
 
 
@@ -68,4 +92,25 @@ export const componentList = <T, E>(components: KeyedComponent<T, E>[]) : Record
 
 export type IteratorScope = {
     __it?: unknown[]
+}
+
+
+export const whenWait = <F extends (...args: any) => Promise<any>>(f: Function, src: EventBus<F>[]) => {
+    src.forEach(bus => {
+        bus.$on('wait', f)
+    })
+}
+
+export const whenDone = <F extends (...args: any) => Promise<R>, R>(f: (e: R) => void, src: EventBus<F>[]) => {
+    src.forEach(bus => {
+        bus.$on('done', f)
+    })
+}
+
+export const whenFail = <F extends (...args: any) => Promise<any>>(src: EventBus<F>, f: Function) => {
+    src.$on('fail', f)
+}
+
+export const whenFinal = <F extends (...args: any) => Promise<any>>(src: EventBus<F>, f: Function) => {
+    src.$on('final', f)
 }

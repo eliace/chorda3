@@ -24,13 +24,20 @@ export enum IsCheck {
     ARRAY,
 }
 
+export interface MethodDescriptor {
+    name: string
+    mutable: boolean
+}
+
 export interface ValueSet<T, K extends keyof T=keyof T> extends Value<T> {
     $at <K extends keyof T=keyof T>(key: K, factory?: Function): Value<T[K]>
     $has (key: ValueKey, check?: HasCheck) : boolean
     $ownKeys () : (string|symbol)[]
     $getOwnPropertyDescriptor (key: ValueKey) : object
 //    $each <I=T[K]>(f: (itm: ValueSet<I>) => void) : void
-    $is (check: IsCheck) : boolean
+    // $is (check: IsCheck) : boolean
+    $is (ctor: Function) : boolean
+//    $getMethodDescriptor (name: string) : MethodDescriptor
 }
 
 export interface ObservableValueSet<T> extends ObservableValue<T> {
@@ -39,7 +46,9 @@ export interface ObservableValueSet<T> extends ObservableValue<T> {
     $ownKeys () : (string|symbol)[]
     $getOwnPropertyDescriptor (key: ValueKey) : object
 //    $each <K extends keyof T=keyof T>(f: (itm: ObservableValueSet<T[K]>) => void) : void
-    $is (check: IsCheck) : boolean
+    // $is (check: IsCheck) : boolean
+    $is (ctor: Function) : boolean
+//    $getMethodDescriptor (name: string) : MethodDescriptor
 }
 
 
@@ -60,6 +69,7 @@ interface ValueNode<T> extends Value<T> {
 // Spies
 
 let _SpyGetters : Observable<any>[] = null
+let _SpySetters : Observable<any>[] = null
 
 // let _SpySubscriptions : Subscription[] = null
 
@@ -78,6 +88,15 @@ export const spyGetters = (fn: Function) : Observable<any>[] => {
     fn()
     const result = _SpyGetters
     _SpyGetters = prevGetters
+    return result
+}
+
+export const spySetters = (fn: Function) : Observable<any>[] => {
+    const prevSetters = _SpySetters
+    _SpySetters = []
+    fn()
+    const result = _SpySetters
+    _SpySetters = prevSetters
     return result
 }
 
@@ -111,7 +130,12 @@ export const isLastValue = (v: any) : boolean => {
     return false
 }
 
-
+export const isDestroyedValue = (v: any) : boolean => {
+    if (typeof (v as LifecycleProvider).$destroy === 'function') {
+        return v.$isDestroyed
+    }
+    return false
+}
 
 
 
@@ -224,6 +248,10 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
     }
 
     set $value (newValue: any) {
+
+        if (_SpySetters) {
+            _SpySetters.push(this)
+        }
 
         if (this._destroyed) {
             console.error('Value drop destroyed state', this)
@@ -600,6 +628,9 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
         if (this._initialized) {
             return this._memoValue
         }
+        if (this._destroyed) {
+            return undefined
+        }
         const v = this._source.$get() as any
         return v == null ? v : v[this._key]
 //        return this._initialized ? this._memoValue : (this._source.$get() as any)[this._key]
@@ -630,6 +661,10 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
         // FIXME здесь нужно каскадное обновление
 //        this.$update(UpdateDirection.DESC, undefined, this._memoValue, EMPTY)
 //        this._subscriptions.forEach(sub => sub.subscriber.$publish(undefined, this._memoValue, EMPTY))
+    }
+
+    get $isDestroyed () {
+        return this._destroyed
     }
 
     // get _inTransaction () : boolean {

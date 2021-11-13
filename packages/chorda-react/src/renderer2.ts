@@ -12,6 +12,7 @@ type RenderRoot = {
 
 export const EVENT_MAP : Keyed<string> = {
     click: 'onClick',
+    doubleClick: 'onDoubleClick',
     change: 'onChange',
     input: 'onInput',
     focus: 'onFocus',
@@ -137,6 +138,7 @@ export type ReactAttributes = Partial<{
 export type ReactDomEvents = {
     $dom: {
         click: () => React.MouseEvent
+        doubleClick: () => React.MouseEvent
         change: () => React.ChangeEvent
         input: () => React.FormEvent
         focus: () => React.FocusEvent

@@ -23,7 +23,7 @@ export default () : Infer.Blueprint<any> => {
     log.push(label.$value)
     
     firstName.$value = 'xxxxxxx'
-    firstName.$value = 'aaa'
+//    firstName.$value = 'aaa'
     
     log.push(label.$value)    
 

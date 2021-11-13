@@ -293,6 +293,7 @@ export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
                                         },
                                         events: {
                                             onBeforeLoad: (e, {url}) => {
+                                                console.log('image placeholder')
                                                 url.$value = IMAGE_PLACEHOLDER
                                             } 
                                         }

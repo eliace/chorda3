@@ -1,7 +1,9 @@
-import { InferBlueprint, observable } from "@chorda/core";
-import { Article } from "../api";
+import { callable, computable, InferBlueprint, observable } from "@chorda/core";
+import { api, Article } from "../api";
 import { TagList } from "../components";
 import { Block, Button, Column, Container, Fieldset, Form, FormGroup, Icon, Input, Row, Tag, Textarea } from "../elements";
+import { RouterScope } from "../router";
+import { ActionEventsOf } from "../utils";
 
 
 
@@ -11,14 +13,17 @@ type EditorScope = {
     isNew: boolean
     isPosting: boolean
     tags: string
-    postArticle: (article: Article) => void
+}
+
+type EditorActions = {
+    postArticle: (article: Article, tags: string) => Promise<Article>
     updateArticle: (slug: string, article: Article) => void
     deleteTag: (article: Article, tag: string) => void
 }
 
 
 
-export const EditorPage = () : InferBlueprint<EditorScope> => {
+export const EditorPage = () : InferBlueprint<EditorScope&RouterScope&EditorActions> => {
     return {
         css: 'editor-page',
         templates: {
@@ -81,10 +86,10 @@ export const EditorPage = () : InferBlueprint<EditorScope> => {
                                         }),
                                     ]
                                 }),
-                                onSubmit: (e, {isNew, postArticle, updateArticle, article}) => {
+                                onSubmit: (e, {isNew, postArticle, updateArticle, article, tags}) => {
                                     e.preventDefault()
                                     if (isNew.$value) {
-                                        postArticle(article)
+                                        postArticle(article, tags)
                                     }
                                     else {
                                         updateArticle(article.slug, article)
@@ -99,6 +104,35 @@ export const EditorPage = () : InferBlueprint<EditorScope> => {
         initials: {
             article: () => observable({} as Article),
             tags: () => observable(''),
-        }
+            isPosting: () => observable(false),
+            postArticle: () => callable((article, tags) => {
+                const articleToSave = {
+                    title: article.title,
+                    description: article.description,
+                    body: article.body,
+                    tagList: tags.split(',').map(s => s.trim()).filter(s => s.length > 0)//.concat(article.tagList)
+                }
+                return api.postArticle(articleToSave)
+            }),
+            updateArticle: () => callable(api.updateArticle),
+        },
+        injections: {
+            isNew: $ => computable(() => {
+                return $.route.route.params.slug == null
+            }),
+        },
+        joints: {
+            postingArticle: ({postArticle, isPosting}) => {
+
+                postArticle.$on('wait', () => {
+                    isPosting.$value = true
+                })
+
+                postArticle.$on('done', () => {
+                    isPosting.$value = false
+                })
+
+            }
+        },
     }
 }
