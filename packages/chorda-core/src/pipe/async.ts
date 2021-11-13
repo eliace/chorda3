@@ -1,4 +1,4 @@
-import { ownTaskFilter, Scheduler, subscriptionTaskFilter, Task, unknownTaskFilter } from "./utils";
+import { ownTaskFilter, Scheduler, subscriptionTaskFilter, Fiber, unknownTaskFilter } from "./utils";
 
 
 const avgTimeInterval = (t0: number, t1: number, total: number) => {
@@ -11,7 +11,7 @@ const log = (msg: string, ...data: any) => {
 
 
 
-export class AsyncEngine<T extends Task = Task> implements Scheduler<T> {
+export class AsyncEngine<T extends Fiber = Fiber> implements Scheduler<T> {
 
     tasks: T[]
     deferred: T[]
@@ -28,7 +28,7 @@ export class AsyncEngine<T extends Task = Task> implements Scheduler<T> {
         this.name = name || 'default'
     } 
 
-    publish(task: T): void {
+    queue(task: T): void {
 
         if (task.done) {
             return
@@ -51,7 +51,7 @@ export class AsyncEngine<T extends Task = Task> implements Scheduler<T> {
         this.subscriptions = this.subscriptions.filter(sub => sub != engine)
     }
 
-    task (fn: Function, arg?: any, target?: any) : Task {
+    fiber (fn: Function, arg?: any, target?: any) : Fiber {
         return {fn, arg, target, engine: this}
     }
 
@@ -73,7 +73,7 @@ export class AsyncEngine<T extends Task = Task> implements Scheduler<T> {
             let tasks = this.tasks
             this.tasks = []
 
-            this.deferred = this.deferred.concat(this.process(tasks))
+            this.deferred = this.deferred.concat(this.flush(tasks))
 
             // отправляем чужие задачи дальше по конвейеру
             if (this.tasks.length == 0) {
@@ -92,7 +92,7 @@ export class AsyncEngine<T extends Task = Task> implements Scheduler<T> {
         })
     }
 
-    process (tasks: T[]) : T[] {
+    flush (tasks: T[]) : T[] {
         return tasks.filter(ownTaskFilter(this))
     }
 

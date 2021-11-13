@@ -1,11 +1,11 @@
 import { State, Stateable } from "./Hub"
-import { AsyncEngine, ownTaskFilter, Scheduler, Task } from "./pipe"
+import { AsyncEngine, ownTaskFilter, Scheduler, Fiber } from "./pipe"
 
 
 
-export class DefaultPatcher extends AsyncEngine<Task<Stateable>> {
+export class DefaultPatcher extends AsyncEngine<Fiber<Stateable>> {
 
-    process (tasks: Task<Stateable>[]) : Task<Stateable>[] {
+    process (tasks: Fiber<Stateable>[]) : Fiber<Stateable>[] {
         return tasks.filter(task => {
             if (task.target && (task.target.state == State.Destroying || task.target.state == State.Destroyed)) {
                 //        deleted++
@@ -25,6 +25,6 @@ export class DefaultPatcher extends AsyncEngine<Task<Stateable>> {
 
 
 
-export const createAsyncPatcher = (name?: string) : Scheduler<Task<Stateable>> => {
+export const createAsyncPatcher = (name?: string) : Scheduler<Fiber<Stateable>> => {
     return new DefaultPatcher(name)
 }

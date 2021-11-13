@@ -1,4 +1,4 @@
-import { Pipe, Scheduler, Task, AsyncEngine, pipe } from '../src/pipe'
+import { Pipe, Scheduler, Fiber, AsyncEngine, pipe } from '../src/pipe'
 
 
 
@@ -35,7 +35,7 @@ class AsyncPatchEngine extends AsyncEngine {
 
 
 class AnimationRenderEngine extends AsyncPatchEngine {
-    publish(task: Task): void {
+    queue(task: Fiber): void {
         throw new Error('Method not implemented.')
     }
 }
@@ -61,14 +61,14 @@ describe ('Pipe', () => {
 
         engine.subscribe(engine2)
 
-        engine.publish(engine2.task(() => {
+        engine.queue(engine2.fiber(() => {
             console.log('end')
             done()
         }))
 
-        engine.publish(task(() => console.log('1')))
-        engine.publish(task(() => console.log('2')))
-        engine.publish(task(() => console.log('3')))
+        engine.queue(task(() => console.log('1')))
+        engine.queue(task(() => console.log('2')))
+        engine.queue(task(() => console.log('3')))
 
     })
 
@@ -82,8 +82,8 @@ describe ('Pipe', () => {
         pipe(engine, engine3)
 
         pipe(engine)
-            .push(engine2.task(() => console.log('2')))
-            .push(engine3.task(() => console.log('3')))
+            .push(engine2.fiber(() => console.log('2')))
+            .push(engine3.fiber(() => console.log('3')))
             .push(task(() => console.log('1')))
 
     })
@@ -94,7 +94,7 @@ describe ('Pipe', () => {
         const engine2 = new AsyncPatchEngine()
         const engine3 = new AsyncPatchEngine()
 
-        pipe(engine, engine2, engine3).push(engine3.task(() => {
+        pipe(engine, engine2, engine3).push(engine3.fiber(() => {
             console.log('end')
             done()
         }))

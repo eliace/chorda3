@@ -1,10 +1,10 @@
-import { ownTaskFilter, Scheduler, subscriptionTaskFilter, Task, unknownTaskFilter } from "./utils";
+import { ownTaskFilter, Scheduler, subscriptionTaskFilter, Fiber, unknownTaskFilter } from "./utils";
 
 
 
-export class BufferedEngine<T extends Task = Task> implements Scheduler<T> {
+export class BufferedEngine<T extends Fiber = Fiber> implements Scheduler<T> {
 
-    tasks: Task[]
+    tasks: Fiber[]
     subscriptions: Scheduler[]
     processing: boolean
 
@@ -14,7 +14,7 @@ export class BufferedEngine<T extends Task = Task> implements Scheduler<T> {
         this.processing = false
     } 
 
-    publish(task: T): void {
+    queue(task: T): void {
 
         if (task.done) {
             return
@@ -35,7 +35,7 @@ export class BufferedEngine<T extends Task = Task> implements Scheduler<T> {
         this.subscriptions = this.subscriptions.filter(sub => sub != engine)
     }
 
-    task (fn: Function, arg?: any, target?: any) : Task {
+    fiber (fn: Function, arg?: any, target?: any) : Fiber {
         return {fn, arg, target, engine: this}
     }
 

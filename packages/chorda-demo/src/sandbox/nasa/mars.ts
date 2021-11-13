@@ -152,7 +152,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                                                             myChart && myChart.destroy()
 
                                                             //requestAnimationFrame(() => {
-                                                            $patcher.publish($renderer.task(() => {
+                                                            $patcher.queue($renderer.fiber(() => {
                     
                                                                 //console.log(mission.photos.slice(0, 100).map(photo => photo.total_photos))
                     

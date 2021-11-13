@@ -220,7 +220,7 @@ export const App = () : HtmlBlueprint<AppScope> => {
                                     })
                                 },
                                 updateNetwork: ({$patcher, $renderer}) => {
-                                    $patcher.publish($renderer.task(() => {
+                                    $patcher.queue($renderer.fiber(() => {
                                         const data: vis.Data = buildHtmlTree()
                                         if (_network) {
                                             const nextPatch = () => {

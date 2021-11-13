@@ -1,6 +1,6 @@
 import { Value, EventBus, Subscription, ObservableValue, Handler, isEventBus, isObservable, noAutoTerminal, ValueIterator, ValueSet, autoTerminalAware, isAutoTerminal, Observable, Thenable, isCallable, spySubscriptions, isValueSet, isLastValue, isDestroyedValue } from './value'
 import { MixRules, mixin, Mixed } from './mix'
-import { ownTask, Pipe, Scheduler } from './pipe'
+import { fiber, Pipe, Scheduler } from './pipe'
 
 
 export type Scope = {
@@ -195,7 +195,7 @@ export type Keyed<T=unknown> = {
 let _PatchingHub : Hub<unknown, any> = undefined
 
 export const patch = (o: any) => {
-    _PatchingHub.scope.$patcher.publish(ownTask(_PatchingHub.patch, o, _PatchingHub))
+    _PatchingHub.scope.$patcher.queue(fiber(_PatchingHub.patch, o, _PatchingHub))
     console.warn('Explicit use of patch is obsolete')
     //_PatchingHub.scope.$pipe.push(ownTask(_PatchingHub.patch, o, _PatchingHub))
 }
@@ -536,7 +536,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
         this.state = State.Initializing
 
         // добавляем патч в очередь задач
-        this.scope.$patcher.publish(ownTask(this.patch, options, this))
+        this.scope.$patcher.queue(fiber(this.patch, options, this))
     }
 
     patch (optPatch: O) : void {
@@ -818,7 +818,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
                             // здесь скоуп должен быть доступен только для чтения
                             const patchOpts = binding(entry.$isTerminal ? next : entry, prev/*, this.scope*/)
                             if (patchOpts) {
-                                this.scope.$patcher.publish(ownTask(this.patch, patchOpts, this))
+                                this.scope.$patcher.queue(fiber(this.patch, patchOpts, this))
                                 // this.patchAware(() => {
                                 //     patch(patchOpts)
                                 // })()
@@ -832,7 +832,7 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
             else {
                 const patchOpts = binding(entry, undefined)
                 if (patchOpts) {
-                    this.scope.$patcher.publish(ownTask(this.patch, patchOpts, this))
+                    this.scope.$patcher.queue(fiber(this.patch, patchOpts, this))
                     // this.patchAware(() => {
                     //     patch(patchOpts)
                     // })()

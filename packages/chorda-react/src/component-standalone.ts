@@ -1,6 +1,6 @@
 import { Blueprint, buildHtmlContext, buildHtmlOptions, Html, Scheduler } from "@chorda/core"
 import * as React from "react"
-import { createReactRenderer } from "./renderer2"
+import { createReactRenderer } from "./renderer"
 
 
 type StandaloneProps = {

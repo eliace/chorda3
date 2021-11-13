@@ -189,7 +189,7 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
 //                debugger
                     // планируем перерисовку в свой такт (после всех патчей)
                     //html.scope.$engine.publish(html.scope.$renderer.task(null))
-                    html.scope.$pipe.push(html.scope.$renderer.task(null))
+                    html.scope.$pipe.push(html.scope.$renderer.fiber(null))
                     //                break
             }
             html = html.parent
@@ -300,11 +300,11 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
                     if (html.isRoot) {
                         if (this.state == State.Destroying) {
                             // отложенное удаление планируем в ближайший кадр, чтобы удаленный элемент как можно скорее пропал из VDOM
-                            html.scope.$renderer.publish(html.scope.$renderer.task(null))
+                            html.scope.$renderer.queue(html.scope.$renderer.fiber(null))
                         }
                         else {
                             // немедленное удаление синхронизируем с патчами, чтобы избежать "моргания"
-                            html.scope.$patcher.publish(html.scope.$renderer.task(null))
+                            html.scope.$patcher.queue(html.scope.$renderer.fiber(null))
                         }
         //                debugger
         //                break

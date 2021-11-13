@@ -1,4 +1,4 @@
-import { Blueprint, computable, HtmlScope, Infer, iterator, observable, ownTask, passthruLayout } from "@chorda/core"
+import { Blueprint, computable, HtmlScope, Infer, iterator, observable, fiber, passthruLayout } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import * as director from 'director'
 
@@ -225,7 +225,7 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
 
                                                     editing.$subscribe(next => {
                                                         if (next) {
-                                                            $patcher.publish($renderer.task(() => {
+                                                            $patcher.queue($renderer.fiber(() => {
                                                                 $dom.$value.focus()
                                                             }))
                                                             value.$value = todo.text

@@ -118,7 +118,7 @@ export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&
                                                 $dom.$value.scrollIntoView({block: 'nearest'})
                                             }
                                             else {
-                                                $patcher.publish($renderer.task(() => {
+                                                $patcher.queue($renderer.fiber(() => {
                                                     $dom.$value.scrollIntoView({block: 'nearest'})
                                                 }))
                                             }

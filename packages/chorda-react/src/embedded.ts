@@ -1,10 +1,10 @@
 import { Html, Renderer, Scheduler, VNodeFactory } from "@chorda/core";
-import { ReactRenderer2 } from ".";
+import { ReactRenderer } from "./renderer";
 
 
 
 
-class EmbeddedReactRenderer extends ReactRenderer2 {
+class EmbeddedReactRenderer extends ReactRenderer {
 
     _callback: Function
 

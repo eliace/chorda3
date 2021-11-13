@@ -1,4 +1,4 @@
-import { autoTerminalAware, Blueprint, callable, Callable, buildHtmlContext, buildHtmlOptions, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, ownTask, patch, pipe, PublishFunc, Scope, spyGetters, Value, createBasicRenderer } from "@chorda/core"
+import { autoTerminalAware, Blueprint, callable, Callable, buildHtmlContext, buildHtmlOptions, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, fiber, patch, pipe, PublishFunc, Scope, spyGetters, Value, createBasicRenderer } from "@chorda/core"
 import { createReactRenderer, ReactDomEvents } from "@chorda/react"
 import * as vis from "vis-network"
 import { App, routes } from "./App"
@@ -415,7 +415,7 @@ export const stopMouseDown: Joint<HtmlScope> = ({$dom}) => {
 export const autoFocus: Joint<HtmlScope&{autoFocus: boolean}> = ({$dom, $renderer}) => {
     $dom.$subscribe(el => {
         if (el) {
-            $renderer.publish(ownTask(() => {
+            $renderer.queue(fiber(() => {
                 el.focus()
             }))
         }

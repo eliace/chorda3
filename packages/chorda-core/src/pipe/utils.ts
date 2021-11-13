@@ -1,6 +1,6 @@
 
 
-export type Task<T=any> = {
+export type Fiber<T=any> = {
     key?: string
     fn: Function
     arg?: any
@@ -10,15 +10,15 @@ export type Task<T=any> = {
 }
 
 
-export interface Scheduler<T extends Task = Task> {
+export interface Scheduler<F extends Fiber = Fiber> {
 
-    publish (task: T) : void
+    queue (fiber: F) : void
 
     subscribe (engine: Scheduler) : boolean
     
     unsubscribe (engine: Scheduler) : void
 
-    task (fn: Function, arg?: any, target?: any) : Task
+    fiber (fn: Function, arg?: any, target?: any) : Fiber
 
     readonly isProcessing: boolean
 }
@@ -47,20 +47,20 @@ export interface Pipe {
     // - исполнить задачу прямо сейчас в указанном планировщике или добавить в конвейер
 
     // добавляем задачу в начало конвейера
-    push (task: Task) : Pipe
+    push (fiber: Fiber) : Pipe
     // исполняем задачу в ближайший тик планировщика
-    asap (task: Task) : Pipe
+    asap (fiber: Fiber) : Pipe
 }
 
 
-export const ownTask = (fn: Function, arg?: any, target?: any) => {
+export const fiber = (fn: Function, arg?: any, target?: any) => {
     return {fn, arg, target}
 }
 
 
 
 
-export const ownTaskFilter = (owner: Scheduler) => (task: Task) => {
+export const ownTaskFilter = (owner: Scheduler) => (task: Fiber) => {
     if (!task.engine || task.engine == owner) {
 //        console.log('task', task.arg, task.target)
         // исполняем задачу
@@ -72,18 +72,18 @@ export const ownTaskFilter = (owner: Scheduler) => (task: Task) => {
     }
 }
 
-export const subscriptionTaskFilter = (subscriptions: Scheduler[]) => (task: Task) => {
+export const subscriptionTaskFilter = (subscriptions: Scheduler[]) => (task: Fiber) => {
     const engine = subscriptions.find((sub) => sub == task.engine)
     if (engine) {
-        engine.publish(task)
+        engine.queue(task)
     }
     else {
         return true
     }
 }
 
-export const unknownTaskFilter = (subscriptions: Scheduler[]) => (task: Task) => {
+export const unknownTaskFilter = (subscriptions: Scheduler[]) => (task: Fiber) => {
     subscriptions.forEach(sub => {
-        sub.publish(task)
+        sub.queue(task)
     })
 }

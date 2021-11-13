@@ -32,7 +32,7 @@ export const withDetectListBounds = <T>(props?: Blueprint<T&BoundsScope>) : Infe
 
                 const detect = () => {
                     if ($dom.$value /*&& __it.$value.length > 0*/) {
-                        $patcher.publish($renderer.task(() => {
+                        $patcher.queue($renderer.fiber(() => {
                             bounds.$value = $dom.$value.getBoundingClientRect()
                         }))
                     }

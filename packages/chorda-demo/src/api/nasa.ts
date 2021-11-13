@@ -11,13 +11,13 @@ import axios from "axios"
  */
 
 const API_KEY = 'rt4vY3GxQ5sphrVit5elLXDPjPNtjz38cPVf0JMS'
-//const BASE_URL = 'https://api.nasa.gov/mars-photos/api/v1'
+const BASE_URL = 'https://api.nasa.gov/mars-photos/api/v1'
 
 
 const marsRest = axios.create({
-    // baseURL: BASE_URL,
-    // params: {api_key: API_KEY}
-    baseURL: 'https://mars-photos.herokuapp.com/',
+    baseURL: BASE_URL,
+    params: {api_key: API_KEY}
+//    baseURL: 'https://mars-photos.herokuapp.com/',
 })
 
 const imagesRest = axios.create({

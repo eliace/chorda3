@@ -108,7 +108,7 @@ export default <T>() : Infer.Blueprint<T> => {
                                 updateBounds: ({$dom, bounds, active, $patcher, $renderer}) => {
                                     watch(() => {
                                         if ($dom.$value /*&& active.$value*/) {
-                                            $patcher.publish($renderer.task(() => {
+                                            $patcher.queue($renderer.fiber(() => {
                                                 const prevDisplay = $dom.$value.style.display
                                                 $dom.$value.style.display = 'block'
                                                 bounds.$value = $dom.$value.getBoundingClientRect()

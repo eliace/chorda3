@@ -24,7 +24,7 @@ export const EVENT_MAP : Keyed<string> = {
 
 
 
-export class ReactRenderer2 extends AsyncEngine implements Renderer, VNodeFactory {
+export class ReactRenderer extends AsyncEngine implements Renderer, VNodeFactory {
 
     roots: RenderRoot[]
 
@@ -120,7 +120,7 @@ const domMap = new WeakMap<any, Function>()
 
 
 export const createReactRenderer = () : Scheduler&Renderer&VNodeFactory => {
-    return new ReactRenderer2()
+    return new ReactRenderer()
 }
 
 
