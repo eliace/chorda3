@@ -56,7 +56,7 @@ export const TextInput = <T, E>(props: TextInputProps<T&TextInputScope, E>) : In
             onBlur: props.onBlur,
             onEsc: props.onEsc,
         },
-        initials: {
+        defaults: {
             value: () => observable(props.value || ''),
             onInput: () => callable(null),
             onFocus: () => callable(null),

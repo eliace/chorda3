@@ -18,7 +18,7 @@ export type AuthActions = {
 
 export const withAuth = <T, E>(props: Blueprint<T&AuthScope&AuthActions, E>) : InferBlueprint<T, E> => {
     return mix<AuthScope&AuthActions, ActionEventsOf<AuthActions>>({
-        initials: {
+        defaults: {
             login: () => callable(null),
             register: () => callable(null),
             logout: () => callable(null),

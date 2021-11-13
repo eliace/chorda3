@@ -63,7 +63,7 @@ export const Slider = <T, E>(props: SliderProps<T&SliderScope, E>) : InferBluepr
                 }
             }
         },
-        initials: {
+        defaults: {
             value: () => observable(props.value),
             min: () => observable(props.min),
             max: () => observable(props.max),

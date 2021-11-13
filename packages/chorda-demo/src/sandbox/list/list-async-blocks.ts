@@ -77,7 +77,7 @@ export default <T>() : HtmlBlueprint<T> => {
             ]
         }),
         Coerced<LazyScrollScope<Tmdb.Movie>&HtmlScope>({
-            initials: {
+            defaults: {
                 lazyPages: () => observable([]),
                 intersectionObserver: () => observable(null),
                 avgHeight: () => observable(0),
@@ -271,7 +271,7 @@ export default <T>() : HtmlBlueprint<T> => {
 /*
         withDetectListBounds(withWatchScroll(DynamicList<LazyPage<Tmdb.Movie>[], MoviesScope&LazyScrollScope<Tmdb.Movie>&HtmlScope&WatchScrollScope&BoundsScope>({
             as: {
-                initials: {
+                defaults: {
                     lazyPages: () => observable([]),
                     intersectionObserver: () => observable(null),
                     // loadPage: () => observable((page: number) => {

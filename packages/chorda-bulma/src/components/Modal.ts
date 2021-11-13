@@ -62,7 +62,7 @@ export const Modal = <T, E>(props: ModalProps<T&ModalScope, E>) : InferBlueprint
                 }
             }
         },
-        initials: {
+        defaults: {
             active: () => observable(props.active)
         },
         injections: {

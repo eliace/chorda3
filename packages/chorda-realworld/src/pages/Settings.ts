@@ -99,7 +99,7 @@ export const SettingsPage = () : InferBlueprint<SettingsScope&AppScope&AuthScope
                 ])
             })
         },
-        initials: {
+        defaults: {
             settings: () => observable({} as any)
         },
         joints: {

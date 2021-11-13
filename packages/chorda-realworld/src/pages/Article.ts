@@ -214,7 +214,7 @@ export const ArticlePage = () : InferBlueprint<ArticleScope&AppScope&RouterScope
                 },
             })
         },
-        initials: {
+        defaults: {
             article: () => observable({author: {}} as Article),
             comments: () => observable(null),
         },

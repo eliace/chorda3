@@ -35,7 +35,7 @@ export const withInfiniteScroll = <T, E>(props: HtmlBlueprint<T&InfiniteScrollSc
     }
 
     return mix<InfiniteScrollScope&HtmlScope>({
-        initials: {
+        defaults: {
             infiniteScroll: () => observable({
                 intersectionObserver: null,
                 observableItems: new Map(),

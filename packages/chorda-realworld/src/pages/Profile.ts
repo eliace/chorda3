@@ -138,7 +138,7 @@ export const ProfilePage = () : InferBlueprint<ProfileScope&AuthScope> => {
                 ])
             })
         },
-        initials: {
+        defaults: {
             profile: () => observable({} as Profile),
             articles: () => observable([]),
             selectedGroup: () => observable('my'),

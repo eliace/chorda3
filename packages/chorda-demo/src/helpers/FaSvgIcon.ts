@@ -64,7 +64,7 @@ export const FaSvgIcon = <T, E>(props: FaSvgIconProps<T&FaSvgIconScope>) : Infer
             tooltip: (v) => ({dom: {title: v}})
         }
     }, props && {
-        initials: {
+        defaults: {
             data: () => observable(props.icon)
         },
         injections: {

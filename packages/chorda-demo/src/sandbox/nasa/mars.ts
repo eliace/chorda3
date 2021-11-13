@@ -350,7 +350,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                 active$: $ => $.modal,
             })
         },
-        initials: {
+        defaults: {
             modal: () => observable(false),
             roverImageUrl: () => observable(null),
             rover: () => observable(Nasa.Rovers.Curiosity),

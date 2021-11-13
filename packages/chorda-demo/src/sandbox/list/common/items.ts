@@ -76,7 +76,7 @@ export const MovieListItem = <I, T=IteratorScope<Tmdb.Movie[]>>(props: MovieList
         ])),
         props?.as,
         props && {
-            initials: {
+            defaults: {
                 noOriginalTitle: () => observable(null),
                 noPoster: () => observable(null),
             },

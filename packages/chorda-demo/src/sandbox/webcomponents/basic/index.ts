@@ -50,7 +50,7 @@ export default () : Infer.Blueprint<any> => {
         reactions: {
             toggle: v => ({dom: {active: v}})
         },
-        initials: {
+        defaults: {
             toggle: () => observable(false)
         }
         // items: [

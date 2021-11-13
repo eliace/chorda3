@@ -27,7 +27,7 @@ export const Input = <T, E>(props: InputProps<T&InputScope>) : InferBlueprint<T,
             type: props.type,
             placeholder: props.placeholder,
         },
-        initials: {
+        defaults: {
             value: () => observable('')
         },
         injections: {

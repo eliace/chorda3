@@ -185,7 +185,7 @@ export default <T>() : Infer.Blueprint<T> => {
                             ({classes: {'is-active': v}, components: {menu: v}})
                         },
                     },
-                    initials: {
+                    defaults: {
                         parentScrollTop: () => observable(0)
                     },
                     joints: {

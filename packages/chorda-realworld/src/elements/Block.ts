@@ -42,7 +42,7 @@ export const Block = <T>(props: BlockPropsType<unknown, T>) : InferBlueprint<T> 
             },
             items: props.items,
             defaultItem: props.itemAs,
-            initials: {
+            defaults: {
                 addons: () => observable(null),
             },
             injections: {

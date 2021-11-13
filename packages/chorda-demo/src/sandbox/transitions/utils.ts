@@ -156,7 +156,7 @@ type FLIPScope = {
 
 export const withFLIP = <T, E>(props: Blueprint<T&FLIPScope, E>) : InferBlueprint<T, E> => {
     return mix<HtmlScope&FLIPScope>({
-        initials: {
+        defaults: {
             flip: () => callable(null)
         },
         joints: {

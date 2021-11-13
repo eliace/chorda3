@@ -245,7 +245,7 @@ export const DropdownOld = <I, V=I, T=unknown>(props: DropdownOldProps<T&Dropdow
     },
     props?.as, 
     props && {
-        initials: {
+        defaults: {
             value: () => observable(null),
             selected: () => observable(null),
             items: () => observable([]),
@@ -448,7 +448,7 @@ export const DropdownOldItem = <I, V=I, T=DropdownOldScope<I, V>>(props: Dropdow
             }
         }
     }, {
-        initials: {
+        defaults: {
             item: (scope) => scope.__it,
             offset: () => observable(null),
             text: () => observable(null),

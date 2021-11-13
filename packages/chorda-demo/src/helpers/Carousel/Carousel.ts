@@ -106,7 +106,7 @@ export const Carousel = <T>(props: CarouselProps<T&CarouselScope>) : InferBluepr
             },
             title: props.title
         },
-        initials: {
+        defaults: {
             images: () => observable([]),
             current: () => observable(props.current || 0),
 //            slides: () => observable([]),

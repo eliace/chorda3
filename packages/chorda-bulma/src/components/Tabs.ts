@@ -92,7 +92,7 @@ export const Tabs = <T extends Scope>(props: TabsProps<T&TabsScope>) : HtmlBluep
         injections: {
             tabs: props.tabs$
         },
-        initials: {
+        defaults: {
             tabs: () => null
         },
         templates: {

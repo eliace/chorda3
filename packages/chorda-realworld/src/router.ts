@@ -23,7 +23,7 @@ export type RouterScope = {
 
 export const withRouter = <T, E>(props: Blueprint<T&RouterScope, E>, routes: Route<Record<string, any>>[]) : InferBlueprint<T, E> => {
     return mix<RouterScope>({
-        initials: {
+        defaults: {
             route: () => observable(null),
             navigate: () => callable(null),
         },

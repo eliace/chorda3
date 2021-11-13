@@ -9,7 +9,7 @@ type ParentScrollScope = {
 
 export const withParentScrollTop = <T>(props: Blueprint<T&ParentScrollScope>) : InferBlueprint<T> => {
     return mix<ParentScrollScope&HtmlScope>({
-        initials: {
+        defaults: {
             parentScrollTop: () => observable(null)
         },
         joints: {

@@ -32,7 +32,7 @@ export const Lazy = <T>(props: LazyComponentProps<T&LazyScope>) : Infer.Blueprin
                 fallback: !v
             }})
         },
-        initials: {
+        defaults: {
             lazyComponent: () => observable(null),
             isLazyLoad: () => observable(false),
         },

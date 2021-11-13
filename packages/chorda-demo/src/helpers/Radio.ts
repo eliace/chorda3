@@ -71,7 +71,7 @@ export const Radio = <T, E>(props: RadioProps<T&RadioScope, E>) : InferBlueprint
                 }
             }
         },
-        initials: {
+        defaults: {
             value: () => observable(props.value),
             name: () => props.name,
         },

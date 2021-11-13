@@ -18,7 +18,7 @@ export const Addon = <T>(props: AddonProps<T&AddonScope>): InferBlueprint<T> => 
         templates: {
             content: props.content
         },
-        initials: {
+        defaults: {
             name: () => props.name
         }
     })

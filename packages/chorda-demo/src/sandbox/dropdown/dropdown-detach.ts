@@ -46,7 +46,7 @@ export default () : Infer.Blueprint<Scope> => {
                         trigger: true,
                         menu: false
                     },
-                    initials: {
+                    defaults: {
                         lazyComponents: () => observable({} as any),
                     },
                     reactions: {

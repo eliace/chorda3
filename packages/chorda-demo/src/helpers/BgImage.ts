@@ -37,7 +37,7 @@ export const BgImage = <T, E>(props: BgImageProps<T&BgImageScope, E>) : HtmlBlue
         injections: {
             url: props.url$
         },
-        initials: {
+        defaults: {
             url: () => observable(props.url)
         },
         styles: {

@@ -148,7 +148,7 @@ export interface HubOptions<D, E, B extends HubBlueprint<D, E>=HubBlueprint<D, E
     // кастомизация скоупа
     joints?: Joints<D>
     // инжекторы по умолчанию
-    initials?: Injectors<D>
+    defaults?: Injectors<D>
     // инициализация скоупа
     init?: () => {[P in keyof D]?: D[P]}
 
@@ -420,11 +420,11 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
                         isInjected = true
 //                            return target[p]
                     }
-                }    
+                }
 
 
-                if (!isInjected && prop < PropState.Default && this.options.initials) {
-                    const injector: Injector<any, any> = (this.options.initials as any)[p]
+                if (!isInjected && prop < PropState.Default && this.options.defaults) {
+                    const injector: Injector<any, any> = (this.options.defaults as any)[p]
                     if (injector !== undefined) {
                         if (typeof injector === 'function') {
                             _InjectProps[String(p)] = PropState.Default

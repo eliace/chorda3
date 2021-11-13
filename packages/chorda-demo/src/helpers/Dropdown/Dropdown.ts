@@ -148,7 +148,7 @@ export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&
     },
     props?.as,
     props && withStopMouseDown(withBounds(withOuterKeydown({
-        initials: {
+        defaults: {
             value: () => observable(null),
             selected: () => observable(null),
             items: () => observable([]),

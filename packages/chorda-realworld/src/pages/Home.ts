@@ -197,7 +197,7 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope&HomeActions
                 })
             })
         },
-        initials: {
+        defaults: {
             tags: () => observable({
                 list: [],
                 fetching: false

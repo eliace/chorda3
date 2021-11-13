@@ -22,7 +22,7 @@ type AuthScope = {
 
 export const AuthPage = () : Infer.Blueprint<AuthScope&AuthActions&AppScope&RouterScope, ActionEventsOf<AuthActions>> => {
     return {
-        initials: {
+        defaults: {
             email: () => observable(''),
             password: () => observable(''),
             username: () => observable(''),

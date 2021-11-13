@@ -91,7 +91,7 @@ export const ArticlePreview = <T, E>(props: ArticlePropsType<T, E>) : InferBluep
         events: {
             onFavorite: props.onFavorite
         },
-        initials: {
+        defaults: {
             onFavorite: () => callable(null),
         }
     })

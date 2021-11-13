@@ -95,7 +95,7 @@ type AsyncImageLoadActions = {
 
 const withAsyncImageLoad = <T, E>(props: Blueprint<T&AsyncImageLoadScope, E&AsyncImageLoadActions>) : InferBlueprint<T, E> => {
     return mix<AsyncImageLoadScope>({
-        initials: {
+        defaults: {
             onBeforeLoad: () => callable(null)
         },
         joints: {
@@ -150,7 +150,7 @@ const FavouriteButton = <T, E>(props: FavouriteButtonProps<T&FavouriteScope, E>)
 
 export const Search = () : HtmlBlueprint<SearchScope, SearchEvents> => {
     return {
-        initials: {
+        defaults: {
             orderId: () => observable('random'),
             typeId: () => observable('all'),
             categoryId: () => observable(null),

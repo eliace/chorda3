@@ -39,7 +39,7 @@ export const DropdownItem = <T, E>(props: DropdownItemPropsType<any, T>) : Infer
             isCurrent: (v) => ({classes: {'is-current': v}}),
         }
     }, {
-        initials: {
+        defaults: {
 //            offsetTop: () => observable(null),
             text: () => observable(null),
 //            currentOffsetTop: () => observable(null),

@@ -61,7 +61,7 @@ export const NavLink = <T, E>(props: NavLinkProps<T&NavLinkScope, E>) : InferBlu
     },
     props?.as,
     props && {
-        initials: {
+        defaults: {
             text: () => observable(props.text),
             href: () => observable(props.href || '#'),
             name: () => props.name,

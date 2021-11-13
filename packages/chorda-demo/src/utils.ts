@@ -363,7 +363,7 @@ export const onOuterClick: Joint<HtmlScope> = ({$dom}) => {
 
 export const withOuterClick = <T, E>(props: Blueprint<T&OuterClickScope, E&OuterClickEvents>) : InferBlueprint<T, E> => {
     return mix<OuterClickScope>({
-        initials: {
+        defaults: {
             onOuterClick: () => callable(null)
         },
         joints: {
@@ -429,7 +429,7 @@ export type BoundsScope = {
 
 export const withBounds = <T, E>(props: Blueprint<T&BoundsScope, E>) : InferBlueprint<T, E> => {
     return mix<BoundsScope&HtmlScope>({
-        initials: {
+        defaults: {
             bounds: () => observable(null),
         },
         joints: {
@@ -460,7 +460,7 @@ export type KeydownActions = {
 
 export const withOuterKeydown = <T, E>(props: Blueprint<T&KeydownActions, E&KeydownActions>) : InferBlueprint<T, E> => {
     return mix<KeydownActions>({
-        initials: {
+        defaults: {
             onOuterKeyDown: () => callable(null)
         },
         joints: {

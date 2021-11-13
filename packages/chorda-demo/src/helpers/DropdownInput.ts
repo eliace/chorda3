@@ -53,7 +53,7 @@ export const DropdownInput = <T, E, I=MenuItem>(props: DropdownInputPropsType<I,
                     }),
                 }), props.trigger)
             },
-            initials: {
+            defaults: {
                 focused: () => observable(false)
             },
             joints: {

@@ -11,7 +11,7 @@ const renderer = createReactRenderer()
 
 export const withReact = <T, E>(props: Blueprint<T, E>) : InferBlueprint<T, E> => {
     return mix<ReactScope&HtmlScope, HtmlEvents>({
-        initials: {
+        defaults: {
             preactRoot: () => observable(null),
             $renderer: () => renderer,
         },

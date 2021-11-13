@@ -99,7 +99,7 @@ export const Breadcrumbs = <T, E>(props: BreadcrumbsProps<T&BreadcrumbsScope, E>
             }
         }
     }, {
-        initials: {
+        defaults: {
             items: () => props.items && observable(props.items),
             items2: () => null,
         },

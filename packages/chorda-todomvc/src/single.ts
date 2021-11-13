@@ -245,7 +245,7 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
                                         todo: v => ({classes: {completed: (v && v.completed) || false}}), // FIXME
                                         editing: v => ({classes: {editing: v}})
                                     },
-                                    initials: {
+                                    defaults: {
                                         editing: () => observable(false),
                                         value: () => observable(''),
                                     },
@@ -292,7 +292,7 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
                                             }
                                         }
                                     },
-                                    initials: {
+                                    defaults: {
                                         selected: $ => computable(() => {
                                             return $.router.route == $.name
                                         })
@@ -306,7 +306,7 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
                                                 text: 'All'
                                             }
                                         },
-                                        initials: {
+                                        defaults: {
                                             name: () => 'all'
                                         }
                                     },
@@ -317,7 +317,7 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
                                                 text: 'Active'
                                             }
                                         },
-                                        initials: {
+                                        defaults: {
                                             name: () => 'active'
                                         }
                                     },
@@ -328,7 +328,7 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
                                                 text: 'Completed'
                                             }
                                         },
-                                        initials: {
+                                        defaults: {
                                             name: () => 'completed'
                                         }
                                     },
@@ -391,7 +391,7 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
         //         todos,
         //     }
         // },
-        initials: {
+        defaults: {
             router: () => useRouter(),
             store: () => useLocalStore(),
             newTodo: () => observable(''),

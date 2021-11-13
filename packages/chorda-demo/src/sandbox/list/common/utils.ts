@@ -24,7 +24,7 @@ export type BoundsScope = {
 
 export const withDetectListBounds = <T>(props?: Blueprint<T&BoundsScope>) : Infer.Blueprint<T> => {
     return mix<BoundsScope&HtmlScope&IteratorScope<any>>({
-        initials: {
+        defaults: {
             bounds: () => observable(null),
         },
         joints: {
@@ -54,7 +54,7 @@ export type WatchScrollScope = {
 
 export const withWatchScroll = <T>(props?: HtmlBlueprint<T&WatchScrollScope>) : HtmlBlueprint<T> => {
     return mix<WatchScrollScope&HtmlScope>({
-        initials: {
+        defaults: {
             scrollTop: () => observable(0),
         },
         joints: {

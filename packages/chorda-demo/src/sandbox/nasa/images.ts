@@ -57,7 +57,7 @@ export const Images = () : InferBlueprint<ImagesScope> => {
                 }
             }
         },
-        initials: {
+        defaults: {
             query: () => observable('soyuz'),
             collection: () => observable(null),
             page: () => observable(1),

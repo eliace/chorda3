@@ -11,7 +11,7 @@ const renderer = createPreactRenderer()
 
 export const withPreact = <T, E>(props: Blueprint<T, E>) : InferBlueprint<T, E> => {
     return mix<PreactScope&HtmlScope, HtmlEvents>({
-        initials: {
+        defaults: {
             preactRoot: () => observable(null),
             $renderer: () => renderer,
         },

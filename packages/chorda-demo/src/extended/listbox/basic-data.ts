@@ -27,7 +27,7 @@ export default () : HtmlBlueprint => {
             reactions: {
                 data: (v) => ({items: iterator(v, 'data')})
             },
-            initials: {
+            defaults: {
                 data: () => users// iterable(users, 'data')
             }
         })

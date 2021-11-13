@@ -85,7 +85,7 @@ export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : HtmlBluepri
             icon: props.icon,
             content: (!!props.leftIcon || !!props.rightIcon),
         },
-        initials: {
+        defaults: {
             color: () => observable(props.color),
             active: () => observable(props.active),
             text: () => observable(props.text),

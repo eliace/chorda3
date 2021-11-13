@@ -48,7 +48,7 @@ export const NasaExample = () : InferBlueprint<{selected: string}> => {
                 }
             }
         ],
-        initials: {
+        defaults: {
             selected: () => observable('apod')
         }
     })

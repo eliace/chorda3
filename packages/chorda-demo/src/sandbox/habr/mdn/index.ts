@@ -56,7 +56,7 @@ export default () : Infer.Blueprint<MdnSearchScope&ExampleScope&ExampleActions, 
                 },
             },
         },
-        initials: {
+        defaults: {
             query: () => observable(''),
             flex: () => new Index({ tokenize: 'forward' }),
             db: () => observable([]),

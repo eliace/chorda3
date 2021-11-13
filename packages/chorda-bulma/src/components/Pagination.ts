@@ -69,7 +69,7 @@ export const Pagination = <T, E>(props: PaginationProps<T, E>) : InferBlueprint<
     }, 
     props?.as,
     props && {
-        initials: {
+        defaults: {
             maxPages: () => observable(props.maxPages),
             current: () => observable(1),
         },

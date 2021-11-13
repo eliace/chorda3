@@ -5,7 +5,7 @@ import { DropdownScope } from "../../../helpers"
 
 export const withMultiselect = <T, E>(blueprint: Blueprint<T, E>) : InferBlueprint<T, E> => {
     return mix<DropdownScope<any[]>>(blueprint, {
-        initials: {
+        defaults: {
             selected: () => observable([]),
         },
         injections: {

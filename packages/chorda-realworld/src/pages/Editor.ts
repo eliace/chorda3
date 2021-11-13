@@ -101,7 +101,7 @@ export const EditorPage = () : InferBlueprint<EditorScope&RouterScope&EditorActi
                 })
             })
         },
-        initials: {
+        defaults: {
             article: () => observable({} as Article),
             tags: () => observable(''),
             isPosting: () => observable(false),

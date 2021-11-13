@@ -43,7 +43,7 @@ export const Button = <T, E>(props: ButtonProps<T&ButtonScope, E>) : InferBluepr
         css: props.css,
         text: props.text,
         weight: props.order,
-        initials: {
+        defaults: {
             addons: () => observable(null),
             disabled: () => observable(null),
         },

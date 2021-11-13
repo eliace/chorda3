@@ -11,7 +11,7 @@ const renderer = createInfernoRenderer()
 
 export const withInferno = <T, E>(props: Blueprint<T, E>) : InferBlueprint<T, E> => {
     return mix<InfernoScope&HtmlScope, HtmlEvents>({
-        initials: {
+        defaults: {
             infernoRoot: () => observable(null),
 //            parentEl: () => observable(null),
 //            $engine: () => patcher,

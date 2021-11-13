@@ -1,4 +1,4 @@
-import { HtmlBlueprint, InferBlueprint, mix } from "@chorda/core"
+import { Blueprint, HtmlBlueprint, InferBlueprint, mix, observable } from "@chorda/core"
 
 
 
@@ -28,7 +28,7 @@ export const CardHeader = <T>(props: CardHeaderProps<T>) : InferBlueprint<T> => 
             title: {
                 text: props.title
             },
-            icon: props.icon
+            icon: props.icon || false
         }
     }
 }
@@ -38,7 +38,7 @@ export const CardHeader = <T>(props: CardHeaderProps<T>) : InferBlueprint<T> => 
 type CardScope = {
     model: {
         title: string
-        titleIcon: string
+        titleIcon: Blueprint<unknown>
     }
 }
 
@@ -117,6 +117,12 @@ export const Card = <T>(props: CardProps<T&CardScope>) : InferBlueprint<T> => {
                 }
             }
         },
+        // defaults: {
+        //     model: () => observable({
+        //         title: '',
+        //         titleIcon: false
+        //     })
+        // }
         // scope: {
         //     model: () => observable(props)
         // }

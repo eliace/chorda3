@@ -70,7 +70,7 @@ export const FaIcon = <T>(props: FaIconProps<T&DataScope<string>, ReactDomEvents
     },
     props?.as,
     props && {
-        initials: {
+        defaults: {
             data: () => observable(props.icon)
         },
         injections: {

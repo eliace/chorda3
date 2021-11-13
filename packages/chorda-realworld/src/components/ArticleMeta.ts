@@ -57,7 +57,7 @@ export const ArticleMeta = <T, E>(props: ArticleMetaPropsType<T, E>) : InferBlue
         templates: {
             ...props.addons
         },
-        initials: {
+        defaults: {
             article: () => observable(null)
         },
         injections: {
