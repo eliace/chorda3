@@ -1,5 +1,12 @@
 import axios from "axios"
 
+/**
+ * 
+ * CatAPI
+ * 
+ * https://thecatapi.com
+ * 
+ */
 
 export namespace CatApi {
 

@@ -62,9 +62,15 @@ const config = {
             position: 'right'
           },
           {
-            href: 'https://chorda-demo.netlify.app/#/elements/box', 
-            label: 'Demo', 
-            position: 'right'
+            label: 'Demo',
+            position: 'right',
+            items: [{
+              href: 'https://chorda-demo.netlify.app/#/elements/box',
+              label: 'Examples', 
+            }, {
+              href: 'https://chorda-todomvc.netlify.app',
+              label: 'TodoMVC', 
+            }]
           },
           {
             href: 'https://github.com/eliace/chorda3',

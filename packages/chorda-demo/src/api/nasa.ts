@@ -1,11 +1,23 @@
 import axios from "axios"
 
-const API_KEY = 'rt4vY3GxQ5sphrVit5elLXDPjPNtjz38cPVf0JMS'
-const BASE_URL = 'https://api.nasa.gov/mars-photos/api/v1'
+/**
+ * 
+ * NASA API
+ * 
+ * https://api.nasa.gov
+ * https://github.com/nasa/apod-api
+ * https://github.com/chrisccerami/mars-photo-api
+ * 
+ */
 
-const rest = axios.create({
-    baseURL: BASE_URL,
-    params: {api_key: API_KEY}
+const API_KEY = 'rt4vY3GxQ5sphrVit5elLXDPjPNtjz38cPVf0JMS'
+//const BASE_URL = 'https://api.nasa.gov/mars-photos/api/v1'
+
+
+const marsRest = axios.create({
+    // baseURL: BASE_URL,
+    // params: {api_key: API_KEY}
+    baseURL: 'https://mars-photos.herokuapp.com/',
 })
 
 const imagesRest = axios.create({
@@ -74,10 +86,10 @@ export namespace Nasa {
     export const api = {
         mars: {
             getRoverPhotos: (rover: Rovers, sol: number, page?: number, camera?: string) : Promise<{photos: Photo[]}> => {
-                return rest.get(`/rovers/${rover}/photos?`, {params: {sol, page, camera}}).then(response => response.data)
+                return marsRest.get(`/rovers/${rover}/photos?`, {params: {sol, page, camera}}).then(response => response.data)
             },
             getMission: (rover: Rovers) : Promise<{photo_manifest: Mission}> => {
-                return rest.get(`/manifests/${rover}`).then(response => response.data)
+                return marsRest.get(`/manifests/${rover}`).then(response => response.data)
             }
         },
         images: {

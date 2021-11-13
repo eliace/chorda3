@@ -1,5 +1,12 @@
 import axios from "axios";
 
+/**
+ * NHL API
+ * 
+ * https://gitlab.com/dword4/nhlapi
+ * 
+ */
+
 const rest = axios.create({
     baseURL: 'https://statsapi.web.nhl.com/api/v1',
     headers: {}
