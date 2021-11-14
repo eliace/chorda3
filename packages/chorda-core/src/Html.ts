@@ -107,6 +107,10 @@ export class Html<D=unknown, E=unknown, H=any, S extends HtmlScope=HtmlScope, O 
     patch (optPatch: O) {
         super.patch(optPatch)
 
+        // if (this.state == State.Destroying || this.state == State.Destroyed) {
+        //     return
+        // }
+
         const o = this.options
 
         // TODO

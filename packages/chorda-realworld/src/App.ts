@@ -1,11 +1,11 @@
-import { callable, CallableEvents, computable, InferBlueprint } from "@chorda/core";
+import { callable, CallableEvents, computable, InferBlueprint, observable, watch } from "@chorda/core";
 import { Route } from "router5";
 import { api, User } from "./api";
 import { withAuth } from "./auth";
 import { Footer, Header } from "./components";
 import { ArticlePage, AuthPage, EditorPage, Home, ProfilePage, SettingsPage } from "./pages";
 import { Pages, withRouter } from "./router";
-import { isNull, watch } from "./utils";
+import { isNull } from "./utils";
 
 
 export type AppScope = {
@@ -19,9 +19,6 @@ export type AppScope = {
         profile: boolean
     }>
 }
-
-
-
 
 
 // type Action<E extends (...args: any) => any> = CallableEvents<ReturnType<E>>
@@ -72,6 +69,7 @@ export default () : InferBlueprint<AppScope> => {
                 const route = $.route.route.name
                 return {
                     header: true,
+                    footer: true,
                     home: route == Pages.Home,
                     signIn: route == Pages.SignIn,
                     signUp: route == Pages.SignUp,
@@ -96,16 +94,17 @@ export default () : InferBlueprint<AppScope> => {
             settings: SettingsPage,
             profile: ProfilePage,
         },
-        components: {
-            header: true,
-            footer: true,
-            signIn: false,
-            signUp: false,
-            home: false,
-            article: false,
-            editor: false,
-            settings: false,
-            profile: false,
-        },
+        components: false // FIXME
+        // components: {
+        //     header: false,
+        //     footer: false,
+        //     signIn: false,
+        //     signUp: false,
+        //     home: false,
+        //     article: false,
+        //     editor: false,
+        //     settings: false,
+        //     profile: false,
+        // },
     }, routes))
 }

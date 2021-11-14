@@ -24,6 +24,7 @@ export const Nav = <T, E>(props: NavProps<T&NavScope, E>) : InferBlueprint<T, E>
             tag: 'li',
             css: 'nav-item'
         },
+        components: false // FIXME
     },
     props && {
         css: props.css,

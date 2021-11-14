@@ -1,6 +1,5 @@
-import { Injector, mix, observable, HtmlScope, InferBlueprint } from "@chorda/core"
+import { Injector, mix, observable, HtmlScope, InferBlueprint, watch } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
-import { watch } from "../utils"
 
 
 export type InputScope = {

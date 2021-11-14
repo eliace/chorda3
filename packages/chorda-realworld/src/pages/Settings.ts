@@ -1,8 +1,7 @@
-import { InferBlueprint, observable } from "@chorda/core"
+import { InferBlueprint, observable, watch } from "@chorda/core"
 import { AppScope } from "../App"
 import { AuthActions, AuthScope } from "../auth"
 import { Block, Button, Column, Columns, Container, Fieldset, Form, FormGroup, H1, Input, Text, Textarea } from "../elements"
-import { watch } from "../utils"
 
 
 

@@ -180,7 +180,7 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
     }
 
     toJSON () {
-        console.log('to json')
+        console.log('to json', this.$value)
         return this.$value
     }
 

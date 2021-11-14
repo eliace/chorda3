@@ -1,9 +1,9 @@
-import { computable, InferBlueprint, observable } from "@chorda/core"
+import { computable, InferBlueprint, observable, watch } from "@chorda/core"
 import { api, Article, Profile } from "../api"
 import { AuthScope } from "../auth"
 import { ArticlePreview } from "../components"
 import { Block, Button, Column, Columns, Container, H4, Icon, Img, Link, Nav, NavLink, Paragraph, Text } from "../elements"
-import { Icons, watch } from "../utils"
+import { Icons } from "../utils"
 
 
 

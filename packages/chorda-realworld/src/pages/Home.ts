@@ -1,11 +1,10 @@
-import { callable, computable, InferBlueprint, observable, passthruLayout, Value, ValueSet } from "@chorda/core"
+import { callable, computable, dispatchable, InferBlueprint, observable, passthruLayout, Value, ValueSet, watch } from "@chorda/core"
 import { api, Article, Articles } from "../api"
-import { ApiResponse } from "../api/rest"
 import { AppScope } from "../App"
 import { AuthScope } from "../auth"
 import { TagList, ArticlePreview } from "../components"
 import { Block, Column, Columns, Container, Link, List, Nav, NavLink, Tag, Text } from "../elements"
-import { componentList, watch, whenDone, whenWait } from "../utils"
+import { componentList, whenDone, whenWait } from "../utils"
 
 
 enum Feeds {
@@ -147,11 +146,14 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope&HomeActions
                                 reactions: {
                                     articles: (v) => ({
                                         components: {
+                                            tabs: true,
+                                            list: v.list.length > 0,
                                             loading: v.fetching,
                                             noArticles: v.list.length == 0 && !v.fetching
                                         }
                                     })
-                                }
+                                },
+                                components: false // FIXME
                             }
                         }),
                         Column({
@@ -209,11 +211,11 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope&HomeActions
                 fetching: false
             }),
             selectedGroup: () => observable(null),
-            loadFeed: () => callable(null),
-            loadGlobal: () => callable(null),
-            loadSelected: () => callable(null),
+            loadFeed: () => dispatchable(null),
+            loadGlobal: () => dispatchable(null),
+            loadSelected: () => dispatchable(null),
             selectedTag: () => observable(null),
-            favorite: () => callable(null),
+            favorite: () => dispatchable(null),
         },
         injections: {
             hasTags: $ => computable(() => {
@@ -243,7 +245,7 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope&HomeActions
 
                 loadSelected.$value = () => {
                     articles.list.$value = []
-                    return api.getArticlesByTag(selectedTag, {offset: (pageNo-1)*pageSize, limit: pageSize}).then(data => {
+                    return api.getArticlesByTag(selectedTag.$value, {offset: (pageNo-1)*pageSize, limit: pageSize}).then(data => {
                         articles.list.$value = data.articles
                         articles.total.$value = data.articlesCount
                     })
@@ -263,7 +265,7 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope&HomeActions
                 }
 
 
-                const loadArticles = callable(() => {
+                const loadArticles = dispatchable(() => {
 
                     if (selectedGroup.$value == Feeds.Your) {
                         loadFeed()
@@ -277,7 +279,9 @@ export const Home = () : InferBlueprint<HomeScope&AppScope&AuthScope&HomeActions
                 })
 
                 watch(() => {
+                    
                     loadArticles()
+
                 }, [selectedGroup, selectedTag])
 
                 watch(() => {

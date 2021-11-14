@@ -542,7 +542,8 @@ export class Hub<D, E, S extends HubScope = HubScope, O extends HubOptions<D, E>
     patch (optPatch: O) : void {
 
         if (this.state == State.Destroying || this.state == State.Destroyed) {
-//            console.error('Try to patch destroyed hub')
+//            console.warn('Ignore patch of destroyed object', this, optPatch)
+//            return
             throw new Error('Try to patch destroyed object')
         }
 

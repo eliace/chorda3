@@ -13,39 +13,39 @@ export const isNull = (v: any) : boolean => {
 }
 
 
-export const watch = <T>(f: PublishFunc<T>, objects: any[]) => {
+// export const watch = <T>(f: PublishFunc<T>, objects: any[]) => {
 
 
-    const all = computable(() => objects.map(o => o.$value))
-//    all.$touch({$publish: () => {}})
-    all.$subscribe(f as any)
+//     const all = computable(() => objects.map(o => o.$value))
+// //    all.$touch({$publish: () => {}})
+//     all.$subscribe(f as any)
     
-    // const sub = {
-    //     subscribers: new Set<Observable<any>>(),
-    //     $publish: () => {
-    //         const setters = spySetters(() => {
-    //             f.apply(this, objects.map(o => o.$value))
-    //         })
-    //         setters.forEach(s => sub.subscribers.add(s))
-    //     },
-    //     get $subscriptions (): any[] {
-    //         const subscriptions = [] as any[]
-    //         sub.subscribers.forEach(subscriber => {
-    //             subscriptions.push({subscriber})
-    //         })
-    //         console.log('watch subscriptions', subscriptions)
-    //         return subscriptions
-    //     }
-    // }
+//     // const sub = {
+//     //     subscribers: new Set<Observable<any>>(),
+//     //     $publish: () => {
+//     //         const setters = spySetters(() => {
+//     //             f.apply(this, objects.map(o => o.$value))
+//     //         })
+//     //         setters.forEach(s => sub.subscribers.add(s))
+//     //     },
+//     //     get $subscriptions (): any[] {
+//     //         const subscriptions = [] as any[]
+//     //         sub.subscribers.forEach(subscriber => {
+//     //             subscriptions.push({subscriber})
+//     //         })
+//     //         console.log('watch subscriptions', subscriptions)
+//     //         return subscriptions
+//     //     }
+//     // }
     
-//     for (let obj of objects) {
-//         if (obj == null) {
-//             throw Error('Watched object is null')
-//         }
-//         (obj as Observable<unknown>).$subscribe(sub)
-// //        (obj as Observable<unknown>).$subscribe(() => autoTerminalAware(f))
-//     }
-}
+// //     for (let obj of objects) {
+// //         if (obj == null) {
+// //             throw Error('Watched object is null')
+// //         }
+// //         (obj as Observable<unknown>).$subscribe(sub)
+// // //        (obj as Observable<unknown>).$subscribe(() => autoTerminalAware(f))
+// //     }
+// }
 
 
 

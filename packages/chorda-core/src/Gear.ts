@@ -137,6 +137,10 @@ export class Gear<D=unknown, E=unknown, S extends GearScope=GearScope, O extends
     patch (optPatch: O) {
         super.patch(optPatch)
 
+        // if (this.state == State.Destroying || this.state == State.Destroyed) {
+        //     return
+        // }
+
         const o = this.options
 
         // console.log(optPatch)

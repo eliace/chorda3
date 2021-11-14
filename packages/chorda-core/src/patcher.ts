@@ -5,7 +5,7 @@ import { AsyncEngine, ownTaskFilter, Scheduler, Fiber } from "./pipe"
 
 export class DefaultPatcher extends AsyncEngine<Fiber<Stateable>> {
 
-    process (tasks: Fiber<Stateable>[]) : Fiber<Stateable>[] {
+    flush (tasks: Fiber<Stateable>[]) : Fiber<Stateable>[] {
         return tasks.filter(task => {
             if (task.target && (task.target.state == State.Destroying || task.target.state == State.Destroyed)) {
                 //        deleted++
