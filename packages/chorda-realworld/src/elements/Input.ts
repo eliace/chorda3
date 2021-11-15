@@ -44,7 +44,7 @@ export const Input = <T, E>(props: InputProps<T&InputScope>) : InferBlueprint<T,
                 
                 watch(() => {
                     if ($dom.$value && props.autoFocus) {
-                        $renderer.queue($renderer.fiber(() => {
+                        $renderer.queue($renderer.effect(() => {
                             $dom.$value.focus()
                         }))
                     }

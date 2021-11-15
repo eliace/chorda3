@@ -1,5 +1,4 @@
-import { Blueprint, HtmlScope, InferBlueprint, mix, observable } from "@chorda/core"
-import { watch } from "../../../utils"
+import { Blueprint, HtmlScope, InferBlueprint, mix, observable, watch } from "@chorda/core"
 
 
 

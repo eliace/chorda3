@@ -1,5 +1,4 @@
-import { Blueprint, HtmlScope, Infer, mix } from "@chorda/core"
-import { watch } from "../../../utils"
+import { Blueprint, HtmlScope, Infer, mix, watch } from "@chorda/core"
 
 
 export function isFuzzySearchString(str: string) {

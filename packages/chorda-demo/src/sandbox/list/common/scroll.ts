@@ -1,5 +1,5 @@
-import { callable, computable, HtmlBlueprint, HtmlOptions, HtmlScope, mix, observable } from "@chorda/core"
-import { Custom, watch } from "../../../utils"
+import { callable, computable, HtmlBlueprint, HtmlOptions, HtmlScope, mix, observable, watch } from "@chorda/core"
+import { Custom } from "../../../utils"
 
 
 

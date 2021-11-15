@@ -65,7 +65,7 @@ export default <T>() : HtmlBlueprint<T> => {
                         const detect = () => {
     //                        console.log('detect bounds')
                             if ($dom.$value) {
-                                $patcher.queue($renderer.fiber(() => {
+                                $patcher.queue($renderer.effect(() => {
                                     bounds.$value = $dom.$value.getBoundingClientRect()
                                 }))
                             }
@@ -104,7 +104,7 @@ export default <T>() : HtmlBlueprint<T> => {
                             const el = $dom.$value
     //                        console.log('detect scroll height')
                             if (el) {
-                                $patcher.queue($renderer.fiber(() => {
+                                $patcher.queue($renderer.effect(() => {
                                     // if (scrollTop + bounds.height > scrollHeight) {
                                     //     el.scrollTop = scrollHeight - bounds.height - 1
                                     // }
@@ -165,7 +165,7 @@ export default <T>() : HtmlBlueprint<T> => {
                         }
 
                         const resetScroll = () => {
-                            $patcher.queue($renderer.fiber(() => {
+                            $patcher.queue($renderer.effect(() => {
                                 $dom.$value.scrollTo(0, 0)
                             }))
                         }

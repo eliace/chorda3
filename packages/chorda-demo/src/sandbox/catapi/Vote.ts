@@ -86,7 +86,7 @@ export const Vote = () : InferBlueprint<VoteScope&HtmlScope> => {
                                                     if ($dom.$value && url.$value) {
                                                         const el = $dom.$value
                                                         el.classList.add(name+'-enter')
-                                                        $patcher.queue($renderer.fiber(() => {
+                                                        $patcher.queue($renderer.effect(() => {
                                                             el.classList.add(name+'-enter-active'/*, name+'-enter'*/)
                                                             
                                                             el.classList.remove(name+'-enter')

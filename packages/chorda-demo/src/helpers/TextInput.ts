@@ -1,5 +1,4 @@
-import { BasicDomEvents, Blueprint, callable, HtmlBlueprint, HtmlScope, Infer, Injector, Listener, mix, observable } from "@chorda/core";
-import { watch } from "../utils";
+import { BasicDomEvents, Blueprint, callable, HtmlBlueprint, HtmlScope, Infer, Injector, Listener, mix, observable, watch } from "@chorda/core";
 
 
 export type TextInputScope = {

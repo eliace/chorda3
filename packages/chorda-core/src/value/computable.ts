@@ -173,6 +173,8 @@ class ComputableNode<T> extends ObservableNode<T> implements Computable {
             })
             this._sources.clear()
             this._initialized = false
+
+            this.$destroy()
 //            this._destroyed = true
 
 //            console.log('unsubscribed computable detected [unsubscribe]')

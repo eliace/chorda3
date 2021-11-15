@@ -1,4 +1,4 @@
-import { Pipe, Scheduler, Fiber } from "./utils";
+import { Pipe, Scheduler, Effect } from "./utils";
 
 
 
@@ -17,12 +17,12 @@ class SimplePipe implements Pipe {
         }
     }
 
-    push(task: Fiber<any>): Pipe {
+    push(task: Effect<any>): Pipe {
         this.head.queue(task)
         return this
     }
     
-    asap(task: Fiber<any>): Pipe {
+    asap(task: Effect<any>): Pipe {
         if (task.engine && task.engine.isProcessing) {
             task.engine.queue(task)
         }

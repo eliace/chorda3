@@ -1,6 +1,5 @@
 import { HtmlBlueprint, HtmlScope, Injector, Listener, observable, mix, InferBlueprint, Blueprint } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
-import { watch } from "../../utils"
 import { MenuItem } from "./utils"
 
 

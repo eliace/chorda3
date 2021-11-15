@@ -1,4 +1,4 @@
-import { ownTaskFilter, Scheduler, subscriptionTaskFilter, Fiber, unknownTaskFilter } from "./utils";
+import { ownTaskFilter, Scheduler, subscriptionTaskFilter, Effect, unknownTaskFilter } from "./utils";
 
 
 const avgTimeInterval = (t0: number, t1: number, total: number) => {
@@ -11,7 +11,7 @@ const log = (msg: string, ...data: any) => {
 
 
 
-export class AsyncEngine<T extends Fiber = Fiber> implements Scheduler<T> {
+export class AsyncEngine<T extends Effect = Effect> implements Scheduler<T> {
 
     tasks: T[]
     deferred: T[]
@@ -51,7 +51,7 @@ export class AsyncEngine<T extends Fiber = Fiber> implements Scheduler<T> {
         this.subscriptions = this.subscriptions.filter(sub => sub != engine)
     }
 
-    fiber (fn: Function, arg?: any, target?: any) : Fiber {
+    effect (fn: Function, arg?: any, target?: any) : Effect {
         return {fn, arg, target, engine: this}
     }
 
@@ -63,36 +63,43 @@ export class AsyncEngine<T extends Fiber = Fiber> implements Scheduler<T> {
 
         this.scheduled = true
         setTimeout(() => {
-//            console.log(`[${this.name}] tick start`, this.tasks.length)
-            const t0 = performance.now()
 
             this.scheduled = false
-            this.processing = true
-//            console.log('tick')
 
-            let tasks = this.tasks
-            this.tasks = []
+            this.flush()
 
-            this.deferred = this.deferred.concat(this.flush(tasks))
-
-            // отправляем чужие задачи дальше по конвейеру
-            if (this.tasks.length == 0) {
-                this.deferred
-                    .filter(subscriptionTaskFilter(this.subscriptions))
-                    .filter(unknownTaskFilter(this.subscriptions))
-            }
-            else if (!this.scheduled) {
-                console.error('Non scheduled tasks detected', this.tasks)
-            }
-
-            this.processing = false
-
-            const t1 = performance.now()
-            log(`[${this.name}] patch end`, tasks.length, Math.round(t1 - t0), avgTimeInterval(t0, t1, tasks.length)/*, deleted ? '-'+deleted : ''*/)
         })
     }
 
-    flush (tasks: T[]) : T[] {
+    flush () {
+
+        const t0 = performance.now()
+
+        this.processing = true
+        //            console.log('tick')
+        
+        let tasks = this.tasks
+        this.tasks = []
+
+        this.deferred = this.deferred.concat(this.process(tasks))
+
+        // отправляем чужие задачи дальше по конвейеру
+        if (this.tasks.length == 0) {
+            this.deferred
+                .filter(subscriptionTaskFilter(this.subscriptions))
+                .filter(unknownTaskFilter(this.subscriptions))
+        }
+        else if (!this.scheduled) {
+            console.error('Non scheduled tasks detected', this.tasks)
+        }
+
+        this.processing = false
+        
+        const t1 = performance.now()
+        log(`[${this.name}] patch end`, tasks.length, Math.round(t1 - t0), avgTimeInterval(t0, t1, tasks.length)/*, deleted ? '-'+deleted : ''*/)
+    }
+
+    process (tasks: T[]) : T[] {
         return tasks.filter(ownTaskFilter(this))
     }
 

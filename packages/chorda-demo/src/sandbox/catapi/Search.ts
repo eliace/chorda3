@@ -1,6 +1,6 @@
-import { Blueprint, callable, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, Injector, iterable, Listener, mix, observable } from "@chorda/core"
+import { Blueprint, callable, computable, HtmlBlueprint, HtmlEvents, HtmlScope, InferBlueprint, Injector, iterable, Listener, mix, observable, watch } from "@chorda/core"
 import { Button, Field, Fields } from "chorda-bulma"
-import { Coerced, createAppScope, IteratorScope, ListBlueprint, watch, withList } from "../../utils"
+import { Coerced, createAppScope, IteratorScope, ListBlueprint, withList } from "../../utils"
 import { BgImage, BgImagePropsType, Dropdown, DropdownItem, DropdownItemPropsType, DropdownOld, DropdownOldItem, DropdownPropsType, FaIcon, SvgImagePlaceholder } from "../../helpers"
 import { faHeart, faRedo, faUserLock } from "@fortawesome/free-solid-svg-icons"
 import { CatApi } from "../../api"

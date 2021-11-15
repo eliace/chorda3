@@ -1,5 +1,4 @@
-import { buildHtmlContext, buildHtmlOptions, Html, InferBlueprint, observable, patch } from "@chorda/core";
-import { createAsyncPatcher } from "@chorda/engine";
+import { buildHtmlContext, buildHtmlOptions, Html, Infer, InferBlueprint, observable, patch } from "@chorda/core";
 import { ChordaEmbedded, ChordaStandalone, createEmbedReactRenderer, ReactDomEvents } from "@chorda/react";
 import * as React from "react";
 
@@ -11,9 +10,9 @@ type TestScope = {
     i18n: string
 }
 
-export const Test = () : InferBlueprint<{value: string}&TestScope, ReactDomEvents> => {
+export const Test = () : Infer.Blueprint<{value: string}&TestScope, ReactDomEvents> => {
     return {
-        initials: {
+        defaults: {
             value: () => observable('')
         },
         items: [{
@@ -28,12 +27,12 @@ export const Test = () : InferBlueprint<{value: string}&TestScope, ReactDomEvent
         }, {
             tag: 'p',
             reactions: {
-                value: v => patch({text: v})
+                value: v => ({text: v})
             }
         }, {
             tag: 'div',
             reactions: {
-                i18n: v => patch({text: v})
+                i18n: v => ({text: v})
             }
         }]
     }

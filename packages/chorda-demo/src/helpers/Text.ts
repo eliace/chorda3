@@ -15,18 +15,13 @@ type TextProps<T> = {
     css?: string
     text$?: Injector<T>
     onClick?: Listener<T, React.MouseEvent>
+    format?: (v: any) => string
 }
 
 
 export const Text = <T>(props: TextProps<T&TextScope>) : InferBlueprint<T> => {
     return mix<TextScope, ReactDomEvents>(props?.as || {tag: 'span'}, {
 //        tag: 'span',
-        reactions: {
-            text: (v) => {
-//                console.log('s', v)
-                return ({text: String(v)})
-            }
-        },
     }, props && {
         css: props.css,
         defaults: {
@@ -39,6 +34,11 @@ export const Text = <T>(props: TextProps<T&TextScope>) : InferBlueprint<T> => {
             $dom: {
                 click: props.onClick
             }
-        }
+        },
+        reactions: {
+            text: (v) => {
+                return ({text: (props.format || String)(v)})
+            }
+        },
     })
 }

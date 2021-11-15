@@ -1,6 +1,6 @@
-import { computable, InferBlueprint, observable, Scope } from "@chorda/core";
+import { computable, InferBlueprint, observable, Scope, watch } from "@chorda/core";
 import { Column, ColumnLayout, RowLayout } from "chorda-bulma";
-import { watch, withMix } from "../../utils";
+import { withMix } from "../../utils";
 import { COUNTRIES, Country } from "../../data";
 import { Paragraph, Text, Dropdown, DropdownTrigger, TextInput, DropdownPropsType } from "../../helpers";
 

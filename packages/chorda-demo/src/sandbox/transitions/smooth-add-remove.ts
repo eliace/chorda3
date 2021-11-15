@@ -1,7 +1,6 @@
-import { InferBlueprint, iterable, observable } from "@chorda/core"
+import { InferBlueprint, iterable, observable, watch } from "@chorda/core"
 import { Button, Buttons, List, ListItem } from "chorda-bulma"
-import { watch, withHtml } from "../../utils"
-import { Text } from "../../helpers"
+import { withHtml } from "../../utils"
 import { withFLIP, withShowHide } from "./utils"
 
 

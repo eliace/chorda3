@@ -1,10 +1,10 @@
-import { computable, InferBlueprint, observable } from "@chorda/core"
+import { computable, InferBlueprint, observable, watch } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import { faCamera } from "@fortawesome/free-solid-svg-icons"
 import { Link, Modal, Image, Field, Button, Addon, Fields, Pagination } from "chorda-bulma"
 import { Nasa } from "../../api"
 import { BgImage, FaIcon, FaSvgIcon, Text, Radio, Slider, Dropdown, DropdownPropsType, DropdownItem, DropdownItemPropsType, DropdownTrigger } from "../../helpers"
-import { ListBlueprint, watch, withAs, withHtml, withHtmlBlueprint, withList } from "../../utils"
+import { ListBlueprint, withAs, withHtml, withHtmlBlueprint, withList } from "../../utils"
 import Chart from "chart.js/auto"
 import _ from "lodash"
 
@@ -152,7 +152,7 @@ export const Mars = () : InferBlueprint<MarsScope> => {
                                                             myChart && myChart.destroy()
 
                                                             //requestAnimationFrame(() => {
-                                                            $patcher.queue($renderer.fiber(() => {
+                                                            $patcher.queue($renderer.effect(() => {
                     
                                                                 //console.log(mission.photos.slice(0, 100).map(photo => photo.total_photos))
                     

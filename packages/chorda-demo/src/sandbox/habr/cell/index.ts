@@ -1,5 +1,4 @@
-import { computable, Infer, iterator, observable, patch } from "@chorda/core"
-import { watch } from "../../../utils"
+import { computable, Infer, iterator, observable, patch, watch } from "@chorda/core"
 import { Text } from "../../../helpers"
 
 

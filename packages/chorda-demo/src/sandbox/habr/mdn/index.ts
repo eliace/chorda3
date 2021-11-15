@@ -1,5 +1,4 @@
 import { BasicDomEvents, Blueprint, callable, computable, Infer, observable } from "@chorda/core"
-import { watch } from "../../../utils"
 import { Index } from "flexsearch"
 import { MdnSearchItem, MdnSearchScope } from "./search"
 import { MdnSearchSimple } from "./simple"

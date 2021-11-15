@@ -475,3 +475,19 @@ export const updateRefs = (nodes: DomNode[]) => {
 export const getTrackingNodeCount = () => {
     return nodeMap.size
 }
+
+export const getTrackingElementAndNodeCount = () => {
+    const out = {
+        textNodes: 0,
+        elements: 0
+    }
+    nodeMap.forEach(el => {
+        if (el.nodeType == Node.TEXT_NODE) {
+            out.textNodes++
+        }
+        else {
+            out.elements++
+        }
+    })
+    return out
+}

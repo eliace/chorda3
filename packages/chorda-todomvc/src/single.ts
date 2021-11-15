@@ -1,4 +1,4 @@
-import { Blueprint, computable, HtmlScope, Infer, iterator, observable, fiber, passthruLayout } from "@chorda/core"
+import { Blueprint, computable, HtmlScope, Infer, iterator, observable, ownEffect, passthruLayout, watch } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 import * as director from 'director'
 
@@ -23,7 +23,7 @@ type TodoMvcScope = {
 
 type TodoMvcActions = {
     addTodo: () => void
-    toggleTodoAsDone: (id: number, value: boolean) => void
+    markTodoCompleted: (id: number, value: boolean) => void
     deleteTodo: (id: number) => void
     toggleAll: (value: boolean) => void
     clearCompleted: () => void
@@ -80,9 +80,15 @@ const pluralize = (count: number, word: string) => {
     return count === 1 ? word : word + 's';
 }
 
+const filters = {
+    all: () => true,
+    completed: (todo) => !!todo.completed,
+    active: (todo) => !todo.completed
+} as {[key: string]: (todo: Todo) => boolean}
 
 
-export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&TodoMvcActions, ReactDomEvents> => {
+
+export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&TodoMvcActions&HtmlScope, ReactDomEvents> => {
     return {
         templates: {
             app: {
@@ -114,8 +120,19 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
                                         }
                                     }
                                 },
-                                reactions: {
-                                    newTodo: v => ({dom: {value: v}})
+                                joints: {
+                                    fixReactValueChange: ({newTodo, $dom}) => {
+
+                                        watch(() => {
+                                            if ($dom.$value) {
+                                                const el = ($dom.$value as HTMLInputElement)
+                                                if (el.value != newTodo.$value) {
+                                                    el.value = newTodo.$value
+                                                }
+                                            }
+                                        }, [newTodo, $dom])
+
+                                    }
                                 }
                             }
                         }
@@ -161,9 +178,9 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
                                                     dom: {type: 'checkbox'},
                                                     events: {
                                                         $dom: {
-                                                            change: (e, {toggleTodoAsDone, todo}) => {
+                                                            change: (e, {markTodoCompleted, todo}) => {
                                                                 const el = e.currentTarget as HTMLInputElement
-                                                                toggleTodoAsDone(todo.id, el.checked)
+                                                                markTodoCompleted(todo.id, el.checked)
                                                             }
                                                         }
                                                     },
@@ -223,22 +240,29 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
                                             joints: {
                                                 autoFocus: ({$dom, editing, $renderer, $patcher, todo, value}) => {
 
-                                                    editing.$subscribe(next => {
-                                                        if (next) {
-                                                            $patcher.queue($renderer.fiber(() => {
+                                                    watch(() => {
+                                                        if (editing.$value) {
+                                                            $patcher.queue($renderer.effect(() => {
                                                                 $dom.$value.focus()
                                                             }))
                                                             value.$value = todo.text
                                                         }
-                                                    })
+                                                    }, [editing, $dom])
 
-                                                    $dom.$subscribe(() => {})
-                                                    
+                                                },
+                                                fixReactValueChange: ({value, $dom}) => {
+
+                                                    watch(() => {
+                                                        if ($dom.$value) {
+                                                            const el = ($dom.$value as HTMLInputElement)
+                                                            if (el.value != value.$value) {
+                                                                el.value = value.$value
+                                                            }
+                                                        }
+                                                    }, [value, $dom])
+            
                                                 }
                                             },
-                                            reactions: {
-                                                value: v => ({dom: {value: v}})
-                                            }
                                         }
                                     },
                                     reactions: {
@@ -401,22 +425,12 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
                 $.todos.$value = [...$.todos.$value, {text: $.newTodo.$value, id: new Date().getTime()}]
                 $.newTodo.$value = ''
             },
-            toggleTodoAsDone: $ => (id, value) => {
+            markTodoCompleted: $ => (id, value) => {
                 const idx = $.todos.findIndex(todo => todo.id == +id)
                 $.todos[idx].completed = value
             },
             filteredTodos: $ => computable(() => {
-                return $.todos.filter(todo => {
-                    if ($.router.route == 'all') {
-                        return true
-                    }
-                    else if ($.router.route == 'active') {
-                        return !todo.completed
-                    }
-                    else if ($.router.route == 'completed') {
-                        return todo.completed
-                    }
-                })
+                return $.todos.filter(filters[$.router.route || 'all'])
             }),
             deleteTodo: $ => (id) => {
                 $.todos.$value = $.todos.filter(todo => todo.id != +id)
@@ -425,16 +439,16 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
                 $.todos.$value = $.todos.map(todo => ({...todo, completed: value}))
             },
             isAllCompleted: $ => computable(() => {
-                return $.filteredTodos.length > 0 && $.filteredTodos.filter(todo => todo.completed).length == $.filteredTodos.length
+                return $.filteredTodos.length > 0 && $.filteredTodos.filter(filters['completed']).length == $.filteredTodos.length
             }),
             hasCompleted: $ => computable(() => {
-                return $.todos.filter(todo => todo.completed).length > 0
+                return $.todos.filter(filters['completed']).length > 0
             }),
             activeCount: $ => computable(() => {
-                return $.todos.filter(todo => !todo.completed).length
+                return $.todos.filter(filters['active']).length
             }),
             clearCompleted: $ => () => {
-                $.todos.$value = $.todos.filter(todo => !todo.completed)
+                $.todos.$value = $.todos.filter(filters['active'])
             },
             changeTodoText: $ => (id, text) => {
                 const idx = $.todos.findIndex(todo => todo.id == +id)
@@ -444,11 +458,11 @@ export default () : Infer.Blueprint<TodoMvcScope&RouterScope&LocalStoreScope&Tod
         joints: {
             storeTodos: ({store, todos}) => {
 
-                todos.$subscribe(next => {
-                    if (next) {
+                watch(() => {
+                    if (todos.$value) {
                         store.save(todos)
                     }
-                })
+                }, [todos])
 
             }
         }

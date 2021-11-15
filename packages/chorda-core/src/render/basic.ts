@@ -28,6 +28,7 @@ export class BasicRenderer extends AsyncEngine implements Renderer, VNodeFactory
     
     attach(el: Element, node: Renderable): void {
         this.roots.push({el, node})
+        !this.scheduled && this.schedule()
     }
 
     detach(node: Renderable): void {
@@ -36,11 +37,22 @@ export class BasicRenderer extends AsyncEngine implements Renderer, VNodeFactory
 
 
     schedule () {
+
+        if (this.scheduled) {
+            return
+        }
+
         this.scheduled = true
         queueMicrotask(() => {
+
 //        requestAnimationFrame(() => {
             log('[basic] render start')
             this.scheduled = false
+
+            if (this.roots.length == 0) {
+                log('[basic] render suspend')                
+                return
+            }
 
             this.processing = true
 
@@ -51,6 +63,8 @@ export class BasicRenderer extends AsyncEngine implements Renderer, VNodeFactory
 
             this.roots.forEach((root, i) => {
                 try {
+                    log('[basic] root render begin', tasks.length)   
+
                     const out = {created: [] as any[], deleted: [] as any[]}
                     renderTree(rendered[i], out, el => {
                         root.el.append(el)
@@ -71,7 +85,7 @@ export class BasicRenderer extends AsyncEngine implements Renderer, VNodeFactory
                         .filter(subscriptionTaskFilter(this.subscriptions))
                         .filter(unknownTaskFilter(this.subscriptions))
 
-                    log('[basic] render end', tasks.length)   
+                    log('[basic] root render end', tasks.length)   
                 }
                 catch (err) {
                     console.error(err)
@@ -92,6 +106,8 @@ export class BasicRenderer extends AsyncEngine implements Renderer, VNodeFactory
             })
 
             this.processing = false
+
+            log('[basic] render finish', this.roots.length, tasks.length)
         })
     }
 
@@ -194,5 +210,12 @@ export type BasicDomEvents = {
         keydown: () => KeyboardEvent
         submit: () => SubmitEvent
         select: () => Event
+    }
+}
+
+
+export type GlobalDomEvents = {
+    $dom: {
+        [I in keyof GlobalEventHandlersEventMap]: () => GlobalEventHandlersEventMap[I]
     }
 }

@@ -140,6 +140,13 @@ export const isDestroyedValue = (v: any) : boolean => {
 
 
 
+let _nodesTotal = 0
+
+export const getTrackingObservableCount = () => {
+    return _nodesTotal
+}
+
+
 export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T>, LifecycleProvider {
 
     _memoValue: any
@@ -165,6 +172,8 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
         this._uid = undefined
         this._initialized = source == null
         this._destroyed = false
+
+        _nodesTotal++
     }
 
     get $key () {
@@ -647,6 +656,8 @@ export abstract class Node<T, E=any> extends PubSub<T, E> implements ValueNode<T
             this._entries[i].$destroy()
         }
         this._memoValue = undefined
+
+        _nodesTotal--
 
         // ?
         // this._subscriptions.forEach(sub => {

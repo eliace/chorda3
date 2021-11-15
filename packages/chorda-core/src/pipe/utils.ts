@@ -1,6 +1,6 @@
 
 
-export type Fiber<T=any> = {
+export type Effect<T=any> = {
     key?: string
     fn: Function
     arg?: any
@@ -10,26 +10,28 @@ export type Fiber<T=any> = {
 }
 
 
-export interface Scheduler<F extends Fiber = Fiber> {
+export interface Scheduler<F extends Effect = Effect> {
 
-    queue (fiber: F) : void
+    queue (effect: F) : void
 
     subscribe (engine: Scheduler) : boolean
     
     unsubscribe (engine: Scheduler) : void
 
-    fiber (fn: Function, arg?: any, target?: any) : Fiber
+    effect (fn: Function, arg?: any, target?: any) : Effect
+
+    flush () : void
 
     readonly isProcessing: boolean
 }
 
 
 
-interface Engine {
-    change () : void  // завешенное изменение
-    effect () : void  // эффект отрисовки
-    patch () : void  // патч компонента
-}
+// interface Engine {
+//     change () : void  // завешенное изменение
+//     effect () : void  // эффект отрисовки
+//     patch () : void  // патч компонента
+// }
 
 
 
@@ -47,20 +49,20 @@ export interface Pipe {
     // - исполнить задачу прямо сейчас в указанном планировщике или добавить в конвейер
 
     // добавляем задачу в начало конвейера
-    push (fiber: Fiber) : Pipe
+    push (effect: Effect) : Pipe
     // исполняем задачу в ближайший тик планировщика
-    asap (fiber: Fiber) : Pipe
+    asap (effect: Effect) : Pipe
 }
 
 
-export const fiber = (fn: Function, arg?: any, target?: any) => {
+export const ownEffect = (fn: Function, arg?: any, target?: any) => {
     return {fn, arg, target}
 }
 
 
 
 
-export const ownTaskFilter = (owner: Scheduler) => (task: Fiber) => {
+export const ownTaskFilter = (owner: Scheduler) => (task: Effect) => {
     if (!task.engine || task.engine == owner) {
 //        console.log('task', task.arg, task.target)
         // исполняем задачу
@@ -72,7 +74,7 @@ export const ownTaskFilter = (owner: Scheduler) => (task: Fiber) => {
     }
 }
 
-export const subscriptionTaskFilter = (subscriptions: Scheduler[]) => (task: Fiber) => {
+export const subscriptionTaskFilter = (subscriptions: Scheduler[]) => (task: Effect) => {
     const engine = subscriptions.find((sub) => sub == task.engine)
     if (engine) {
         engine.queue(task)
@@ -82,7 +84,7 @@ export const subscriptionTaskFilter = (subscriptions: Scheduler[]) => (task: Fib
     }
 }
 
-export const unknownTaskFilter = (subscriptions: Scheduler[]) => (task: Fiber) => {
+export const unknownTaskFilter = (subscriptions: Scheduler[]) => (task: Effect) => {
     subscriptions.forEach(sub => {
         sub.queue(task)
     })

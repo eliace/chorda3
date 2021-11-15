@@ -15,7 +15,7 @@ class EmbeddedReactRenderer extends ReactRenderer {
 
     schedule () {
         this.scheduled = true
-        setTimeout(() => {
+        queueMicrotask(() => {
 //        requestAnimationFrame(() => {
 //            console.log('[react] render start')
             this.scheduled = false

@@ -1,5 +1,4 @@
-import { Blueprint, callable, computable, InferBlueprint, mix, observable } from "@chorda/core"
-import { watch } from "../../../utils"
+import { Blueprint, callable, computable, InferBlueprint, mix, observable, watch } from "@chorda/core"
 import { DropdownScope } from "../../../helpers"
 
 

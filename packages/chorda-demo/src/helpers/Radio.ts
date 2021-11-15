@@ -1,8 +1,7 @@
-import { Blueprint, callable, HtmlScope, InferBlueprint, Injector, Listener, mix, observable, passthruLayout } from "@chorda/core"
+import { Blueprint, callable, HtmlScope, InferBlueprint, Injector, Listener, mix, observable, passthruLayout, watch } from "@chorda/core"
 import { ReactDomEvents } from "@chorda/react"
 
 import "bulma-checkradio/dist/css/bulma-checkradio.min.css"
-import { watch } from "../utils"
 
 type RadioScope = {
     value: boolean

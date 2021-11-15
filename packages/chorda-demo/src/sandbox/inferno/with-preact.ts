@@ -1,6 +1,5 @@
-import { Blueprint, HtmlEvents, HtmlScope, InferBlueprint, mix, observable, pipe, Renderable } from "@chorda/core"
+import { Blueprint, HtmlEvents, HtmlScope, InferBlueprint, mix, observable, pipe, Renderable, watch } from "@chorda/core"
 import { createPreactRenderer } from "@chorda/preact"
-import { watch } from "../../utils"
 
 type PreactScope = {
     preactRoot: Renderable

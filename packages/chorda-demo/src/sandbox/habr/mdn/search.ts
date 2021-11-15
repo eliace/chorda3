@@ -1,6 +1,5 @@
-import { BasicDomEvents, Blueprint, HtmlScope, Infer, mix } from "@chorda/core"
+import { BasicDomEvents, Blueprint, HtmlScope, Infer, mix, watch } from "@chorda/core"
 import { faSearch } from "@fortawesome/free-solid-svg-icons"
-import { watch } from "../../../utils"
 import { DropdownInput, DropdownInputPropsType, DropdownItem, DropdownItemPropsType, FaIcon, TextInput } from "../../../helpers"
 import { HighlightedItem } from "./highlighted"
 import { withAutoFocus } from "./utils"

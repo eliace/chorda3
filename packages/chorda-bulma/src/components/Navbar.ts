@@ -18,12 +18,15 @@ export const NavbarBrand = <T>(props: NavbarBrandProps) : HtmlBlueprint<T> => {
 
 type NavbarItemProps<T> = {
     link?: string
+    as?: HtmlBlueprint<T>
 }
 
 export const NavbarItem = <T>(props: NavbarItemProps<T>) : HtmlBlueprint<T> => {
     return mix({
         tag: 'a',
-    }, props && {
+    },
+    props?.as, 
+    props && {
         dom: {
             href: props.link
         },
@@ -32,12 +35,12 @@ export const NavbarItem = <T>(props: NavbarItemProps<T>) : HtmlBlueprint<T> => {
 
 // Menu
 
-type NavbarMenuProps = {
-    start?: HtmlBlueprint[]
-    end?: HtmlBlueprint[]
+type NavbarMenuProps<T, E> = {
+    start?: HtmlBlueprint<T, E>[]
+    end?: HtmlBlueprint<T, E>[]
 }
 
-export const NavbarMenu = <T, E>(props: NavbarMenuProps) : InferBlueprint<T, E> => {
+export const NavbarMenu = <T, E>(props: NavbarMenuProps<T, E>) : InferBlueprint<T, E> => {
     return {
         components: {
             start: {

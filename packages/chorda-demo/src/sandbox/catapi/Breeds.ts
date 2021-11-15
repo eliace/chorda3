@@ -1,7 +1,7 @@
-import { Blueprint, callable, computable, EventBus, HtmlBlueprint, InferBlueprint, mix, observable, Scope, Value } from "@chorda/core"
+import { Blueprint, callable, computable, EventBus, HtmlBlueprint, InferBlueprint, mix, observable, watch } from "@chorda/core"
 import { Card, Field, Title } from "chorda-bulma"
-import { Coerced, Custom, Content, watch } from "../../utils"
-import { Carousel, Dropdown, DropdownItem, DropdownItemPropsType, DropdownOld, DropdownOldItem, DropdownProps, DropdownPropsType, DropdownScope, Paragraph, Text } from "../../helpers"
+import { Content } from "../../utils"
+import { Carousel, Dropdown, DropdownItem, DropdownItemPropsType, DropdownPropsType, DropdownScope, Paragraph, Text } from "../../helpers"
 import { CatApi } from "../../api"
 
 

@@ -1,4 +1,4 @@
-import { autoTerminalAware, Blueprint, callable, Callable, buildHtmlContext, buildHtmlOptions, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, fiber, patch, pipe, PublishFunc, Scope, spyGetters, Value, createBasicRenderer } from "@chorda/core"
+import { autoTerminalAware, Blueprint, callable, Callable, buildHtmlContext, buildHtmlOptions, defaultHtmlFactory, defaultLayout, EventBus, Html, HtmlBlueprint, HtmlEvents, HtmlOptions, HtmlScope, InferBlueprint, Injector, iterable, Joint, Keyed, Listener, mix, Observable, observable, ownEffect, patch, pipe, PublishFunc, Scope, spyGetters, Value, createBasicRenderer, watch, MicrotaskEngine } from "@chorda/core"
 import { createReactRenderer, ReactDomEvents } from "@chorda/react"
 import * as vis from "vis-network"
 import { App, routes } from "./App"
@@ -7,6 +7,7 @@ import { RouterScope, useRouter } from "./router"
 
 
 export type AppScope = {
+    isShowSidebar: boolean
 } & RouterScope
 
 
@@ -174,24 +175,24 @@ export const createValueEffect = <T, F extends Function>(bus: EventBus<any>&Valu
 }
 
 
-type FlattenObservable<T> = T extends Observable<infer I> ? I : T
+// type FlattenObservable<T> = T extends Observable<infer I> ? I : T
 
-type WatchArrType1 = <T>(f: (next: [FlattenObservable<T>]) => void, objects: [T]) => void
-type WatchArrType2 = <T, T2>(f: (next: [FlattenObservable<T>, FlattenObservable<T2>]) => void, objects: [T, T2]) => void
-type WatchArrType3 = <T, T2, T3>(f: (next: [T, T2, T3]) => void, objects: [T, T2, T3]) => void
-type WatchArrType4 = <T, T2, T3, T4>(f: (next: [T, T2, T3, T4]) => void, objects: [T, T2, T3, T4]) => void
+// type WatchArrType1 = <T>(f: (next: [FlattenObservable<T>]) => void, objects: [T]) => void
+// type WatchArrType2 = <T, T2>(f: (next: [FlattenObservable<T>, FlattenObservable<T2>]) => void, objects: [T, T2]) => void
+// type WatchArrType3 = <T, T2, T3>(f: (next: [T, T2, T3]) => void, objects: [T, T2, T3]) => void
+// type WatchArrType4 = <T, T2, T3, T4>(f: (next: [T, T2, T3, T4]) => void, objects: [T, T2, T3, T4]) => void
 
-type WatchArrType = WatchArrType1&WatchArrType2&WatchArrType3&WatchArrType4
+// type WatchArrType = WatchArrType1&WatchArrType2&WatchArrType3&WatchArrType4
 
-export const watch : WatchArrType = <T>(f: PublishFunc<T>, objects: any[]) => {
-    for (let obj of objects) {
-        if (obj == null) {
-            throw Error('Watched object is null')
-        }
-        (obj as Observable<unknown>).$subscribe(() => f.apply(this, [objects.map(o => o.$value)]))
-//        (obj as Observable<unknown>).$subscribe(() => autoTerminalAware(f))
-    }
-}
+// export const watch : WatchArrType = <T>(f: PublishFunc<T>, objects: any[]) => {
+//     for (let obj of objects) {
+//         if (obj == null) {
+//             throw Error('Watched object is null')
+//         }
+//         (obj as Observable<unknown>).$subscribe(() => f.apply(this, [objects.map(o => o.$value)]))
+// //        (obj as Observable<unknown>).$subscribe(() => autoTerminalAware(f))
+//     }
+// }
 
 // export const compute = <T>(f: PublishFunc<T>, objects?: any[]) => {
 //     const sub: PublishFunc<T> = () => autoTerminalAware(f)
@@ -415,7 +416,7 @@ export const stopMouseDown: Joint<HtmlScope> = ({$dom}) => {
 export const autoFocus: Joint<HtmlScope&{autoFocus: boolean}> = ({$dom, $renderer}) => {
     $dom.$subscribe(el => {
         if (el) {
-            $renderer.queue(fiber(() => {
+            $renderer.queue(ownEffect(() => {
                 el.focus()
             }))
         }

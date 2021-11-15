@@ -1,6 +1,5 @@
-import { Blueprint, HtmlEvents, HtmlScope, InferBlueprint, mix, observable, pipe, Renderable } from "@chorda/core"
+import { Blueprint, HtmlEvents, HtmlScope, InferBlueprint, mix, observable, pipe, Renderable, watch } from "@chorda/core"
 import { createInfernoRenderer } from "@chorda/inferno"
-import { watch } from "../../utils"
 
 type InfernoScope = {
     infernoRoot: Renderable

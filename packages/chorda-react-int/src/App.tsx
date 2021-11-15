@@ -29,13 +29,9 @@ function App() {
           Learn React
         </a>
         <TestContext.Provider value={{i18n: 'en'}}>
-          <ChordaComponent2/>
+          {/* <ChordaComponent2/> */}
+          <ChordaComponent3/>
         </TestContext.Provider>
-        <MyComponent 
-          rootProps={{className: 'custom'}} 
-          buttonProps={{className: 'custom-button'}}
-          text={props => <p className="custom-text">{props.children}</p>}
-          />
         <button onClick={handleClick}>Test button</button>
       </header>
     </div>

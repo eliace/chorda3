@@ -1,8 +1,8 @@
-import { Blueprint, computable, Infer, observable } from "@chorda/core"
+import { Blueprint, computable, Infer, observable, watch } from "@chorda/core"
 import { ColumnLayout, MenuItem, RowLayout } from "chorda-bulma"
 import { Dropdown } from "../../helpers"
 import { COUNTRIES, Country } from "../../data"
-import { watch, withHtml, withBounds } from "../../utils"
+import { withHtml, withBounds } from "../../utils"
 import { withPortal } from "./common/with-portal"
 import { withParentScrollTop } from "./common/with-parent-scroll-top"
 
@@ -108,7 +108,7 @@ export default <T>() : Infer.Blueprint<T> => {
                                 updateBounds: ({$dom, bounds, active, $patcher, $renderer}) => {
                                     watch(() => {
                                         if ($dom.$value /*&& active.$value*/) {
-                                            $patcher.queue($renderer.fiber(() => {
+                                            $patcher.queue($renderer.effect(() => {
                                                 const prevDisplay = $dom.$value.style.display
                                                 $dom.$value.style.display = 'block'
                                                 bounds.$value = $dom.$value.getBoundingClientRect()

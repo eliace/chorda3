@@ -1,11 +1,11 @@
-import { callable, computable, HtmlScope, Injector, mix, reactive, patch, Scope, Blueprint, HtmlBlueprint, InferBlueprint, HtmlEvents, observable, BasicDomEvents } from "@chorda/core"
+import { callable, computable, HtmlScope, Injector, mix, reactive, patch, Scope, Blueprint, HtmlBlueprint, InferBlueprint, HtmlEvents, observable, BasicDomEvents, watch } from "@chorda/core"
 import { faAngleDown, faAngleUp, faCircleNotch } from "@fortawesome/free-solid-svg-icons"
 import { Button, ButtonPropsType } from "chorda-bulma"
 import { FaIcon } from "../FaIcon"
 import { DropdownMenu } from "./DropdownMenu"
 import { DropdownTrigger } from "./DropdownTrigger"
 import { MenuItem } from "./utils"
-import { watch, withBlueprint, withBounds, withIterableItems, withOuterClick, withOuterKeydown, withPreventDefaultMouseDown, withStopMouseDown } from '../../utils'
+import { withBounds, withIterableItems, withOuterClick, withOuterKeydown, withPreventDefaultMouseDown, withStopMouseDown } from '../../utils'
 import { DropdownItem } from "./DropdownItem"
 
 
@@ -118,7 +118,7 @@ export const Dropdown = <T extends Scope, E, I=MenuItem>(props: DropdownProps<T&
                                                 $dom.$value.scrollIntoView({block: 'nearest'})
                                             }
                                             else {
-                                                $patcher.queue($renderer.fiber(() => {
+                                                $patcher.queue($renderer.effect(() => {
                                                     $dom.$value.scrollIntoView({block: 'nearest'})
                                                 }))
                                             }

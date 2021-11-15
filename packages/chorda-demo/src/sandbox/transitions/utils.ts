@@ -1,5 +1,4 @@
-import { Blueprint, callable, HtmlScope, InferBlueprint, mix, observable } from "@chorda/core";
-import { watch } from "../../utils";
+import { Blueprint, callable, HtmlScope, InferBlueprint, mix, observable, watch } from "@chorda/core";
 
 
 const waitTransitionEnd = (el: Element, callback: Function) => {
@@ -49,7 +48,7 @@ export const withShowHide = <T, E>(props: Blueprint<T, E>, showName: string = 'f
 
                     el.classList.add(name+'-enter-active', name+'-enter')
                     
-                    $patcher.queue($renderer.fiber(() => {
+                    $patcher.queue($renderer.effect(() => {
                         if ($dom.$value == null) {
                             console.warn('dom detached')
                             return
@@ -57,14 +56,14 @@ export const withShowHide = <T, E>(props: Blueprint<T, E>, showName: string = 'f
                         console.log('show begin')
                         el.classList.remove(name+'-enter')    
                         // el.classList.add(name+'-leave-to')
-                        $patcher.queue($renderer.fiber(() => {
+                        $patcher.queue($renderer.effect(() => {
                             if ($dom.$value == null) {
                                 console.warn('dom detached')
                                 return
                             }
                             waitTransitionEnd(el, () => {
                                 console.log('show end')
-                                $patcher.queue($renderer.fiber(() => {
+                                $patcher.queue($renderer.effect(() => {
                                     el.classList.remove(name+'-enter-active')
 
                                     if (animation.$value == 'show') {
@@ -97,7 +96,7 @@ export const withShowHide = <T, E>(props: Blueprint<T, E>, showName: string = 'f
 
 //                    const cnt = performance.now()
                     
-                    $patcher.queue($renderer.fiber(() => {
+                    $patcher.queue($renderer.effect(() => {
                         if ($dom.$value == null) {
                             console.warn('dom detached')
                             done()
@@ -106,7 +105,7 @@ export const withShowHide = <T, E>(props: Blueprint<T, E>, showName: string = 'f
                         console.log('hide begin')
                         el.classList.remove(name+'-leave')    
                         el.classList.add(name+'-leave-to')
-                        $patcher.queue($renderer.fiber(() => {
+                        $patcher.queue($renderer.effect(() => {
                             if ($dom.$value == null) {
                                 console.warn('dom detached')
                                 done()
@@ -177,7 +176,7 @@ export const withFLIP = <T, E>(props: Blueprint<T&FLIPScope, E>) : InferBlueprin
 
                     el.style.transform = 'none'
 
-                    $patcher.queue($renderer.fiber(() => {
+                    $patcher.queue($renderer.effect(() => {
                         const bcr2 = el.getBoundingClientRect()
 
                         const dx = bcr.left - bcr2.left
@@ -193,7 +192,7 @@ export const withFLIP = <T, E>(props: Blueprint<T&FLIPScope, E>) : InferBlueprin
                         el.style.transition = 'none'
                         console.log('[flip] last+invert', dx, dy)
 
-                        $patcher.queue($renderer.fiber(() => {
+                        $patcher.queue($renderer.effect(() => {
 
                             el.getBoundingClientRect() // force reflow
 

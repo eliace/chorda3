@@ -1,10 +1,9 @@
-import { computable, DomNode, HtmlBlueprint, HtmlScope, Injector, iterable, Joint, Listener, mix, observable, Value } from "@chorda/core";
+import { computable, DomNode, HtmlBlueprint, HtmlScope, Injector, iterable, Joint, Listener, mix, observable, Value, watch } from "@chorda/core";
 import { ReactDomEvents } from "@chorda/react";
 import { faAngleDown, faAngleUp, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { Button } from "chorda-bulma";
-import { FaSvgIcon } from "./FaSvgIcon";
 import { FaIcon } from "./FaIcon";
-import { OuterClickEvent, stopMouseDown, watch, onOuterClick } from "../utils";
+import { OuterClickEvent, stopMouseDown, onOuterClick } from "../utils";
 
 
 // type MenuItem = {
